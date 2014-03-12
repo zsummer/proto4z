@@ -56,7 +56,7 @@ bool operator==(const tagData & tag1, const tagData &tag2)
 		&& tag1.str == tag2.str;
 }
 
-ReadStream & operator >>(ReadStream & rs, tagData & data)
+ReadStream<> & operator >>(ReadStream<> & rs, tagData & data)
 {
 	rs >> data.bl;
 	rs >> data.ch;
@@ -74,7 +74,7 @@ ReadStream & operator >>(ReadStream & rs, tagData & data)
 	rs >> data.str;
 	return rs;
 }
-WriteStream & operator <<(WriteStream & ws, const tagData & data)
+WriteStream<> & operator <<(WriteStream<> & ws, const tagData & data)
 {
 	ws << data.bl;
 	ws << data.ch;
@@ -128,7 +128,7 @@ int main()
 		Clear(test2);
 		//2head, 59 pod, 2 str head, 7 string char count.
 		const int protocolLen = 2+59+2+7;
-		WriteStream ws(buf, protocolLen, bigEndianType);
+		WriteStream<> ws;
 		try
 		{
 			ws << test1;
@@ -138,14 +138,14 @@ int main()
 			cout << e.what() << endl;
 		}
 
-		unsigned short headerlen = ReadStreamHeader(buf, bigEndianType);
+		unsigned short headerlen = StreamToInteger<DefaultStreamHeadTrait::Integer, DefaultStreamHeadTrait>(ws.GetWriteStream()+DefaultStreamHeadTrait::PreOffset); 
 		
 		if (headerlen != protocolLen)
 		{
 			cout << "read header len error" << endl;
 		}
 
-		ReadStream rs(buf, headerlen, bigEndianType);
+		ReadStream<> rs(ws.GetWriteStream(), ws.GetWriteLen());
 		try
 		{
 			rs >> test2;
@@ -163,15 +163,7 @@ int main()
 			cout <<"check lprotocol failed" << endl;
 		}
 
-		try
-		{
-			ws << char(1);
-			cout <<"Bounds check  WriteStream failed" << endl;
-		}
-		catch (std::runtime_error e)
-		{
-			cout <<"Bounds check  WriteStream success. "<< endl;
-		}
+
 		try
 		{
 			char ch = 'a';
