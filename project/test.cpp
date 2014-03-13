@@ -255,6 +255,103 @@ int main()
 		}
 	}
 
+	cout << "check attach stream" << endl;
+	//--------------------------
+	{
+		tagData test2 = { 0 };
+		char buff[100] = { 0 };
+		//2head, 59 pod, 2 str head, 7 string char count.
+		TestBigStreamHeadTrait::Integer packLen = 59 + 7 + TestBigStreamHeadTrait::PackLenSize * 2 + TestBigStreamHeadTrait::PreOffset + TestBigStreamHeadTrait::PostOffset;
+		WriteStream<TestBigStreamHeadTrait> ws(buff, packLen);
+		try
+		{
+			ws << test1;
+			cout << "write all type success" << endl;
+		}
+		catch (std::runtime_error e)
+		{
+			cout << "write all type failed. error=" << e.what() << endl;
+		}
+
+		TestBigStreamHeadTrait::Integer packLen2 = StreamToInteger<TestBigStreamHeadTrait::Integer, TestBigStreamHeadTrait>(ws.GetWriteStream() + TestBigStreamHeadTrait::PreOffset);
+		packLen2 += TestBigStreamHeadTrait::HeadLen;
+		if (packLen2 != packLen || packLen2 != ws.GetWriteLen())
+		{
+			cout << "check write packLen2 len error" << endl;
+		}
+		else
+		{
+			cout << "check write packLen2 len success" << endl;
+		}
+
+		std::pair<bool, TestBigStreamHeadTrait::Integer> ret = CheckBuffIntegrity<TestBigStreamHeadTrait>(ws.GetWriteStream(), 1, 100);
+		if (ret.first && ret.second == TestBigStreamHeadTrait::HeadLen - 1)
+		{
+			cout << "CheckBuffIntegrity check write header len success" << endl;
+		}
+		else
+		{
+			cout << "CheckBuffIntegrity check write header len failed" << endl;
+		}
+		ret = CheckBuffIntegrity<TestBigStreamHeadTrait>(ws.GetWriteStream(), 50, 100);
+		if (ret.first && ret.second == ws.GetWriteLen() - 50)
+		{
+			cout << "CheckBuffIntegrity check write header len success" << endl;
+		}
+		else
+		{
+			cout << "CheckBuffIntegrity check write header len failed" << endl;
+		}
+		ret = CheckBuffIntegrity<TestBigStreamHeadTrait>(ws.GetWriteStream(), ws.GetWriteLen(), 200);
+		if (ret.first && ret.second == 0)
+		{
+			cout << "CheckBuffIntegrity check write header len success" << endl;
+		}
+		else
+		{
+			cout << "CheckBuffIntegrity check write header len failed" << endl;
+		}
+		ReadStream<TestBigStreamHeadTrait> rs(ws.GetWriteStream(), ws.GetWriteLen());
+		try
+		{
+			rs >> test2;
+		}
+		catch (std::runtime_error e)
+		{
+			cout << e.what() << endl;
+		}
+		if (test1 == test2)
+		{
+			cout << "check protocol success" << endl;
+		}
+		else
+		{
+			cout << "check protocol failed" << endl;
+		}
+
+		try
+		{
+			char ch = 'a';
+			ws << ch;
+			cout << "Bounds check  WriteStream failed" << endl;
+		}
+		catch (std::runtime_error e)
+		{
+			cout << "Bounds check  WriteStream success." << endl;
+		}
+
+		try
+		{
+			char ch = 'a';
+			rs >> ch;
+			cout << "Bounds check  ReadStream failed" << endl;
+		}
+		catch (std::runtime_error e)
+		{
+			cout << "Bounds check  ReadStream success." << endl;
+		}
+	}
+
 	cout << "all check done . " << endl;
 	getchar();
 	return 0;
