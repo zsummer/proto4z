@@ -37,10 +37,10 @@
 
 /*
  * AUTHORS:  YaweiZhang <yawei_zhang@foxmail.com>
- * VERSION:  0.2
+ * VERSION:  0.3
  * PURPOSE:  A lightweight library for process protocol .
  * CREATION: 2013.07.04
- * LCHANGE:  2013.12.03
+ * LCHANGE:  2014.03.13
  * LICENSE:  Expat/MIT License, See Copyright Notice at the begin of this file.
  */
 
@@ -55,6 +55,9 @@
  * VERSION 0.1.0 <DATE: 2013.07.4>
  * 	create the first project.  
  * 	support big-endian or little-endian
+ * VERSION 0.3.0 <DATE: 2014.03.13>
+ *  support user-defined header
+ *  WriteStream auto alloc memory
  * 
  */
 #pragma once
@@ -106,7 +109,16 @@ struct DefaultStreamHeadTrait
 	const static ZSummer_EndianType EndianType = LittleEndian; //序列化时对整形的字节序
 };
 
-
+struct TestBigStreamHeadTrait
+{
+	typedef unsigned int Integer;
+	const static Integer PreOffset = 2; //前置偏移字节数
+	const static Integer PackLenSize = sizeof(Integer); //存储包长的内存字节数
+	const static Integer PostOffset = 4; //后置偏移字节数
+	const static Integer HeadLen = PreOffset + PackLenSize + PostOffset; //头部总长
+	const static bool PackLenIsContainHead = false; // 包长是否包括头部(不包含表示其长度为包体总长)
+	const static ZSummer_EndianType EndianType = BigEndian; //序列化时对整形的字节序
+};
 
 template<class Integer, class StreamHeadTrait>
 Integer StreamToInteger(const char stream[sizeof(Integer)])
@@ -121,11 +133,11 @@ Integer StreamToInteger(const char stream[sizeof(Integer)])
 	{
 		if (StreamHeadTrait::EndianType != LocalEndianType())
 		{
-			char *dst = (char*)&integer;
-			char *src = (char*)stream + integerLen;
+			unsigned char *dst = (unsigned char*)&integer;
+			unsigned char *src = (unsigned char*)stream + integerLen;
 			while (integerLen > 0)
 			{
-				*dst++ = *++src;
+				*dst++ = *--src;
 				integerLen --;
 			}
 		}
@@ -148,11 +160,11 @@ void IntegerToStream(Integer integer, char *stream)
 	{
 		if (StreamHeadTrait::EndianType != LocalEndianType())
 		{
-			char *src = (char*)&integer+integerLen;
-			char *dst = (char*)stream;
+			unsigned char *src = (unsigned char*)&integer + integerLen;
+			unsigned char *dst = (unsigned char*)stream;
 			while (integerLen > 0)
 			{
-				*dst++ = *++src;
+				*dst++ = *--src;
 				integerLen --;
 			}
 		}
@@ -166,12 +178,12 @@ void IntegerToStream(Integer integer, char *stream)
 
 //! return: -1:error,  0:ready, >0: need buff length to recv.
 template<class StreamHeadTrait>
-inline long long CheckBuffIntegrity(const char * buff, typename StreamHeadTrait::Integer curBuffLen, typename StreamHeadTrait::Integer maxBuffLen)
+inline std::pair<bool, typename StreamHeadTrait::Integer> CheckBuffIntegrity(const char * buff, typename StreamHeadTrait::Integer curBuffLen, typename StreamHeadTrait::Integer maxBuffLen)
 {
 	//! 检查包头是否完整
 	if (curBuffLen < StreamHeadTrait::HeadLen)
 	{
-		return StreamHeadTrait::HeadLen - curBuffLen;
+		return std::make_pair(true, StreamHeadTrait::HeadLen - curBuffLen);
 	}
 
 	//! 获取包长度
@@ -182,53 +194,36 @@ inline long long CheckBuffIntegrity(const char * buff, typename StreamHeadTrait:
 		packLen += StreamHeadTrait::HeadLen;
 		if (packLen < oldInteger) //over range
 		{
-			return -1;
+			return std::make_pair(false, curBuffLen);
 		}
 	}
 
 	//! check
 	if (packLen > maxBuffLen)
 	{
-		return -1;
+		return std::make_pair(false, curBuffLen);
 	}
 	if (packLen == curBuffLen)
 	{
-		return 0;
+		return std::make_pair(true, (typename StreamHeadTrait::Integer)0);
 	}
 	if (packLen < curBuffLen)
 	{
-		return -1;
+		return std::make_pair(false, curBuffLen);;
 	}
-	return packLen - curBuffLen;
+	return std::make_pair(true, packLen - curBuffLen);
 }
 
 
-template<class StreamHeadTrait>
-class Stream
-{
-public:
-	Stream()
-	{
-		m_dataLen = 0;
-		m_cursor = StreamHeadTrait::HeadLen;
-	}
-	Stream(typename StreamHeadTrait::Integer dataLen, typename StreamHeadTrait::Integer cursor)
-	{
-		m_dataLen = dataLen;
-		m_cursor = cursor;
-	}
-	virtual ~Stream(){}
-protected:
-	typename StreamHeadTrait::Integer m_dataLen;
-	typename StreamHeadTrait::Integer m_cursor;
-};
+
 
 template<class StreamHeadTrait=DefaultStreamHeadTrait, class AllocType = std::allocator<char> >
-class WriteStream :public Stream<StreamHeadTrait>
+class WriteStream
 {
 public:
-	WriteStream()
+	WriteStream(typename StreamHeadTrait::Integer nBufReserve = StreamHeadTrait::HeadLen)
 	{
+		m_data.reserve(nBufReserve);
 		m_data.resize(StreamHeadTrait::HeadLen, '\0');
 		m_cursor = StreamHeadTrait::HeadLen;
 		m_dataLen = (typename StreamHeadTrait::Integer) m_data.length();
@@ -304,12 +299,14 @@ public:
 	inline WriteStream & operator << (const std::string & data) { return *this << data.c_str();}
 private:
 	std::basic_string<char, std::char_traits<char>, AllocType> m_data;
+	typename StreamHeadTrait::Integer m_dataLen;
+	typename StreamHeadTrait::Integer m_cursor;
 };
 
 
 
 template<class StreamHeadTrait=DefaultStreamHeadTrait>
-class ReadStream :public Stream<StreamHeadTrait>
+class ReadStream
 {
 public:
 	ReadStream(const char *buf, typename StreamHeadTrait::Integer len)
@@ -338,6 +335,10 @@ public:
 	inline void MoveCursor(typename StreamHeadTrait::Integer unit)
 	{
 		m_cursor += unit;
+	}
+	inline typename StreamHeadTrait::Integer GetCursor()
+	{
+		return m_cursor;
 	}
 	template <class T>
 	inline ReadStream & ReadIntegerData(T & t, unsigned short len = sizeof(T))
@@ -401,7 +402,7 @@ public:
 	inline ReadStream & operator >> (std::string & data) 
 	{
 		typename StreamHeadTrait::Integer len = 0;
-		ReadSimpleData(len);
+		ReadIntegerData(len);
 		const char * p = PeekContentData(len);
 		data.assign(p, len);
 		SkipContentData(len);
@@ -409,6 +410,8 @@ public:
 	}
 private:
 	const char * m_data;
+	typename StreamHeadTrait::Integer m_dataLen;
+	typename StreamHeadTrait::Integer m_cursor;
 };
 
 
