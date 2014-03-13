@@ -2,6 +2,7 @@
 
 #include "../protocol4z.h"
 #include <iostream>
+#include <stdio.h>
 using namespace std;
 using namespace zsummer::protocol4z;
 
@@ -81,6 +82,7 @@ WriteStream<StreamHeadTrait> & operator <<(WriteStream<StreamHeadTrait> & ws, co
 int main()
 {
 
+
 	tagData test1 = {true, 'a', 200, -1, 65000, -2, 333,-3,111,-4,250, (float)123.2,123.4, "1234567"};
 
 
@@ -88,7 +90,7 @@ int main()
 	{
 		tagData test2 = { 0 };
 		//2head, 59 pod, 2 str head, 7 string char count.
-		DefaultStreamHeadTrait::Integer packLen = 59 + 7 + DefaultStreamHeadTrait::PackLenSize * 2 + DefaultStreamHeadTrait::EndianType + DefaultStreamHeadTrait::PostOffset;
+		DefaultStreamHeadTrait::Integer packLen = 59 + 7 + DefaultStreamHeadTrait::PackLenSize * 2 + DefaultStreamHeadTrait::PreOffset + DefaultStreamHeadTrait::PostOffset;
 		WriteStream<DefaultStreamHeadTrait> ws;
 		try
 		{
