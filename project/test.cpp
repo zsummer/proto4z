@@ -23,11 +23,13 @@ struct tagData
 	float f;
 	double lf;
 	std::string str;
+	std::vector<int> vct;
+	std::map<int, int> kv;
 };
 
 bool operator==(const tagData & tag1, const tagData &tag2)
 {
-	return tag1.bl == tag2.bl 
+	return tag1.bl == tag2.bl
 		&& tag1.ch == tag2.ch
 		&& tag1.uch == tag2.uch
 		&& tag1.ush == tag2.ush
@@ -39,7 +41,9 @@ bool operator==(const tagData & tag1, const tagData &tag2)
 		&& tag1.ull == tag2.ull
 		&& tag1.f == tag2.f
 		&& tag1.lf == tag2.lf
-		&& tag1.str == tag2.str;
+		&& tag1.str == tag2.str
+		&& tag1.vct.size() == tag2.vct.size()
+		&& tag1.kv.size() == tag2.kv.size();
 }
 template<class StreamHeadTrait>
 ReadStream<StreamHeadTrait> & operator >>(ReadStream<StreamHeadTrait> & rs, tagData & data)
@@ -58,6 +62,8 @@ ReadStream<StreamHeadTrait> & operator >>(ReadStream<StreamHeadTrait> & rs, tagD
 	rs >> data.f;
 	rs >> data.lf;
 	rs >> data.str;
+	rs >> data.vct;
+	rs >> data.kv;
 	return rs;
 }
 template<class StreamHeadTrait>
@@ -77,6 +83,8 @@ WriteStream<StreamHeadTrait> & operator <<(WriteStream<StreamHeadTrait> & ws, co
 	ws << data.f;
 	ws << data.lf;
 	ws << data.str;
+	ws << data.vct;
+	ws << data.kv;
 	return ws;
 }
 int main()
@@ -84,13 +92,16 @@ int main()
 
 
 	tagData test1 = {true, 'a', 200, -1, 65000, -2, 333,-3,111,-4,250, (float)123.2,123.4, "1234567"};
-
+	test1.vct.push_back(1);
+	test1.vct.push_back(2);
+	test1.kv[1] = 1;
+	test1.kv[100] = 100;
 
 	
 	{
 		tagData test2 = { 0 };
 		//2head, 59 pod, 2 str head, 7 string char count.
-		DefaultStreamHeadTrait::Integer packLen = 59 + 7 + DefaultStreamHeadTrait::PackLenSize * 2 + DefaultStreamHeadTrait::PreOffset + DefaultStreamHeadTrait::PostOffset;
+		DefaultStreamHeadTrait::Integer packLen = 59 + 7 + 8 + 16 +DefaultStreamHeadTrait::PackLenSize * 4 + DefaultStreamHeadTrait::PreOffset + DefaultStreamHeadTrait::PostOffset;
 		WriteStream<DefaultStreamHeadTrait> ws;
 		try
 		{
@@ -175,7 +186,7 @@ int main()
 	{
 		tagData test2 = { 0 };
 		//2head, 59 pod, 2 str head, 7 string char count.
-		TestBigStreamHeadTrait::Integer packLen = 59 + 7 + TestBigStreamHeadTrait::PackLenSize * 2 + TestBigStreamHeadTrait::PreOffset + TestBigStreamHeadTrait::PostOffset;
+		TestBigStreamHeadTrait::Integer packLen = 59 + 7 + 8 + 16 + TestBigStreamHeadTrait::PackLenSize * 4 + TestBigStreamHeadTrait::PreOffset + TestBigStreamHeadTrait::PostOffset;
 		WriteStream<TestBigStreamHeadTrait> ws;
 		try
 		{
@@ -207,7 +218,7 @@ int main()
 		{
 			cout << "CheckBuffIntegrity check write header len failed" << endl;
 		}
-		ret = CheckBuffIntegrity<TestBigStreamHeadTrait>(ws.GetWriteStream(), 50, 100);
+		ret = CheckBuffIntegrity<TestBigStreamHeadTrait>(ws.GetWriteStream(), 50, 200);
 		if (ret.first && ret.second == ws.GetWriteLen() - 50)
 		{
 			cout << "CheckBuffIntegrity check write header len success" << endl;
@@ -259,9 +270,9 @@ int main()
 	//--------------------------
 	{
 		tagData test2 = { 0 };
-		char buff[100] = { 0 };
+		char buff[200] = { 0 };
 		//2head, 59 pod, 2 str head, 7 string char count.
-		TestBigStreamHeadTrait::Integer packLen = 59 + 7 + TestBigStreamHeadTrait::PackLenSize * 2 + TestBigStreamHeadTrait::PreOffset + TestBigStreamHeadTrait::PostOffset;
+		TestBigStreamHeadTrait::Integer packLen = 59 + 7 + 8 + 16 + TestBigStreamHeadTrait::PackLenSize * 4 + TestBigStreamHeadTrait::PreOffset + TestBigStreamHeadTrait::PostOffset;
 		WriteStream<TestBigStreamHeadTrait> ws(buff, packLen);
 		try
 		{
@@ -293,7 +304,7 @@ int main()
 		{
 			cout << "CheckBuffIntegrity check write header len failed" << endl;
 		}
-		ret = CheckBuffIntegrity<TestBigStreamHeadTrait>(ws.GetWriteStream(), 50, 100);
+		ret = CheckBuffIntegrity<TestBigStreamHeadTrait>(ws.GetWriteStream(), 50, 200);
 		if (ret.first && ret.second == ws.GetWriteLen() - 50)
 		{
 			cout << "CheckBuffIntegrity check write header len success" << endl;

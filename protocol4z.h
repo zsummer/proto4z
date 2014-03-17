@@ -66,6 +66,8 @@
 
 #include <string.h>
 #include <string>
+#include <vector>
+#include <map>
 #include <assert.h>
 #ifndef WIN32
 #include <stdexcept>
@@ -241,7 +243,7 @@ public:
 		m_cursor = StreamHeadTrait::HeadLen;
 	}
 	~WriteStream(){}
-public:
+protected:
 	inline void CheckMoveCursor(typename StreamHeadTrait::Integer unit)
 	{
 		if (m_cursor >= m_maxDataLen)
@@ -274,17 +276,7 @@ public:
 			IntegerToStream<typename StreamHeadTrait::Integer, StreamHeadTrait>(packLen, &m_data[StreamHeadTrait::PreOffset]);
 		}
 	}
-	inline void GetPackHead(char packHead[StreamHeadTrait::HeadLen])
-	{
-		if (m_pAttachData)
-		{
-			memcpy(packHead, m_pAttachData, StreamHeadTrait::HeadLen);
-		}
-		else
-		{
-			memcpy(packHead, &m_data[0], StreamHeadTrait::HeadLen);
-		}
-	}
+
 	template <class T>
 	inline WriteStream<StreamHeadTrait> & WriteIntegerData(T t)
 	{
@@ -326,6 +318,19 @@ public:
 		FixPackLen();
 		return * this;
 	}
+
+public:
+	inline void GetPackHead(char packHead[StreamHeadTrait::HeadLen])
+	{
+		if (m_pAttachData)
+		{
+			memcpy(packHead, m_pAttachData, StreamHeadTrait::HeadLen);
+		}
+		else
+		{
+			memcpy(packHead, &m_data[0], StreamHeadTrait::HeadLen);
+		}
+	}
 	inline WriteStream<StreamHeadTrait> & WriteContentData(const void * data, typename StreamHeadTrait::Integer unit)
 	{
 		CheckMoveCursor(unit);
@@ -353,7 +358,11 @@ public:
 			return &m_data[0];
 		}
 	}
-	inline typename StreamHeadTrait::Integer GetWriteLen(){return m_cursor;}
+
+	inline typename StreamHeadTrait::Integer GetWriteLen()
+	{
+		return m_cursor;
+	}
 
 	inline WriteStream<StreamHeadTrait> & operator << (bool data) { return WriteSimpleData(data); }
 	inline WriteStream<StreamHeadTrait> & operator << (char data) { return WriteSimpleData(data); }
@@ -368,14 +377,7 @@ public:
 	inline WriteStream<StreamHeadTrait> & operator << (unsigned long long data) { return WriteIntegerData(data); }
 	inline WriteStream<StreamHeadTrait> & operator << (float data) { return WriteSimpleData(data); }
 	inline WriteStream<StreamHeadTrait> & operator << (double data) { return WriteSimpleData(data); }
-	inline WriteStream<StreamHeadTrait> & operator << (const char *const data)
-	{
-		typename StreamHeadTrait::Integer len = (typename StreamHeadTrait::Integer)strlen(data);
-		WriteIntegerData(len);
-		WriteContentData(data, len);
-		return *this;
-	}
-	inline WriteStream<StreamHeadTrait> & operator << (const std::string & data) { return *this << data.c_str(); }
+	
 private:
 	std::basic_string<char, std::char_traits<char>, AllocType > m_data;
 	char * m_pAttachData;
@@ -485,20 +487,106 @@ public:
 	inline ReadStream<StreamHeadTrait> & operator >> (unsigned long long & data) { return ReadIntegerData(data); }
 	inline ReadStream<StreamHeadTrait> & operator >> (float & data) { return ReadSimpleData(data); }
 	inline ReadStream<StreamHeadTrait> & operator >> (double & data) { return ReadSimpleData(data); }
-	inline ReadStream<StreamHeadTrait> & operator >> (std::string & data)
-	{
-		typename StreamHeadTrait::Integer len = 0;
-		ReadIntegerData(len);
-		const char * p = PeekContentData(len);
-		data.assign(p, len);
-		SkipContentData(len);
-		return *this;
-	}
 private:
 	const char * m_pAttachData;
 	typename StreamHeadTrait::Integer m_maxDataLen;
 	typename StreamHeadTrait::Integer m_cursor;
 };
+
+//write c-style string
+template<class StreamHeadTrait>
+inline WriteStream<StreamHeadTrait> & operator << (WriteStream<StreamHeadTrait> & ws, const char *const data)
+{
+	typename StreamHeadTrait::Integer len = (typename StreamHeadTrait::Integer)strlen(data);
+	ws << len;
+	ws.WriteContentData(data, len);
+	return ws;
+}
+
+//write std::string
+template<class StreamHeadTrait, class _Traits, class _Alloc>
+inline WriteStream<StreamHeadTrait> & operator << (WriteStream<StreamHeadTrait> & ws, const std::basic_string<char, _Traits, _Alloc> & data)
+{
+	typename StreamHeadTrait::Integer len = (typename StreamHeadTrait::Integer)data.length();
+	ws << len;
+	ws.WriteContentData(data.c_str(), len);
+	return ws;
+}
+//read std::string
+template<class StreamHeadTrait, class _Traits, class _Alloc>
+inline ReadStream<StreamHeadTrait> & operator >> (ReadStream<StreamHeadTrait> & rs, std::basic_string<char, _Traits, _Alloc> & data)
+{
+	typename StreamHeadTrait::Integer len = 0;
+	rs >> len;
+	data.assign(rs.PeekContentData(len), len);
+	rs.SkipContentData(len);
+	return rs;
+}
+
+
+//std::vector
+template<class StreamHeadTrait, class T, class _Alloc>
+inline WriteStream<StreamHeadTrait> & operator << (WriteStream<StreamHeadTrait> & ws, const std::vector<T, _Alloc> & vct)
+{
+	ws << (typename StreamHeadTrait::Integer)vct.size();
+	for (typename std::vector<T, _Alloc>::const_iterator iter = vct.begin(); iter != vct.end(); ++iter)
+	{
+		ws << *iter;
+	}
+	return ws;
+}
+
+template<class StreamHeadTrait, typename T, class _Alloc>
+inline ReadStream<StreamHeadTrait> & operator >> (ReadStream<StreamHeadTrait> & rs, std::vector<T, _Alloc> & vct)
+{
+	typename StreamHeadTrait::Integer totalCount = 0;
+	rs >> totalCount;
+	for (typename StreamHeadTrait::Integer i = 0; i < totalCount; ++i)
+	{
+		T t;
+		rs >> t;
+		vct.push_back(t);
+	}
+	if (vct.size() != totalCount)
+	{
+		throw std::runtime_error("read stream data to vector error.");
+	}
+	return rs;
+}
+
+
+//std::map
+template<class StreamHeadTrait, class Key, class Value, class ls, class _Alloc>
+inline WriteStream<StreamHeadTrait> & operator << (WriteStream<StreamHeadTrait> & ws, const std::map<Key, Value, ls, _Alloc> & kv)
+{
+	ws << (typename StreamHeadTrait::Integer)kv.size();
+	for (typename std::map<Key, Value, ls, _Alloc>::const_iterator iter = kv.begin(); iter != kv.end(); ++iter)
+	{
+		ws << iter->first;
+		ws << iter->second;
+	}
+	return ws;
+}
+
+template<class StreamHeadTrait, class Key, class Value, class ls, class _Alloc>
+inline ReadStream<StreamHeadTrait> & operator >> (ReadStream<StreamHeadTrait> & rs, std::map<Key, Value, ls, _Alloc> & kv)
+{
+	typename StreamHeadTrait::Integer totalCount = 0;
+	rs >> totalCount;
+	for (typename StreamHeadTrait::Integer i = 0; i < totalCount; ++i)
+	{
+		std::pair<Key, Value> pr;
+		rs >> pr.first;
+		rs >> pr.second;
+		kv.insert(pr);
+	}
+	if (kv.size() != totalCount)
+	{
+		throw std::runtime_error("read stream data to map error.");
+	}
+	return rs;
+}
+
 
 
 #ifndef _ZSUMMER_END
