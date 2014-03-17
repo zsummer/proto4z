@@ -25,6 +25,12 @@ struct tagData
 	std::string str;
 	std::vector<int> vct;
 	std::map<int, int> kv;
+	std::set<int> st;
+	std::multimap<int,int> mkv;
+	std::multiset<int> mst;
+	std::list<int> lt;
+	std::deque<int> dq;
+	std::queue<int> qu;
 };
 
 bool operator==(const tagData & tag1, const tagData &tag2)
@@ -43,7 +49,12 @@ bool operator==(const tagData & tag1, const tagData &tag2)
 		&& tag1.lf == tag2.lf
 		&& tag1.str == tag2.str
 		&& tag1.vct.size() == tag2.vct.size()
-		&& tag1.kv.size() == tag2.kv.size();
+		&& tag1.kv.size() == tag2.kv.size()
+		&& tag1.st.size() == tag2.st.size()
+		&& tag1.mkv.size() == tag2.mkv.size()
+		&& tag1.mst.size() == tag2.mst.size()
+		&& tag1.lt.size() == tag2.lt.size()
+		&& tag1.dq.size() == tag2.dq.size();
 }
 template<class StreamHeadTrait>
 ReadStream<StreamHeadTrait> & operator >>(ReadStream<StreamHeadTrait> & rs, tagData & data)
@@ -64,6 +75,11 @@ ReadStream<StreamHeadTrait> & operator >>(ReadStream<StreamHeadTrait> & rs, tagD
 	rs >> data.str;
 	rs >> data.vct;
 	rs >> data.kv;
+	rs >> data.st;
+	rs >> data.mkv;
+	rs >> data.mst;
+	rs >> data.lt;
+	rs >> data.dq;
 	return rs;
 }
 template<class StreamHeadTrait>
@@ -85,23 +101,36 @@ WriteStream<StreamHeadTrait> & operator <<(WriteStream<StreamHeadTrait> & ws, co
 	ws << data.str;
 	ws << data.vct;
 	ws << data.kv;
+	ws << data.st;
+	ws << data.mkv;
+	ws << data.mst;
+	ws << data.lt;
+	ws << data.dq;
 	return ws;
 }
 int main()
 {
-
 
 	tagData test1 = {true, 'a', 200, -1, 65000, -2, 333,-3,111,-4,250, (float)123.2,123.4, "1234567"};
 	test1.vct.push_back(1);
 	test1.vct.push_back(2);
 	test1.kv[1] = 1;
 	test1.kv[100] = 100;
+	test1.st.insert(10);
+	test1.mkv.insert(std::make_pair(10,10));
+	test1.mkv.insert(std::make_pair(10,100));
+	test1.mst.insert(100);
+	test1.mst.insert(100);
+	test1.lt.push_back(10);
+	test1.dq.push_back(100);
+	const unsigned int bodyLength = 59 + 7 +8 + 16 + 4+16+8+4+4;
+	const unsigned int Count = 9;
+
 
 	
 	{
 		tagData test2 = { 0 };
-		//2head, 59 pod, 2 str head, 7 string char count.
-		DefaultStreamHeadTrait::Integer packLen = 59 + 7 + 8 + 16 +DefaultStreamHeadTrait::PackLenSize * 4 + DefaultStreamHeadTrait::PreOffset + DefaultStreamHeadTrait::PostOffset;
+		DefaultStreamHeadTrait::Integer packLen = bodyLength +DefaultStreamHeadTrait::PackLenSize * Count + DefaultStreamHeadTrait::PreOffset + DefaultStreamHeadTrait::PostOffset;
 		WriteStream<DefaultStreamHeadTrait> ws;
 		try
 		{
@@ -133,7 +162,7 @@ int main()
 		{
 			cout << "CheckBuffIntegrity check write header len failed" << endl;
 		}
-		ret = CheckBuffIntegrity<DefaultStreamHeadTrait>(ws.GetWriteStream(), 50, 100);
+		ret = CheckBuffIntegrity<DefaultStreamHeadTrait>(ws.GetWriteStream(), 50, 200);
 		if (ret.first && ret.second == ws.GetWriteLen() - 50)
 		{
 			cout << "CheckBuffIntegrity check write header len success" << endl;
@@ -181,12 +210,11 @@ int main()
 		}
 	}
 
-	cout << "check big stream" << endl;
+	cout << "\n\ncheck big stream" << endl;
 	//--------------------------
 	{
 		tagData test2 = { 0 };
-		//2head, 59 pod, 2 str head, 7 string char count.
-		TestBigStreamHeadTrait::Integer packLen = 59 + 7 + 8 + 16 + TestBigStreamHeadTrait::PackLenSize * 4 + TestBigStreamHeadTrait::PreOffset + TestBigStreamHeadTrait::PostOffset;
+		TestBigStreamHeadTrait::Integer packLen = bodyLength + TestBigStreamHeadTrait::PackLenSize * Count + TestBigStreamHeadTrait::PreOffset + TestBigStreamHeadTrait::PostOffset;
 		WriteStream<TestBigStreamHeadTrait> ws;
 		try
 		{
@@ -266,13 +294,13 @@ int main()
 		}
 	}
 
-	cout << "check attach stream" << endl;
+	cout << "\n\ncheck attach stream" << endl;
 	//--------------------------
 	{
 		tagData test2 = { 0 };
 		char buff[200] = { 0 };
-		//2head, 59 pod, 2 str head, 7 string char count.
-		TestBigStreamHeadTrait::Integer packLen = 59 + 7 + 8 + 16 + TestBigStreamHeadTrait::PackLenSize * 4 + TestBigStreamHeadTrait::PreOffset + TestBigStreamHeadTrait::PostOffset;
+
+		TestBigStreamHeadTrait::Integer packLen = bodyLength + TestBigStreamHeadTrait::PackLenSize * Count + TestBigStreamHeadTrait::PreOffset + TestBigStreamHeadTrait::PostOffset;
 		WriteStream<TestBigStreamHeadTrait> ws(buff, packLen);
 		try
 		{
