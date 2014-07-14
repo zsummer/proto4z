@@ -177,7 +177,7 @@ public:
 							dtype = "std::string";
 						}
 						enumText += "\t";
-						enumText += dtype + " = " + member->second.get<std::string>("<xmlattr>.value")  + " //" + iter->second.get<std::string>("<xmlattr>.desc") + ",\n";
+						enumText += dtype + " = " + member->second.get<std::string>("<xmlattr>.value")  + ", //" + iter->second.get<std::string>("<xmlattr>.desc") + ",\n";
 					}
 					enumText += "};\n";
 					os.write(enumText.c_str(), enumText.length());
