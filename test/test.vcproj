@@ -334,7 +334,7 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\protocol4z.h"
+				RelativePath="..\proto4z.h"
 				>
 			</File>
 		</Filter>
