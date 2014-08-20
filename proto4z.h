@@ -71,9 +71,7 @@
 #pragma once
 #ifndef _PROTO4Z_H_
 #define _PROTO4Z_H_
-#ifndef _CRT_SECURE_NO_WARNINGS
-#define _CRT_SECURE_NO_WARNINGS
-#endif
+
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -98,7 +96,6 @@
 #endif
 _ZSUMMER_BEGIN
 _ZSUMMER_PROTO4Z_BEGIN
-
 
 
 enum ZSummer_EndianType
@@ -1193,8 +1190,15 @@ inline INTEGRITY_RET_TYPE CheckHTTPBuffIntegrity(const char * buff, unsigned int
 		}
 	} while (true);
 
+	//check unsupport chunked
+	HTTPHeadMap::iterator iter = head.find("Transfer-Encoding");
+	if (iter != head.end() && iter->second.find("chunked") != std::string::npos)
+	{
+		return IRT_CORRUPTION;
+	}
+	
 	//check body
-	HTTPHeadMap::iterator iter = head.find("Content-Length");
+	iter = head.find("Content-Length");
 	if (iter == head.end() || atoi(iter->second.c_str()) == 0)
 	{
 		usedCount = cursor;
