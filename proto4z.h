@@ -71,7 +71,9 @@
 #pragma once
 #ifndef _PROTO4Z_H_
 #define _PROTO4Z_H_
-
+#ifndef _CRT_SECURE_NO_WARNINGS
+#define _CRT_SECURE_NO_WARNINGS
+#endif
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -96,6 +98,7 @@
 #endif
 _ZSUMMER_BEGIN
 _ZSUMMER_PROTO4Z_BEGIN
+
 
 
 enum ZSummer_EndianType
@@ -1056,11 +1059,11 @@ inline void ReadStream<StreamHeadTrait>::SkipOriginalData(Integer unit)
 
 
 
-const char * CRLF = "\r\n";
+const char * const CRLF = "\r\n";
 typedef std::map<std::string, std::string> HTTPHeadMap;
 
-INTEGRITY_RET_TYPE CheckWebBuffIntegrity(const char * buff, unsigned int curBuffLen, unsigned int maxBuffLen, 
-										 HTTPHeadMap & head, const char * & body, unsigned int &bodyLen);
+inline INTEGRITY_RET_TYPE CheckHTTPBuffIntegrity(const char * buff, unsigned int curBuffLen, unsigned int maxBuffLen,
+										HTTPHeadMap & head, std::string & body, unsigned int &usedCount);
 class WriteHTTP
 {
 public:
@@ -1111,8 +1114,8 @@ private:
 };
 
 
-INTEGRITY_RET_TYPE CheckHTTPBuffIntegrity(const char * buff, unsigned int curBuffLen, unsigned int maxBuffLen, 
-										 HTTPHeadMap & head, const char * & body, unsigned int &bodyLen)
+inline INTEGRITY_RET_TYPE CheckHTTPBuffIntegrity(const char * buff, unsigned int curBuffLen, unsigned int maxBuffLen, 
+										 HTTPHeadMap & head, std::string & body, unsigned int &usedCount)
 {
 	//check head
 	unsigned int cursor = 0;
@@ -1194,8 +1197,7 @@ INTEGRITY_RET_TYPE CheckHTTPBuffIntegrity(const char * buff, unsigned int curBuf
 	HTTPHeadMap::iterator iter = head.find("Content-Length");
 	if (iter == head.end() || atoi(iter->second.c_str()) == 0)
 	{
-		body = buff+cursor;
-		bodyLen = 0;
+		usedCount = cursor;
 		return IRT_SUCCESS;
 	}
 	unsigned int len = atoi(iter->second.c_str());
@@ -1208,9 +1210,8 @@ INTEGRITY_RET_TYPE CheckHTTPBuffIntegrity(const char * buff, unsigned int curBuf
 		return IRT_SHORTAGE;
 	}
 	
-
-	body = buff+cursor;
-	bodyLen = len;
+	body.assign(buff + cursor, len);
+	usedCount = cursor + len;
 	return IRT_SUCCESS;
 }
 

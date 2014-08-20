@@ -21,9 +21,9 @@ public:
 	{
 
 		HTTPHeadMap head;
-		const char * body;
-		unsigned int bodylen = 0;
-		if (CheckHTTPBuffIntegrity(wh.GetStream(), wh.GetStreamLen(), 1024, head, body, bodylen) == IRT_SUCCESS)
+		std::string body;
+		unsigned int usedLen = 0;
+		if (CheckHTTPBuffIntegrity(wh.GetStream(), wh.GetStreamLen(), 1024, head, body, usedLen) == IRT_SUCCESS)
 		{
 			if (head.find("Host") != head.end()
 				&& (
@@ -44,12 +44,12 @@ public:
 			cout << "Check CheckHTTPBuffIntegrity unpack error. ret =" << (IRT_SHORTAGE ? "IRT_SHORTAGE":"IRT_CORRUPTION") << endl;
 			return false;
 		}
-		if (CheckHTTPBuffIntegrity(wh.GetStream(), wh.GetStreamLen()-1, 1024, head, body, bodylen) != IRT_SHORTAGE)
+		if (CheckHTTPBuffIntegrity(wh.GetStream(), wh.GetStreamLen()-1, 1024, head, body, usedLen) != IRT_SHORTAGE)
 		{
 			cout << "Check CheckHTTPBuffIntegrity IRT_SHORTAGE error" << endl;
 			return false;
 		}
-		if (CheckHTTPBuffIntegrity(wh.GetStream(), wh.GetStreamLen(), wh.GetStreamLen()-1, head, body, bodylen) != IRT_CORRUPTION)
+		if (CheckHTTPBuffIntegrity(wh.GetStream(), wh.GetStreamLen(), wh.GetStreamLen() - 1, head, body, usedLen) != IRT_CORRUPTION)
 		{
 			cout << "Check CheckHTTPBuffIntegrity IRT_CORRUPTION error" << endl;
 			return false;
