@@ -73,6 +73,8 @@
 #define _PROTO4Z_H_
 
 #include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <string>
 #include <vector>
 #include <map>
@@ -1071,7 +1073,7 @@ public:
 	void Post(std::string uri, std::string content)
 	{
 		char buf[100];
-		sprintf(buf, "%u", content.length());
+		sprintf(buf, "%u", (unsigned int)content.length());
 		m_head.insert(std::make_pair("Content-Length", buf));
 		m_buff.append("POST " + uri + " HTTP/1.1" + CRLF);
 		WriteGeneralHead();
@@ -1085,12 +1087,15 @@ public:
 		WriteGeneralHead();
 		m_buff.append(CRLF);
 	}
-	void Result(std::string statusCode)
+	void Response(std::string statusCode, std::string content)
 	{
-		m_head.insert(std::make_pair("Content-Length", "0"));
+		char buf[100];
+		sprintf(buf, "%u", (unsigned int)content.length());
+		m_head.insert(std::make_pair("Content-Length", buf));
 		m_buff.append("HTTP/1.1 " + statusCode + " ^o^" + CRLF);
 		WriteGeneralHead();
 		m_buff.append(CRLF);
+		m_buff.append(content);
 	}
 protected:
 	void WriteGeneralHead()
@@ -1152,7 +1157,7 @@ INTEGRITY_RET_TYPE CheckHTTPBuffIntegrity(const char * buff, unsigned int curBuf
 			}
 			else if (content.substr(0, 4) == "HTTP")
 			{
-				key = "RESULT";
+				key = "RESPONSE";
 			}
 			else
 			{

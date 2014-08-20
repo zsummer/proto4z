@@ -53,7 +53,7 @@ int main()
 	WriteHTTP whResult;
 	whResult.AddHead("test", "test");
 	whResult.AddHead("Host", "www.google.com");
-	whResult.Result("200");
+	whResult.Response("200", "");
 	th.Test(whResult);
 
 	cout << "press any key to continue." << endl;

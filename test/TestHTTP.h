@@ -29,7 +29,7 @@ public:
 				&& (
 					  head.find("GET") != head.end()
 					|| head.find("POST") != head.end()
-					|| head.find("RESULT") != head.end()))
+					|| head.find("RESPONSE") != head.end()))
 			{
 				cout << "Check CheckHTTPBuffIntegrity Success" << endl;
 			}
