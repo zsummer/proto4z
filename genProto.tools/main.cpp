@@ -43,13 +43,14 @@
 #include "utility.h"
 #include "log4z.h"
 #include "tinyxml2.h"
-
+#include "md5.h"
 #ifndef WIN32
 #include <sys/stat.h>
 #else
 #include <direct.h>
 #endif
 
+//数组
 struct DataArray
 {
 	std::string type;
@@ -57,6 +58,7 @@ struct DataArray
 	std::string desc;
 };
 
+//map
 struct DataMap
 {
 	std::string typeKey;
@@ -65,6 +67,7 @@ struct DataMap
 	std::string desc;
 };
 
+//常量
 struct DataConstValue 
 {
 	std::string type;
@@ -73,12 +76,23 @@ struct DataConstValue
 	std::string desc;
 };
 
+//(结构体)成员
 struct DataMember 
 {
 	std::string type;
 	std::string name;
 	std::string desc;
 };
+
+//结构体
+struct GeneralStruct
+{
+	std::string name;
+	std::string desc;
+	std::vector<DataMember> members;
+};
+
+// 协议包
 struct ProtoStruct
 {
 	std::string from;
@@ -87,19 +101,20 @@ struct ProtoStruct
 	unsigned short protoID;
 	std::string desc;
 	std::vector<DataMember> members;
-
 };
 
-struct GeneralStruct 
+struct DataCache 
 {
-	std::string name;
-	std::string desc;
-	std::vector<DataMember> members;
+	std::string protoName;
+	unsigned int protoValue;
 };
 
-const std::string LFCR = "\r\n";
 
+const std::string LFCR = "\n";
+
+//生成协议ID名字
 std::string genProtoIDName(const ProtoStruct & ps){return "ID_" + ps.from + "2" + ps.to + "_" + ps.name;}
+//生成协议结构体名字
 std::string genProtoStructName(const ProtoStruct & ps){ return "Proto"  + ps.name; }
 
 
@@ -259,7 +274,7 @@ using namespace tinyxml2;
 class genProto
 {
 public:
-	std::map<std::string, unsigned short> m_mapCacheNo;
+
 	bool LoadCache(std::string filename)
 	{
 		LOGI("LoadCache [" << filename << "] ...");
@@ -277,6 +292,13 @@ public:
 			doc.PrintError();
 			return false;
 		}
+
+		XMLElement * md5 = doc.FirstChildElement("md5");
+		if (md5 && md5->GetText())
+		{
+			m_md5 = md5->GetText();
+		}
+
 		XMLElement * cacheEles = doc.FirstChildElement("CacheNo");
 		if (cacheEles == NULL)
 		{
@@ -284,6 +306,7 @@ public:
 			doc.PrintError();
 			return false;
 		}
+
 		XMLElement * next = cacheEles->FirstChildElement("cache");
 		do 
 		{
@@ -293,13 +316,17 @@ public:
 			}
 			const char * key = next->Attribute("key");
 			const char * No = next->Attribute("No");
-			if (key == NULL || No == NULL)
+			const char * md5 = next->Attribute("md5");
+			if (key == NULL || No == NULL || md5 == NULL)
 			{
 				LOGE("cache file is invalid. cachefile=" << cachename);
 				doc.PrintError();
 				return false;
 			}
-			m_mapCacheNo.insert(std::make_pair(key, atoi(No)));
+			DataCache dc;
+			dc.protoName = key;
+			dc.protoValue = atoi(No);
+			m_mapCacheNo.insert(std::make_pair(key, dc));
 			if (m_curNo <= atoi(No))
 			{
 				m_curNo = atoi(No) + 1;
@@ -313,7 +340,9 @@ public:
 	unsigned short m_minNo = 0;
 	unsigned short m_maxNo = 0;
 	unsigned short m_curNo = 0;
-	bool m_bUseLog4z = false;
+	std::string m_md5;
+	std::map<std::string, DataCache> m_mapCacheNo;
+
 
 	bool gen(std::string filename)
 	{
@@ -324,6 +353,14 @@ public:
 			LOGD(filename << " not found.");
 			return false;
 		}
+		std::string md5 = genFileMD5(filename);
+		if (md5 == m_md5)
+		{
+			LOGD("skip genProto. file not change. filename=" << filename);
+			return true;
+		}
+		
+
 		//读取文件
 		tinyxml2::XMLDocument doc;
 		if (doc.LoadFile(filename.c_str()) != tinyxml2::XML_SUCCESS)
@@ -377,16 +414,18 @@ public:
 
 			std::ofstream os;
 			os.open(std::string("C++/") + cppFileName, std::ios::binary);
+			
 			if (!os.is_open())
 			{
-				throw std::runtime_error("open cppFileName Error");
+				LOGE("open cppFileName Error. : " << std::string("C++/") + cppFileName);
+				return false;
 			}
 			std::string filehead = "#ifndef " + macroFileName + LFCR;
 			filehead += "#define " + macroFileName + LFCR;
 
 			os.write(filehead.c_str(), filehead.length());
 
-			zsummer::utility::CreateDir("C++");
+			
 
 
 			XMLElement * ele = doc.FirstChildElement("Proto");
@@ -446,12 +485,15 @@ public:
 						auto iterNo = m_mapCacheNo.find(idName);
 						if (iterNo == m_mapCacheNo.end())
 						{
-							m_mapCacheNo[idName] = No;
+							DataCache dc;
+							dc.protoName = idName;
+							dc.protoValue = No;
+							m_mapCacheNo[idName] = dc;
 							m_curNo++;
 						}
 						else
 						{
-							No = iterNo->second;
+							No = iterNo->second.protoValue;
 						}
 						if (No >= m_maxNo)
 						{
@@ -557,6 +599,13 @@ public:
 
 	bool WriteNoCache(std::string filename)
 	{
+		std::string md5 = genFileMD5(filename);
+		if (md5 == m_md5)
+		{
+			LOGD("skip WriteNoCache. file not change. filename=" << filename);
+			return true;
+		}
+		
 		LOGI("WriteNoCache [" << filename + ".cache" << "] ...");
 		std::ofstream os;
 		os.open(filename + ".cache", std::ios::binary);
@@ -565,10 +614,15 @@ public:
 			LOGE(filename + ".cache" << " can not open!.");
 			return false;
 		}
-		std::string text = "<?xml version=\"1.0\" encoding=\"UTF - 8\"?>\n<CacheNo>\n";
+		std::string text = "<?xml version=\"1.0\" encoding=\"UTF - 8\"?>\n\n";
+		text += "<md5>";
+		text += boost::lexical_cast<std::string>(md5);
+		text += "</md5>\n\n";
+		text += "<CacheNo>\n";
 		for (auto &pr : m_mapCacheNo)
 		{
-			text += "\t<cache key = \"" + pr.first + "\" No = \"" + boost::lexical_cast<std::string>(pr.second) + "\" /> \n";
+			text += "\t<cache key = \"" + pr.first + 
+				"\" No = \"" + boost::lexical_cast<std::string>(pr.second.protoValue) + "\" /> \n";
 		}
 		text += "</CacheNo>\n"; 
 		os.write(text.c_str(), text.length());
@@ -600,6 +654,13 @@ int main(int argc, char *argv[])
 	}
 	LOGA("FOUND FILE COUNT = " << files.size());
 	std::cout << "\r\n" << std::endl;
+
+	if (!IsDirectory("C++") && !CreateDir("C++"))
+	{
+		LOGE("CreateDir C++ Error. ");
+		return 0;
+	}
+	
 	for (auto & file : files)
 	{
 		std::string filename = file.filename;
