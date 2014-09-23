@@ -21,9 +21,13 @@
   <ItemGroup>
     <ClCompile Include="log4z.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="tinyxml2.cpp" />
+    <ClCompile Include="utility.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="log4z.h" />
+    <ClInclude Include="tinyxml2.h" />
+    <ClInclude Include="utility.h" />
   </ItemGroup>
   <ItemGroup>
     <Xml Include="ControlProto.No.xml" />

@@ -34,18 +34,15 @@
  * (end of COPYRIGHT)
  */
 
-#include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/xml_parser.hpp>
-#include <boost/lexical_cast.hpp>
-#include <boost/filesystem.hpp>
-#include <boost/filesystem/path.hpp>
-#include <boost/filesystem/operations.hpp>
-#include "log4z.h"
+
+#include <vector>
 #include <map>
 #include <iostream>
 #include <fstream>
 #include <sstream>
-
+#include "utility.h"
+#include "log4z.h"
+#include "tinyxml2.h"
 
 #ifndef WIN32
 #include <sys/stat.h>
@@ -257,40 +254,59 @@ std::string WriteCppProto(const ProtoStruct & ps)
 }
 
 
+using namespace tinyxml2;
+
 class genProto
 {
 public:
 	std::map<std::string, unsigned short> m_mapCacheNo;
 	bool LoadCache(std::string filename)
 	{
-		try
+		LOGI("LoadCache [" << filename << "] ...");
+		std::string cachename = filename + ".cache";
+		if (!zsummer::utility::GetFileStatus(cachename, 6))
 		{
-			boost::property_tree::ptree pt;
-			boost::property_tree::read_xml(filename+".cache", pt);
-			auto keys = pt.get_child("CacheNo");
-			for (auto iter = keys.begin(); iter != keys.end(); ++iter)
-			{
+			LOGD("LoadCache [" << cachename << " not found.");
+			return true;
+		}
 
-				std::string key = iter->second.get<std::string>("<xmlattr>.key");
-				unsigned short value = iter->second.get<unsigned short>("<xmlattr>.No");
-				m_mapCacheNo.insert(std::make_pair(key, value));
+		tinyxml2::XMLDocument doc;
+		if (doc.LoadFile(cachename.c_str()) != tinyxml2::XML_SUCCESS)
+		{
+			LOGE(cachename << " Load Error. ");
+			doc.PrintError();
+			return false;
+		}
+		XMLElement * cacheEles = doc.FirstChildElement("CacheNo");
+		if (cacheEles == NULL)
+		{
+			LOGE("doc.FirstChildElement(\"CacheNo\") Error.");
+			doc.PrintError();
+			return false;
+		}
+		XMLElement * next = cacheEles->FirstChildElement("cache");
+		do 
+		{
+			if (next == NULL)
+			{
+				break;
 			}
-		}
-		catch (std::string err)
-		{
-			LOGW("LoadCache catch exception: error=" << err);
-			return false;
-		}
-		catch (std::exception e)
-		{
-			LOGW("LoadCache catch exception: error=" << e.what());
-			return false;
-		}
-		catch (...)
-		{
-			LOGW("LoadCache catch exception: unknow exception.");
-			return false;
-		}
+			const char * key = next->Attribute("key");
+			const char * No = next->Attribute("No");
+			if (key == NULL || No == NULL)
+			{
+				LOGE("cache file is invalid. cachefile=" << cachename);
+				doc.PrintError();
+				return false;
+			}
+			m_mapCacheNo.insert(std::make_pair(key, atoi(No)));
+			if (m_curNo <= atoi(No))
+			{
+				m_curNo = atoi(No) + 1;
+			}
+			
+			next = next->NextSiblingElement();
+		} while (true);
 		return true;
 	}
 
@@ -301,55 +317,64 @@ public:
 
 	bool gen(std::string filename)
 	{
-		try
+		LOGI("gen [" << filename << "] ...");
+		//检测文件状态
+		if (!zsummer::utility::GetFileStatus(filename, 6))
 		{
-			boost::property_tree::ptree pt;
-			boost::property_tree::read_xml(filename, pt);
-			try
-			{
-				auto traits = pt.get_child("ProtoTraits");
-				m_minNo = boost::lexical_cast<unsigned short>(traits.get_child("MinNo").data());
-				m_maxNo = boost::lexical_cast<unsigned short>(traits.get_child("MaxNo").data());
-			}
-			catch (...)
-			{
+			LOGD(filename << " not found.");
+			return false;
+		}
+		//读取文件
+		tinyxml2::XMLDocument doc;
+		if (doc.LoadFile(filename.c_str()) != tinyxml2::XML_SUCCESS)
+		{
+			LOGE(filename << " Load Error. ");
+			doc.PrintError();
+			return false;
+		}
 
+		//解析traits
+		{
+			XMLElement * ele = doc.FirstChildElement("ProtoTraits");
+			if (ele == NULL)
+			{
+				LOGE("doc.FirstChildElement(\"ProtoTraits\") Error.");
+				doc.PrintError();
+				return false;
 			}
-
+			auto MinNo = ele->FirstChildElement("MinNo");
+			auto MaxNo = ele->FirstChildElement("MaxNo");
+			
+			if (!MinNo || !MinNo->GetText() || !MaxNo || ! MaxNo->GetText())
+			{
+				LOGE("FirstChildElement(\"MinNo\") || FirstChildElement(\"MaxNo\")  Error");
+				doc.PrintError();
+				return false;
+			}
+			m_minNo = atoi(MinNo->GetText());
+			m_maxNo = atoi(MaxNo->GetText());
 			if (m_curNo < m_minNo)
 			{
 				m_curNo = m_minNo;
 			}
-
-			for (auto & pr : m_mapCacheNo)
+			if (m_curNo > m_maxNo)
 			{
-				if (pr.second < m_minNo || pr.second >= m_maxNo)
-				{
-					throw std::runtime_error("No.xml have error. please remove No.xml file and re-genProto.");
-				}
-				if (pr.second >= m_curNo)
-				{
-					m_curNo = pr.second + 1;
-				}
-				
+				LOGE("Current cache Proto No Error. CurNo=" << m_curNo << ", minNo=" << m_minNo << ", maxNo=" << m_maxNo);
+				return false;
 			}
+		}
+		LOGI("gen [" << filename << "] CurProtoNo=" << m_curNo << ", minProtoNo=" << m_minNo << ", maxProtoNo=" << m_maxNo);
 
 
-			
-
-			auto protos = pt.get_child("Proto", pt);
+		//解析proto
+		{
 			std::string cppFileName = filename;
 			cppFileName = cppFileName.substr(0, cppFileName.length() - 4);
 			std::string macroFileName = "_";
 			macroFileName += cppFileName;
 			macroFileName += "_H_";
 			cppFileName += ".h";
-#ifndef WIN32
-			mkdir("C++");
-#else
-			_mkdir("C++");
-#endif
-			
+
 			std::ofstream os;
 			os.open(std::string("C++/") + cppFileName, std::ios::binary);
 			if (!os.is_open())
@@ -361,21 +386,35 @@ public:
 
 			os.write(filehead.c_str(), filehead.length());
 
-			for (auto iter = protos.begin(); iter != protos.end(); ++iter)
+			zsummer::utility::CreateDir("C++");
+
+
+			XMLElement * ele = doc.FirstChildElement("Proto");
+			if (ele == NULL)
 			{
-				std::string stype = iter->first;
+				LOGE("doc.FirstChildElement(\"Proto\") Error.");
+				doc.PrintError();
+				return false;
+			}
+			ele = doc.FirstChildElement();
+			do 
+			{
+				if (ele == NULL)
+				{
+					break;
+				}
+				std::string stype = ele->Name();
 				if (stype == "const")
 				{
 					DataConstValue dc;
-					dc.type = iter->second.get<std::string>("<xmlattr>.type");
-					dc.name = iter->second.get<std::string>("<xmlattr>.name");
-					dc.value = iter->second.get<std::string>("<xmlattr>.value");
-					try
+					
+
+					dc.type = ele->Attribute("type");
+					dc.name = ele->Attribute("name"); 
+					dc.value = ele->Attribute("value"); 
+					if (ele->Attribute("desc"))
 					{
-						dc.desc = iter->second.get<std::string>("<xmlattr>.desc");
-					}
-					catch (...)
-					{
+						dc.desc = ele->Attribute("desc");
 					}
 					std::string text = LFCR;
 					text += WriteCppConstValue(dc);
@@ -383,24 +422,22 @@ public:
 					os.flush();
 				}
 				//结构体类型
-				if (stype  == "struct" || stype == "proto")
+				if (stype == "struct" || stype == "proto")
 				{
 					ProtoStruct  proto;
 					GeneralStruct stt;
 
-					
+
 
 					if (stype == "proto")
 					{
-						proto.name = iter->second.get<std::string>("<xmlattr>.name");
-						proto.from = iter->second.get<std::string>("<xmlattr>.from");
-						proto.to = iter->second.get<std::string>("<xmlattr>.to");
-						try
+						
+						proto.name = ele->Attribute("name");
+						proto.from = ele->Attribute("from");
+						proto.to = ele->Attribute("to");
+						if (ele->Attribute("desc"))
 						{
-							proto.desc = iter->second.get<std::string>("<xmlattr>.desc");
-						}
-						catch (...)
-						{
+							proto.desc = ele->Attribute("desc");
 						}
 						
 						std::string idName = genProtoIDName(proto);
@@ -425,29 +462,26 @@ public:
 					}
 					else
 					{
-						stt.name = iter->second.get<std::string>("<xmlattr>.name");
-						try
+						stt.name = ele->Attribute("name");
+						if (ele->Attribute("desc"))
 						{
-							stt.desc = iter->second.get<std::string>("<xmlattr>.desc");
-						}
-						catch (...)
-						{
+							stt.desc = ele->Attribute("desc");
 						}
 					}
-					
-
-					for (auto member = iter->second.begin(); member != iter->second.end(); ++member)
+					XMLElement * member = doc.FirstChildElement("member");
+					do 
 					{
-						if (member->first != "member") continue;
-						DataMember dm;
-						dm.type = member->second.get<std::string>("<xmlattr>.type");
-						dm.name = member->second.get<std::string>("<xmlattr>.name");
-						try
+						if (member == NULL)
 						{
-							dm.desc = member->second.get<std::string>("<xmlattr>.desc");
+							break;
+
 						}
-						catch (...)
+						DataMember dm;
+						dm.type = member->Attribute("type");
+						dm.name = member->Attribute("name");
+						if (member->Attribute("desc"))
 						{
+							stt.desc = member->Attribute("desc");
 						}
 						if (stype == "proto")
 						{
@@ -457,7 +491,7 @@ public:
 						{
 							stt.members.push_back(dm);
 						}
-					}
+					} while (true);
 					
 					std::string text = LFCR;
 					if (stype == "proto")
@@ -477,14 +511,11 @@ public:
 				if (stype == "array")
 				{
 					DataArray ar;
-					ar.type = iter->second.get<std::string>("<xmlattr>.type");
-					ar.arrayName = iter->second.get<std::string>("<xmlattr>.name");
-					try
+					ar.type = ele->Attribute("type");
+					ar.arrayName = ele->Attribute("name");
+					if (ele->Attribute("desc"))
 					{
-						ar.desc = iter->second.get<std::string>("<xmlattr>.desc");
-					}
-					catch (...)
-					{
+						ar.desc = ele->Attribute("desc");
 					}
 					std::string text = LFCR;
 					text += WriteCppArray(ar);
@@ -495,49 +526,38 @@ public:
 				if (stype == "map")
 				{
 					DataMap dm;
+					dm.typeKey = ele->Attribute("key");
+					dm.typeValue = ele->Attribute("value");
+					dm.mapName = ele->Attribute("name");
+					if (ele->Attribute("desc"))
+					{
+						dm.desc = ele->Attribute("desc");
+					}
 
-					dm.typeKey = iter->second.get<std::string>("<xmlattr>.key");
-					dm.typeValue = iter->second.get<std::string>("<xmlattr>.value");
-					dm.mapName = iter->second.get<std::string>("<xmlattr>.name");
-					try
-					{
-						dm.desc = iter->second.get<std::string>("<xmlattr>.desc");
-					}
-					catch (...)
-					{
-					}
 					std::string text = LFCR;
 					text += WriteCppMap(dm);
 					os.write(text.c_str(), text.length());
 					os.flush();
 				}
-			}
+				ele = ele->NextSiblingElement();
+
+			} while (true);
+
 			std::string fileEnd = LFCR;
 			fileEnd += "#endif" + LFCR;
 			os.write(fileEnd.c_str(), fileEnd.length());
 			os.close();
+			
+		}
 
-
-		}
-		catch (std::string err)
-		{
-			LOGE("ServerConfig catch exception: error=" << err);
-			return false;
-		}
-		catch (std::exception e)
-		{
-			LOGE("ServerConfig catch exception: error=" << e.what());
-			return false;
-		}
-		catch (...)
-		{
-			LOGE("ServerConfig catch exception: unknow exception.");
-			return false;
-		}
 		return true;
 	}
+
+
+
 	bool WriteNoCache(std::string filename)
 	{
+		LOGI("WriteNoCache [" << filename + ".cache" << "] ...");
 		std::ofstream os;
 		os.open(filename + ".cache", std::ios::binary);
 		if (!os.is_open())
@@ -567,45 +587,62 @@ public:
 
 
 
+using namespace zsummer::utility;
 
 int main(int argc, char *argv[])
 {
 	zsummer::log4z::ILog4zManager::GetInstance()->Start();
-	boost::filesystem::path full_path("./", boost::filesystem::native);
-	if (boost::filesystem::exists(full_path))
+	std::vector<_FileInfo> files;
+	if (!SearchFiles("./", files))
 	{
-		boost::filesystem::directory_iterator  iter(full_path);
-		boost::filesystem::directory_iterator  iter_end;
-		for (; iter != iter_end; iter++)
-		{
-			if (boost::filesystem::is_regular_file(*iter))
-			{
-				std::stringstream os;
-				os <<*iter;
-				std::string xmlFile;
-				os >> xmlFile;
-				
-				if (xmlFile.length() <= 8)
-				{
-					continue;
-				}
-				xmlFile = xmlFile.substr(3, xmlFile.length() - 3);
-				xmlFile = xmlFile.substr(0, xmlFile.length() - 1);
-				
-				std::string xmlattr = xmlFile.substr(xmlFile.length() - 4, 4);
-				if (xmlattr != ".xml")
-				{
-					continue;
-				}
-				LOGI(xmlFile);
-				
-				genProto gen;
-				gen.LoadCache(xmlFile);
-				gen.gen(xmlFile);
-				gen.WriteNoCache(xmlFile);
-			}
-		}
+		LOGE("SearchFiles error.");
+		return 0;
 	}
+	LOGA("FOUND FILE COUNT = " << files.size());
+	std::cout << "\r\n" << std::endl;
+	for (auto & file : files)
+	{
+		std::string filename = file.filename;
+		if (filename.size() <= 4)
+		{
+			//LOGD("Skip [" << filename << "] File not a xml .");
+			//zsummer::utility::SleepMillisecond(80);
+			continue;
+		}
+		std::string xmlattr = filename.substr(filename.length() - 4, 4);
+		if (xmlattr != ".xml")
+		{
+			//LOGD("Skip [" << filename << "] File not a xml .");
+			//zsummer::utility::SleepMillisecond(80);
+			continue;
+		}
+		
+		genProto gen;
+		if (!gen.LoadCache(filename))
+		{
+			LOGE("LoadCache Error. filename=" << filename);
+			return 0;
+		}
+		zsummer::utility::SleepMillisecond(150);
+
+		if (!gen.gen(filename))
+		{
+			LOGE("gen Error. filename=" << filename);
+			return 0;
+		}
+		zsummer::utility::SleepMillisecond(120);
+
+		if (!gen.WriteNoCache(filename))
+		{
+			LOGE("WriteNoCache Error. filename=" << filename);
+			return 0;
+		}
+		std::cout << "\r\n\r\n" << std::endl;
+		zsummer::utility::SleepMillisecond(222);
+
+	}
+	
+	LOGA("All Success.");
 
 
 	return 0;
