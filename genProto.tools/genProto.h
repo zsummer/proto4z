@@ -58,7 +58,7 @@
 #include <direct.h>
 #endif
 #include "genProto.h"
-
+using namespace tinyxml2;
 
 //支持的的数据类型
 static  std::map<std::string, std::string> xmlTypeToCppType = {
@@ -87,103 +87,112 @@ static  std::map<std::string, std::string> xmlTypeToCppDefaultValue = {
 		{ "ui64", "0" },
 		{ "float", "0.0" },
 		{ "double", "0.0" },
-		{ "string", "\"\"" },
 };
 
 
 //支持数组类型
 struct DataArray
 {
-	std::string type;
-	std::string arrayName;
-	std::string desc;
+	std::string _type;
+	std::string _arrayName;
+	std::string _desc;
 };
 
 //支持字典类型
 struct DataMap
 {
-	std::string typeKey;
-	std::string typeValue;
-	std::string mapName;
-	std::string desc;
+	std::string _typeKey;
+	std::string _typeValue;
+	std::string _mapName;
+	std::string _desc;
 };
 
 //支持常量类型
 struct DataConstValue
 {
-	std::string type;
-	std::string name;
-	std::string value;
-	std::string desc;
+	std::string _type;
+	std::string _name;
+	std::string _value;
+	std::string _desc;
 };
 
 //支持结构体类型
-struct GeneralStruct
+struct DataStruct
 {
-	std::string name;
-	std::string desc;
+	std::string _name;
+	std::string _desc;
 	struct DataMember
 	{
-		std::string type;
-		std::string name;
-		std::string desc;
+		std::string _type;
+		std::string _name;
+		std::string _desc;
 	};
-	std::vector<DataMember> members;
+	std::vector<DataMember> _members;
+};
+
+//支持协议封包类型
+struct DataProto
+{
+	DataConstValue _const;
+	DataStruct _struct;
 };
 
 
+//协议ID类型
+const std::string ProtoIDType = "ui16";
 
-enum GeneralType
+//生成的代码换行
+const std::string LFCR = " \r\n ";
+
+
+//语法分析用的通用类型.
+enum StoreType
 {
 	GT_DataArray,
 	GT_DataMap,
 	GT_DataConstValue,
-	GT_GeneralStruct,
+	GT_DataStruct,
+	GT_DataProto,
 };
 
-struct GeneralInfo
+//语法分析用的通用数据结构
+struct StoreInfo
 {
-	GeneralType type;
-	DataArray dataArray;
-	DataMap dataMap;
-	DataConstValue dataConstValue;
-	GeneralStruct genStrunct;
+	StoreType _type;
+	DataArray _array;
+	DataMap _map;
+	DataConstValue _const;
+	DataProto _proto;
 };
 
-const std::string ProtoIDType = "ui16";
 
-
-const std::string LFCR = "\n";
-
-
-
-std::string WriteCppConstValue(const DataConstValue & v);
-
-std::string WriteCppArray(const DataArray & a);
-
-std::string WriteCppMap(const DataMap & dm);
-
-std::string WriteCppDataMember(const std::vector<GeneralStruct::DataMember> & ms);
-
-std::string WriteCppDataStructStream(const std::string &name, const std::vector<GeneralStruct::DataMember> & ms);
-
-std::string WriteCppStruct(const GeneralStruct & gs);
+//生成代码
+bool genCppFile(std::string path, std::string filename, std::string attr, std::vector<StoreInfo> & stores);
+bool genLuaFile(std::string path, std::string filename, std::string attr, std::vector<StoreInfo> & stores);
+bool genCSharpFile(std::string path, std::string filename, std::string attr, std::vector<StoreInfo> & stores);
+bool genJsFile(std::string path, std::string filename, std::string attr, std::vector<StoreInfo> & stores);
 
 
 
 
-using namespace tinyxml2;
+//语法分析结果
+enum ParseCode
+{
+	PC_SUCCESS,
+	PC_NEEDSKIP,
+	PC_ERROR,
+};
 
+
+//语法分析和代码生成
 class genProto
 {
-public:
 	//初始化信息
 	std::string m_fileName;
 	std::string m_fileConfigAttr = ".xml";
 	std::string m_fileCacheAttr = ".xml.cache";
-	bool m_bForceGen = false;
 
-	//cache信息
+	//cache分析数据
 	unsigned short m_curNo = 0;
 	std::string m_md5;
 	struct DataCache
@@ -193,26 +202,23 @@ public:
 	};
 	std::map<std::string, DataCache> m_mapCacheNo;
 
-	//xml信息
+	//xml分析数据
 	unsigned short m_minNo = 0;
 	unsigned short m_maxNo = 0;
-	std::vector<GeneralInfo> m_genInfo;
+	std::vector<StoreInfo> m_vctStoreInfo;
 
-	//构造
-	genProto(std::string filename, bool bForceGen = false)
-	{
-		m_fileName = filename;
-		m_bForceGen = bForceGen;
-	}
+public:
+	//filename不包含文件后缀
+	genProto(std::string filename){	m_fileName = filename;}
 
-	bool GenCPP();
-
-	bool LoadCache();
-
-	bool LoadConfig();
-
-	bool WriteNoCache();
-
+	//分析cache
+	ParseCode ParseCache();
+	//分析协议配置
+	ParseCode ParseConfig();
+	//生成对应语言的代码
+	ParseCode GenCode();
+	//写入cache
+	ParseCode WriteCache();
 };
 
 

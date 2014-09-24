@@ -67,53 +67,54 @@ int main(int argc, char *argv[])
 	LOGA("FOUND FILE COUNT = " << files.size());
 	std::cout << "\r\n" << std::endl;
 
-	if (!IsDirectory("C++") && !CreateDir("C++"))
-	{
-		LOGE("CreateDir C++ Error. ");
-		return 0;
-	}
+
 	
 	for (auto & file : files)
 	{
 		std::string filename = file.filename;
 		if (filename.size() <= 4)
 		{
-			//LOGD("Skip [" << filename << "] File not a xml .");
-			//zsummer::utility::SleepMillisecond(80);
 			continue;
 		}
 		std::string xmlattr = filename.substr(filename.length() - 4, 4);
 		if (xmlattr != ".xml")
 		{
-			//LOGD("Skip [" << filename << "] File not a xml .");
-			//zsummer::utility::SleepMillisecond(80);
 			continue;
 		}
 		filename = filename.substr(0, filename.size() - 4);
 		
 		genProto gen(filename);
-		if (!gen.LoadCache())
+		ParseCode pc = gen.ParseCache();
+		if (pc == PC_ERROR)
 		{
 			LOGE("LoadCache Error. filename=" << filename);
 			return 0;
 		}
 		zsummer::utility::SleepMillisecond(150);
-
-		if (!gen.LoadConfig())
+		pc = gen.ParseConfig();
+		if (pc == PC_ERROR)
 		{
 			LOGE("LoadConfig Error. filename=" << filename);
 			return 0;
 		}
 		zsummer::utility::SleepMillisecond(120);
 
-		if (!gen.GenCPP())
+		pc = gen.GenCode();
+		if (pc == PC_ERROR)
 		{
 			LOGE("GenCPP Error. filename=" << filename);
 			return 0;
 		}
+		else if (pc == PC_NEEDSKIP)
+		{
+			LOGD("SKIP WriteCache. filename=" << filename);
+			zsummer::utility::SleepMillisecond(120);
+			continue;
+		}
 		zsummer::utility::SleepMillisecond(120);
 
-		if (!gen.WriteNoCache())
+		pc = gen.WriteCache();
+		if (pc == PC_ERROR)
 		{
 			LOGE("WriteNoCache Error. filename=" << filename);
 			return 0;
@@ -123,8 +124,8 @@ int main(int argc, char *argv[])
 
 	}
 	
-	LOGA("All Success.");
-
+	LOGA("All Success..");
+	zsummer::utility::SleepMillisecond(2000);
 
 	return 0;
 }
