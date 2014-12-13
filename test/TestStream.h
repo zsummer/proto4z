@@ -340,7 +340,7 @@ bool TestBase<StreamHeadTrait>::CheckProtocol(WriteStream<StreamHeadTrait> &ws, 
 
 
 	std::pair<INTEGRITY_RET_TYPE, typename StreamHeadTrait::Integer> ret = CheckBuffIntegrity<StreamHeadTrait>(ws.getStream(), 1, m_packLen);
-	if (ret.first == IRT_SHORTAGE && ret.second == StreamHeadTrait::HeadLen - 1)
+	if (ret.first == IRT_SHORTAGE && ret.second == sizeof(typename StreamHeadTrait::Integer) - 1)
 	{
 		cout << desc << " CheckBuffIntegrity check write header len OK" << endl;
 	}
