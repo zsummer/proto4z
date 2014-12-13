@@ -170,7 +170,7 @@ enum INTEGRITY_RET_TYPE
 //! first: IRT_CORRUPTION data corruption. second: data lenght
 template<class StreamHeadTrait>
 inline std::pair<INTEGRITY_RET_TYPE, typename StreamHeadTrait::Integer>
-CheckBuffIntegrity(const char * buff, typename StreamHeadTrait::Integer curBuffLen, 
+checkBuffIntegrity(const char * buff, typename StreamHeadTrait::Integer curBuffLen, 
 typename StreamHeadTrait::Integer maxBuffLen /*= StreamHeadTrait::MaxPackLen*/);
 
 
@@ -615,12 +615,12 @@ void integerToStream(Integer integer, char *stream)
 
 
 template<class StreamHeadTrait>
-inline std::pair<INTEGRITY_RET_TYPE, typename StreamHeadTrait::Integer> CheckBuffIntegrity(const char * buff, typename StreamHeadTrait::Integer curBuffLen, typename StreamHeadTrait::Integer maxBuffLen)
+inline std::pair<INTEGRITY_RET_TYPE, typename StreamHeadTrait::Integer> checkBuffIntegrity(const char * buff, typename StreamHeadTrait::Integer curBuffLen, typename StreamHeadTrait::Integer maxBuffLen)
 {
 	//! 检查包头是否完整
 	if (curBuffLen < sizeof(typename StreamHeadTrait::Integer))
 	{
-		return std::make_pair(IRT_SHORTAGE, sizeof(typename StreamHeadTrait::Integer) - curBuffLen);
+		return std::make_pair(IRT_SHORTAGE, (unsigned short)sizeof(typename StreamHeadTrait::Integer) - curBuffLen);
 	}
 
 	//! 获取包长度

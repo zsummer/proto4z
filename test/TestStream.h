@@ -240,10 +240,10 @@ public:
 
 
 			//analog recv msg
-			std::pair<INTEGRITY_RET_TYPE, UDStreamHeadTraits::Integer> ret = CheckBuffIntegrity<UDStreamHeadTraits>(ws.getStream(), ws.getStreamLen(), UDStreamHeadTraits::MaxPackLen);
+			std::pair<INTEGRITY_RET_TYPE, UDStreamHeadTraits::Integer> ret = checkBuffIntegrity<UDStreamHeadTraits>(ws.getStream(), ws.getStreamLen(), UDStreamHeadTraits::MaxPackLen);
 			if (ret.first == IRT_CORRUPTION || ret.first == IRT_SHORTAGE)
 			{
-				cout << "CheckRouteProtocol -> " << className << "  CheckBuffIntegrity error" << endl;
+				cout << "CheckRouteProtocol -> " << className << "  checkBuffIntegrity error" << endl;
 				return false;
 			}
 
@@ -339,24 +339,24 @@ bool TestBase<StreamHeadTrait>::CheckProtocol(WriteStream<StreamHeadTrait> &ws, 
 	}
 
 
-	std::pair<INTEGRITY_RET_TYPE, typename StreamHeadTrait::Integer> ret = CheckBuffIntegrity<StreamHeadTrait>(ws.getStream(), 1, m_packLen);
+	std::pair<INTEGRITY_RET_TYPE, typename StreamHeadTrait::Integer> ret = checkBuffIntegrity<StreamHeadTrait>(ws.getStream(), 1, m_packLen);
 	if (ret.first == IRT_SHORTAGE && ret.second == sizeof(typename StreamHeadTrait::Integer) - 1)
 	{
-		cout << desc << " CheckBuffIntegrity check write header len OK" << endl;
+		cout << desc << " checkBuffIntegrity check write header len OK" << endl;
 	}
 	else
 	{
-		cout << desc << " CheckBuffIntegrity check write header len failed" << endl;
+		cout << desc << " checkBuffIntegrity check write header len failed" << endl;
 		return false;
 	}
-	ret = CheckBuffIntegrity<StreamHeadTrait>(ws.getStream(), ws.getStreamLen(), ws.getStreamLen());
+	ret = checkBuffIntegrity<StreamHeadTrait>(ws.getStream(), ws.getStreamLen(), ws.getStreamLen());
 	if (ret.first == IRT_SUCCESS && ret.second == m_packLen)
 	{
-		cout << desc << " CheckBuffIntegrity check write  OK" << endl;
+		cout << desc << " checkBuffIntegrity check write  OK" << endl;
 	}
 	else
 	{
-		cout << desc << " CheckBuffIntegrity check write  failed" << endl;
+		cout << desc << " checkBuffIntegrity check write  failed" << endl;
 		return false;
 	}
 
