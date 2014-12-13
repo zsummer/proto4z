@@ -1019,50 +1019,50 @@ std::string urlDecode(const std::string& orgString);
 class WriteHTTP
 {
 public:
-	const char * getStream(){ return m_buff.c_str();}
-	unsigned int getStreamLen() { return (unsigned int)m_buff.length();}
+	const char * getStream(){ return _buff.c_str();}
+	unsigned int getStreamLen() { return (unsigned int)_buff.length();}
 	void addHead(std::string key, std::string val)
 	{
-		m_head.insert(std::make_pair(key, val));
+		_head.insert(std::make_pair(key, val));
 	}
 	void post(std::string uri, std::string content)
 	{
 		char buf[100];
 		sprintf(buf, "%u", (unsigned int)content.length());
-		m_head.insert(std::make_pair("Content-Length", buf));
-		m_buff.append("POST " + uri + " HTTP/1.1" + CRLF);
+		_head.insert(std::make_pair("Content-Length", buf));
+		_buff.append("POST " + uri + " HTTP/1.1" + CRLF);
 		writeGeneralHead();
-		m_buff.append(CRLF);
-		m_buff.append(content);
+		_buff.append(CRLF);
+		_buff.append(content);
 	}
 	void get(std::string uri)
 	{
-		m_head.insert(std::make_pair("Content-Length", "0"));
-		m_buff.append("GET " + uri + " HTTP/1.1" + CRLF);
+		_head.insert(std::make_pair("Content-Length", "0"));
+		_buff.append("GET " + uri + " HTTP/1.1" + CRLF);
 		writeGeneralHead();
-		m_buff.append(CRLF);
+		_buff.append(CRLF);
 	}
 	void response(std::string statusCode, std::string content)
 	{
 		char buf[100];
 		sprintf(buf, "%u", (unsigned int)content.length());
-		m_head.insert(std::make_pair("Content-Length", buf));
-		m_buff.append("HTTP/1.1 " + statusCode + " ^o^" + CRLF);
+		_head.insert(std::make_pair("Content-Length", buf));
+		_buff.append("HTTP/1.1 " + statusCode + " ^o^" + CRLF);
 		writeGeneralHead();
-		m_buff.append(CRLF);
-		m_buff.append(content);
+		_buff.append(CRLF);
+		_buff.append(content);
 	}
 protected:
 	void writeGeneralHead()
 	{
-		for (HTTPHeadMap::iterator iter = m_head.begin(); iter != m_head.end(); ++iter)
+		for (HTTPHeadMap::iterator iter = _head.begin(); iter != _head.end(); ++iter)
 		{
-			m_buff.append(iter->first + ":" + iter->second + CRLF);
+			_buff.append(iter->first + ":" + iter->second + CRLF);
 		}
 	}
 private:
-	HTTPHeadMap m_head;
-	std::string m_buff;
+	HTTPHeadMap _head;
+	std::string _buff;
 };
 
 
