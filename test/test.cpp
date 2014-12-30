@@ -23,6 +23,8 @@ int main()
 		cout << endl;
 		if (!test1.CheckRouteProtocol()) break;
 		cout << endl << endl;
+
+		
 		TestBase<TestBigStreamHeadTraits> test2;
 		if (!test2.CheckLenght()) break;
 		cout << endl;

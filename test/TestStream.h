@@ -139,6 +139,7 @@ struct tagStreamHead
 struct UDStreamHeadTraits
 {
 	typedef unsigned int Integer;
+	typedef unsigned int ProtoInteger;
 	const static Integer MaxPackLen = 1024*1024*10;//10M
 	const static bool PackLenIsContainHead = true;
 	const static ZSummer_EndianType EndianType = LittleEndian;
@@ -152,32 +153,32 @@ class TestBase
 public:
 	TestBase()
 	{
-		m_testData.bl = true;
-		m_testData.ch = 'a';
-		m_testData.uch = 200;
-		m_testData.ush = -1;
-		m_testData.n = 65000;
-		m_testData.u = -2;
-		m_testData.l = 333;
-		m_testData.ul = -3;
-		m_testData.ll = 111;
-		m_testData.ull = -4;
-		m_testData.f = (float)123.2;
-		m_testData.lf = 123.4;
-		m_testData.str = "1234567";
-		m_testData.vct.push_back(1);
-		m_testData.vct.push_back(2);
-		m_testData.kv[1] = 1;
-		m_testData.kv[100] = 100;
-		m_testData.st.insert(10);
-		m_testData.mkv.insert(std::make_pair(10, 10));
-		m_testData.mkv.insert(std::make_pair(10, 100));
-		m_testData.mst.insert(100);
-		m_testData.mst.insert(100);
-		m_testData.lt.push_back(10);
-		m_testData.dq.push_back(100);
-		m_packLen = 0;
-		m_bodyLen = 0;
+		_testData.bl = true;
+		_testData.ch = 'a';
+		_testData.uch = 200;
+		_testData.ush = -1;
+		_testData.n = 65000;
+		_testData.u = -2;
+		_testData.l = 333;
+		_testData.ul = -3;
+		_testData.ll = 111;
+		_testData.ull = -4;
+		_testData.f = (float)123.2;
+		_testData.lf = 123.4;
+		_testData.str = "1234567";
+		_testData.vct.push_back(1);
+		_testData.vct.push_back(2);
+		_testData.kv[1] = 1;
+		_testData.kv[100] = 100;
+		_testData.st.insert(10);
+		_testData.mkv.insert(std::make_pair(10, 10));
+		_testData.mkv.insert(std::make_pair(10, 100));
+		_testData.mst.insert(100);
+		_testData.mst.insert(100);
+		_testData.lt.push_back(10);
+		_testData.dq.push_back(100);
+		_packLen = 0;
+		_bodyLen = 0;
 	}
 
 	~TestBase()
@@ -188,19 +189,32 @@ public:
 	inline bool CheckLenght()
 	{
 		const char * className = typeid(StreamHeadTrait).name();
-		WriteStream<StreamHeadTrait> testWS(NULL, StreamHeadTrait::MaxPackLen, true);
+		WriteStream<StreamHeadTrait> ws(120);
 		try
 		{
-			testWS << m_testData;
-			m_packLen = testWS.getStreamLen();
-			m_bodyLen = testWS.getStreamBodyLen();
+			ws << _testData;
+			_packLen = ws.getStreamLen();
+			_bodyLen = ws.getStreamBodyLen();
+			if (_packLen - _bodyLen != sizeof(typename StreamHeadTrait::Integer) + sizeof(typename StreamHeadTrait::ProtoInteger))
+			{
+				cout << "CheckLenght -> " << className 
+				<< " HeadLen is error.  packLen=" << _packLen << ", bodyLen=" << _bodyLen << endl;
+				return false;
+			}
+			if (120 != 
+				streamToInteger<typename StreamHeadTrait::ProtoInteger, StreamHeadTrait>(ws.getStream() + sizeof(typename StreamHeadTrait::Integer)) )
+			{
+				cout << "CheckLenght -> " << className 
+				<< " write protocol ID error.  packLen=" << _packLen << ", bodyLen=" << _bodyLen << endl;
+				return false;
+			}
 		}
 		catch (std::runtime_error e)
 		{
 			cout << "CheckLenght -> " << className << " write Fail. error msg=" << e.what() << endl;
 			return false;
 		}
-		cout << "CheckLenght -> " << className << " m_packLen=" << m_packLen << ", m_bodyLen=" << m_bodyLen << endl;
+		cout << "CheckLenght -> " << className << " _packLen=" << _packLen << ", _bodyLen=" << _bodyLen << endl;
 		return true;
 	}
 
@@ -208,9 +222,9 @@ public:
 
 	inline bool CheckAttachProtocol()
 	{
-		char * writeBuff = new char[m_packLen];
-		memset(writeBuff, 0, m_packLen);
-		WriteStream<StreamHeadTrait> ws(writeBuff, m_packLen);
+		char * writeBuff = new char[_packLen];
+		memset(writeBuff, 0, _packLen);
+		WriteStream<StreamHeadTrait> ws(120, writeBuff, _packLen);
 		std::string str = "Check Attach Write. protocolTrits=";
 		str += typeid(StreamHeadTrait).name();
 		str += ":  ";
@@ -219,7 +233,7 @@ public:
 
 	inline bool CheckNoAttachProtocol()
 	{
-		WriteStream<StreamHeadTrait> ws(UBT_AUTO, m_packLen);
+		WriteStream<StreamHeadTrait> ws(120, NULL, _packLen);
 		std::string str = "Check NoAttach Write. protocolTrits=";
 		str += typeid(StreamHeadTrait).name();
 		str += ":  ";
@@ -233,9 +247,9 @@ public:
 		try
 		{
 			//analog recv message buff.
-			WriteStream<UDStreamHeadTraits> ws;
+			WriteStream<UDStreamHeadTraits> ws(120);
 			unsigned int _roomID = 1;
-			ws << _roomID << m_testData;
+			ws << _roomID << _testData;
 			
 
 
@@ -249,7 +263,11 @@ public:
 
 			//check
 			ReadStream<UDStreamHeadTraits> rs(ws.getStream(), ws.getStreamLen());
-
+			if (rs.getProtoID() != 120)
+			{
+				cout << "CheckRouteProtocol -> " << className << "  check Proto ID error" << endl;
+				return false;
+			}
 			//check user data
 			unsigned int roomID2 = 0;
 			rs >> roomID2;
@@ -259,17 +277,19 @@ public:
 				return false;
 			}
 			//check route
-			WriteStream<UDStreamHeadTraits> ws2;
+			WriteStream<UDStreamHeadTraits> ws2(120);
 			ws2.appendOriginalData(rs.getStreamUnread(), rs.getStreamUnreadLen());
 			ReadStream<UDStreamHeadTraits> rs2(ws2.getStream(), ws2.getStreamLen());
 			tagTestData testData;
 			rs2 >> testData;
-			if (testData != m_testData)
+			if (testData != _testData)
 			{
 				cout << "CheckRouteProtocol -> " << className << "  check route error" << endl;
 				return false;
 			}
 			cout << "CheckRouteProtocol -> " << className << "  check route OK" << endl;
+
+
 			return true;
 		}
 		catch (std::runtime_error e)
@@ -282,9 +302,9 @@ public:
 	}
 
 
-	typename StreamHeadTrait::Integer m_packLen;
-	typename StreamHeadTrait::Integer m_bodyLen;
-	tagTestData m_testData;
+	typename StreamHeadTrait::Integer _packLen;
+	typename StreamHeadTrait::Integer _bodyLen;
+	tagTestData _testData;
 };
 
 
@@ -296,106 +316,155 @@ public:
 template < class StreamHeadTrait>
 bool TestBase<StreamHeadTrait>::CheckProtocol(WriteStream<StreamHeadTrait> &ws, const char * desc)
 {
-	try
+	//check write
 	{
-		ws << m_testData;
-		cout << desc << " write all data OK." << endl;
-		if (ws.getStreamLen() == m_packLen)
+		try
 		{
-			cout << desc << " WriteStreamLen OK." << endl;
+			ws << _testData;
+			cout << desc << " write data OK." << endl;
+			if (ws.getStreamLen() == _packLen)
+			{
+				cout << desc << " write data  WriteStreamLen OK." << endl;
+			}
+			else
+			{
+				cout << desc << " write data  WriteStreamLen Failed. getStreamLen()="
+					<< ws.getStreamLen() << ", _packLen=" << _packLen << endl;
+				return false;
+			}
+			if (ws.getStreamBodyLen() == _bodyLen)
+			{
+				cout << desc << " write data WriteStreamBodyLen OK." << endl;
+			}
+			else
+			{
+				cout << desc << " write data WriteStreamBodyLen Failed. getStreamBodyLen()="
+					<< ws.getStreamBodyLen() << ", _bodyLen=" << _bodyLen << endl;
+				return false;
+			}
+		}
+		catch (std::runtime_error e)
+		{
+			cout << desc << " write data catch error msg=" << e.what() << endl;
+			return false;
+		}
+		try
+		{
+			ws << 'c';
+			cout << desc << " write data check bound Failed. getStreamBodyLen()="
+				<< ws.getStreamBodyLen() << ", _bodyLen=" << _bodyLen << endl;
+			return false;
+		}
+		catch (std::runtime_error e)
+		{
+			cout << desc << " write data check bound OK" << endl;
+		}
+	}
+
+
+	//check checkBuffIntegrity
+	{
+		size_t headLen = sizeof(typename StreamHeadTrait::Integer) + sizeof(typename StreamHeadTrait::ProtoInteger);
+		std::pair<INTEGRITY_RET_TYPE, typename StreamHeadTrait::Integer> ret = checkBuffIntegrity<StreamHeadTrait>(ws.getStream(), 1, _packLen);
+		if (ret.first == IRT_SHORTAGE && ret.second == headLen - 1)
+		{
+			cout << desc << " checkBuffIntegrity check header len OK" << endl;
 		}
 		else
 		{
-			cout << desc << " WriteStreamLen Failed. getStreamLen()="
-				<< ws.getStreamLen() << ", m_packLen=" << m_packLen << endl;
+			cout << desc << " checkBuffIntegrity check header len failed" << endl;
 			return false;
 		}
-		if (ws.getStreamBodyLen() == m_bodyLen)
+		ret = checkBuffIntegrity<StreamHeadTrait>(ws.getStream(), ws.getStreamLen(), ws.getStreamLen());
+		if (ret.first == IRT_SUCCESS && ret.second == _packLen)
 		{
-			cout << desc << " WriteBodyStreamLen OK." << endl;
+			cout << desc << " checkBuffIntegrity check integrity  OK" << endl;
 		}
 		else
 		{
-			cout << desc << " WriteBodyStreamLen Failed. getStreamBodyLen()="
-				<< ws.getStreamBodyLen() << ", m_bodyLen=" << m_bodyLen << endl;
+			cout << desc << " checkBuffIntegrity check integrity  failed" << endl;
 			return false;
 		}
 	}
-	catch (std::runtime_error e)
+	
+
+	//check read
 	{
-		cout << desc << " write data Fail. error msg=" << e.what() << endl;
-		return false;
-	}
-	try
-	{
-		ws << 'c';
-		cout << desc << " check Write bound Failed. getStreamBodyLen()="
-			<< ws.getStreamBodyLen() << ", m_bodyLen=" << m_bodyLen << endl;
-		return false;
-	}
-	catch (std::runtime_error e)
-	{
-		cout << desc << " check Write bound OK" << endl;
-	}
+		tagTestData readTestData;
+		ReadStream<StreamHeadTrait> rs(ws.getStream(), ws.getStreamLen());
+
+		try
+		{
+			rs >> readTestData;
+			cout << desc << " check Read all data  OK" << endl;
+		}
+		catch (std::runtime_error e)
+		{
+			cout << desc << " check Read all data  failed" << e.what() << endl;
+			return false;
+		}
+
+		if (readTestData == _testData)
+		{
+			cout << desc << "consistency check OK" << endl;
+		}
+		else
+		{
+			cout << desc << "consistency check failed" << endl;
+			return false;
+		}
+
+		try
+		{
+			char ch = 'a';
+			rs >> ch;
+			cout << desc << "read bounds check  ReadStream failed" << endl;
+			return false;
+		}
+		catch (std::runtime_error e)
+		{
+			cout << desc << "read bounds check  ReadStream OK." << endl;
+		}
+		cout << desc << "check OK." << endl;
 
 
-	std::pair<INTEGRITY_RET_TYPE, typename StreamHeadTrait::Integer> ret = checkBuffIntegrity<StreamHeadTrait>(ws.getStream(), 1, m_packLen);
-	if (ret.first == IRT_SHORTAGE && ret.second == sizeof(typename StreamHeadTrait::Integer) - 1)
-	{
-		cout << desc << " checkBuffIntegrity check write header len OK" << endl;
-	}
-	else
-	{
-		cout << desc << " checkBuffIntegrity check write header len failed" << endl;
-		return false;
-	}
-	ret = checkBuffIntegrity<StreamHeadTrait>(ws.getStream(), ws.getStreamLen(), ws.getStreamLen());
-	if (ret.first == IRT_SUCCESS && ret.second == m_packLen)
-	{
-		cout << desc << " checkBuffIntegrity check write  OK" << endl;
-	}
-	else
-	{
-		cout << desc << " checkBuffIntegrity check write  failed" << endl;
-		return false;
-	}
+		ReadStream<StreamHeadTrait> rs2(rs.getStreamBody(), rs.getStreamBodyLen(), false);
+		tagTestData readTestData2;
+		try
+		{
 
+			rs2 >> readTestData2;
+			cout << desc << " check Read all data  OK" << endl;
+		}
+		catch (std::runtime_error e)
+		{
+			cout << desc << " check Read all data  failed" << e.what() << endl;
+			return false;
+		}
 
-	tagTestData readTestData;
-	ReadStream<StreamHeadTrait> rs(ws.getStream(), ws.getStreamLen());
+		if (readTestData2 == _testData)
+		{
+			cout << desc << "consistency check OK" << endl;
+		}
+		else
+		{
+			cout << desc << "consistency check failed" << endl;
+			return false;
+		}
 
-	try
-	{
-		rs >> readTestData;
-		cout << desc << " check Read all data  OK" << endl;
+		try
+		{
+			char ch = 'a';
+			rs2 >> ch;
+			cout << desc << "read bounds check  ReadStream failed" << endl;
+			return false;
+		}
+		catch (std::runtime_error e)
+		{
+			cout << desc << "read bounds check  ReadStream OK." << endl;
+		}	
 	}
-	catch (std::runtime_error e)
-	{
-		cout << desc << " check Read all data  failed" << e.what() << endl;
-		return false;
-	}
-
-	if (readTestData == m_testData)
-	{
-		cout << desc << "consistency check OK" << endl;
-	}
-	else
-	{
-		cout << desc << "consistency check failed" << endl;
-		return false;
-	}
-
-	try
-	{
-		char ch = 'a';
-		rs >> ch;
-		cout << desc << "read bounds check  ReadStream failed" << endl;
-		return false;
-	}
-	catch (std::runtime_error e)
-	{
-		cout << desc << "read bounds check  ReadStream OK." << endl;
-	}
+	
 	cout << desc << "check OK." << endl;
 	return true;
 }
