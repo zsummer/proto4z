@@ -20,18 +20,22 @@ Protoz.UserInfo[4] = {name = "_heros", type = "array", vtype = "Hero"}
 
 Protoz.LoginResult = {}
 Protoz.LoginResult.__getName = "LoginResult"
+Protoz.LoginResult.__getID = 100
+Protoz.register(Protoz.LoginResult.__getID, Protoz.LoginResult.__getName)
 Protoz.LoginResult[1] = {name = "_retCode", type = "normal", vtype = "ui32"}
 Protoz.LoginResult[2] = {name = "_info", type = "normal", vtype = "UserInfo"}
 
 
-local result = {_retCode = 0,
-					_info = {_uID = 100, _user = "username", _items = {1,2,3}, _heros = {{_name = "hero1"},{_name="hero2"}} } 
+local result = {_retCode = 100,
+					_info = {_uID = 200, _user = "username", _items = {1,2,3}, _heros = {{_name = "hero1"},{_name="hero2"}} } 
 				}
 
 
-local data = Protoz:encode(result, "LoginResult")
+local data = Protoz.encode(result, "LoginResult")
 
-
+local val, pos = string.unpack("<I4", data)
+local val2, pos = string.unpack("<I4", data, pos)
+print(val .. ":" .. val2 .. ":" .. pos)
 
 local hex = ""
 for i = 1, #data do

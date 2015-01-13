@@ -6,7 +6,7 @@
 Protoz = {}
 
 -- base data pack
-function Protoz:__pack(val, tp)
+function Protoz.__pack(val, tp)
 	if val == nil or tp == nil then
 		error(debug.traceback())
 	end
@@ -46,8 +46,19 @@ function Protoz:__pack(val, tp)
 	end
 end
 
+-- base data pack
+function Protoz.__unpack(binData, tp)
+	if binData == nil or tp == nil then
+		error(debug.traceback())
+		return nil
+	end
 
-function Protoz:__encode(obj, protoName, data)
+	
+end
+
+
+
+function Protoz.__encode(obj, protoName, data)
 	if protoName == nil then
 		error("ProtoName is nil. " .. debug.traceback())
 	end
@@ -71,18 +82,18 @@ function Protoz:__encode(obj, protoName, data)
 
 		if protoType.type == "normal" then
 			if type(val) ~= "table" then
-				data.data = data.data .. Protoz:__pack(val, protoType.vtype)
+				data.data = data.data .. Protoz.__pack(val, protoType.vtype)
 			else
-				Protoz:__encode(val, protoType.vtype, data)
+				Protoz.__encode(val, protoType.vtype, data)
 			end
 		elseif protoType.type == "array" then
 			local arrayLen = #val
 			data.data = data.data .. string.pack("<I2", arrayLen)
 			for j =1, #val do
 				if type(val[j]) ~= "table" then
-					data.data = data.data .. Protoz:__pack(val[j], protoType.vtype)
+					data.data = data.data .. Protoz.__pack(val[j], protoType.vtype)
 				else
-					Protoz:__encode(val[j], protoType.vtype, data)
+					Protoz.__encode(val[j], protoType.vtype, data)
 				end
 			end
 		elseif protoType.type == "dict" then
@@ -90,28 +101,63 @@ function Protoz:__encode(obj, protoName, data)
 			data.data = data.data .. string.pack("<I2", dictLen)
 			for j =1, #val do
 				if type(val[j].k) ~= "table" then
-					data.data = data.data .. Protoz:__pack(val[j].k, protoType.ktype)
+					data.data = data.data .. Protoz.__pack(val[j].k, protoType.ktype)
 				else
-					Protoz:__encode(val[j].k, protoType.ktype, data)
+					Protoz.__encode(val[j].k, protoType.ktype, data)
 				end
 				if type(val[j].v) ~= "table" then
-					data.data = data.data .. Protoz:__pack(val[j].v, protoType.vtype)
+					data.data = data.data .. Protoz.__pack(val[j].v, protoType.vtype)
 				else
-					Protoz:__encode(val[j].v, protoType.vtype, data)
+					Protoz.__encode(val[j].v, protoType.vtype, data)
 				end
 			end
 		end
 	end
 end
 
-function Protoz:encode(obj, protoName)
+
+function Protoz.encode(obj, protoName)
 	local data = {data=""}
-	Protoz:__encode(obj, protoName, data)
+	Protoz.__encode(obj, protoName, data)
 	return data.data
 end
 
 
-function Protoz:new(tb)
+
+function Protoz.register(protoID, protoName)
+	if Protoz.__protos == nil then
+		Protoz.__protos = {}
+	end
+	if Protoz.__protos[protoID] ~= nil then
+		error("protoID. id already register. id=" .. protoID .. " registrered name=" .. Protoz.__protos[protoID]  .. ", new protoName=" .. protoName .. ": " .. debug.traceback())
+	end
+	Protoz.__protos[protoID] = protoName
+end
+
+function Protoz.__decode(binData, protoName, result)
+	local proto = Protoz[protoName]
+	if proto == nil then
+		print("parse error. protoName=" .. protoName .. ". trace=" .. debug.traceback())
+		result.ret = nil
+		return nil
+	end
+	for i = 1, #proto do
+
+	end
+	
+end
+
+function Protoz.decode(binData, protoID)
+	local result = {ret = true, result = {}}
+	if Protoz.__protos[protoID] == nil then
+		print("unknown protoID. id=" .. protoID)
+		return nil
+	end
+	Protoz.__decode(binData, Protoz.__protos[protoID], result)
+	return result
+end
+
+function Protoz.new(tb)
     local recursive = {} -- log recursive table
     local function _copy(tb)
         if type(tb) ~= "table" then
