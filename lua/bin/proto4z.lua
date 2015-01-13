@@ -76,6 +76,8 @@ function Protoz:__encode(obj, protoName, data)
 				Protoz:__encode(val, protoType.vtype, data)
 			end
 		elseif protoType.type == "array" then
+			local arrayLen = #val
+			data.data = data.data .. string.pack("<I2", arrayLen)
 			for j =1, #val do
 				if type(val[j]) ~= "table" then
 					data.data = data.data .. Protoz:__pack(val[j], protoType.vtype)
@@ -84,6 +86,8 @@ function Protoz:__encode(obj, protoName, data)
 				end
 			end
 		elseif protoType.type == "dict" then
+			local dictLen = #val
+			data.data = data.data .. string.pack("<I2", dictLen)
 			for j =1, #val do
 				if type(val[j].k) ~= "table" then
 					data.data = data.data .. Protoz:__pack(val[j].k, protoType.ktype)
