@@ -12,6 +12,8 @@ pack base type to binary stream
 @param __pack tp.  type
 @return no result
 ]]
+
+--[[ -- lua 5.3 version
 function Protoz.__pack(val, tp)
 	if val == nil or tp == nil then
 		error(debug.traceback())
@@ -50,6 +52,55 @@ function Protoz.__pack(val, tp)
 		error("unknown base data type when __pack it. val type=" .. type(val) .. "trace: " .. debug.traceback())
 	end
 end
+]]--
+
+-- lua 5.1 + lpack
+function Protoz.__pack(val, tp)
+	if val == nil or tp == nil then
+		error(debug.traceback())
+	end
+	--print(tp .. "[" .. val .. "]")
+	-- integer type
+	if     tp == "i8" or tp == "char" then
+		return string.pack("<c", val)
+	elseif tp == "ui8" or tp == "unsigned char" then
+		return string.pack("<b", val)
+	elseif tp == "i16" or tp == "short" then
+		return string.pack("<h", val)
+	elseif tp == "ui16" or tp == "unsigned short" then
+		return string.pack("<H", val)	
+	elseif tp == "i32" or tp == "int" then
+		return string.pack("<i", val)
+	elseif tp == "ui32" or tp == "unsigned int" then
+		return string.pack("<I", val)	
+	elseif tp == "i64" or tp == "long long" or tp == "ui64" or tp == "unsigned long long" then
+		local i = string.pack("<b", string.byte(val, 1))
+		i = i .. string.pack("<b", string.byte(val, 2))
+		i = i .. string.pack("<b", string.byte(val, 3))
+		i = i .. string.pack("<b", string.byte(val, 4))
+		i = i .. string.pack("<b", string.byte(val, 5))
+		i = i .. string.pack("<b", string.byte(val, 6))
+		i = i .. string.pack("<b", string.byte(val, 7))
+		i = i .. string.pack("<b", string.byte(val, 8))
+		return i
+
+
+	-- string type
+	elseif tp == "string" then
+		return string.pack("<P", val)
+
+	-- float type
+	elseif tp == "float" then
+		return string.pack("<f", val)
+	elseif tp == "double" then
+		return string.pack("<d", val)
+
+	-- error
+	else
+		error("unknown base data type when __pack it. val type=" .. type(val) .. "trace: " .. debug.traceback())
+	end
+end
+
 
 --[[--
 unpack base type from binary stream
@@ -58,6 +109,7 @@ unpack base type from binary stream
 @param __unpack tp.  type
 @return value, next pos
 ]]
+--[[ lua5.3
 function Protoz.__unpack(binData, pos, tp)
 	if binData == nil or tp == nil or pos == nil then
 		error("can't unpack binData. " .. debug.traceback())
@@ -96,7 +148,61 @@ function Protoz.__unpack(binData, pos, tp)
 	end
 
 end
+]]--
+-- lua 5.1 + lpack
+function Protoz.__unpack(binData, pos, tp)
+	if binData == nil or tp == nil or pos == nil then
+		error("can't unpack binData. " .. debug.traceback())
+	end
+	local n
+	local v
+	-- integer type
+	if     tp == "i8" or tp == "char" then
+		n, v = string.unpack(binData, "<c", pos)
+	elseif tp == "ui8" or tp == "unsigned char" then
+		n, v = string.unpack(binData, "<b", pos)
+	elseif tp == "i16" or tp == "short" then
+		n, v = string.unpack(binData, "<h", pos)
+	elseif tp == "ui16" or tp == "unsigned short" then
+		n, v = string.unpack(binData, "<H", pos)
+	elseif tp == "i32" or tp == "int" then
+		n, v = string.unpack(binData, "<i", pos)
+	elseif tp == "ui32" or tp == "unsigned int" then
+		n, v = string.unpack(binData, "<I", pos)
+	elseif tp == "i64" or tp == "long long" or tp == "ui64" or tp == "unsigned long long" then
+		local n, tmp = string.unpack(binData, "<b", binData, pos)
+		v = tmp
+		n, tmp = string.unpack(binData, "<b", binData, pos+1)
+		v = v .. tmp
+		n, tmp = string.unpack(binData, "<b", binData, pos+2)
+		v = v .. tmp
+		n, tmp = string.unpack(binData, "<b", binData, pos+3)
+		v = v .. tmp
+		n, tmp = string.unpack(binData, "<b", binData, pos+4)
+		v = v .. tmp
+		n, tmp = string.unpack(binData, "<b", binData, pos+5)
+		v = v .. tmp
+		n, tmp = string.unpack(binData, "<b", binData, pos+6)
+		v = v .. tmp
+		n, tmp = string.unpack(binData, "<b", binData, pos+7)
+		v = v .. tmp
 
+	-- string type
+	elseif tp == "string" then
+		n, v = string.unpack(binData, "<P", pos)
+
+	-- float type
+	elseif tp == "float" then
+		n, v = string.unpack(binData, "<f", pos)
+	elseif tp == "double" then
+		n, v = string.unpack(binData, "<d", pos)
+
+	else
+		--error("unknown binData to unpack . pos=" .. pos .. " tp=" .. tp .." trace: " .. debug.traceback())
+		n, v = pos, nil
+	end
+	return v, n
+end
 
 --[[--
 encode protocol table to binary stream
@@ -135,7 +241,7 @@ function Protoz.__encode(obj, name, data)
 			end
 		elseif desc.type == "array" then
 			local arrayLen = #val
-			data.data = data.data .. string.pack("<I2", arrayLen)
+			data.data = data.data .. string.pack("<H", arrayLen) --this line lua5.3 or lua5.1+lpack all compatibility 
 			for j =1, #val do
 				if type(val[j]) ~= "table" then
 					data.data = data.data .. Protoz.__pack(val[j], desc.vtype)
@@ -145,7 +251,7 @@ function Protoz.__encode(obj, name, data)
 			end
 		elseif desc.type == "dict" then
 			local dictLen = #val
-			data.data = data.data .. string.pack("<I2", dictLen)
+			data.data = data.data .. string.pack("<H", dictLen)--this line lua5.3 or lua5.1+lpack all compatibility 
 			for j =1, #val do
 				if type(val[j].k) ~= "table" then
 					data.data = data.data .. Protoz.__pack(val[j].k, desc.ktype)

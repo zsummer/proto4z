@@ -22,10 +22,7 @@
     <ClCompile Include="..\lapi.c" />
     <ClCompile Include="..\lauxlib.c" />
     <ClCompile Include="..\lbaselib.c" />
-    <ClCompile Include="..\lbitlib.c" />
     <ClCompile Include="..\lcode.c" />
-    <ClCompile Include="..\lcorolib.c" />
-    <ClCompile Include="..\lctype.c" />
     <ClCompile Include="..\ldblib.c" />
     <ClCompile Include="..\ldebug.c" />
     <ClCompile Include="..\ldo.c" />
@@ -41,6 +38,7 @@
     <ClCompile Include="..\lobject.c" />
     <ClCompile Include="..\lopcodes.c" />
     <ClCompile Include="..\loslib.c" />
+    <ClCompile Include="..\lpack.c" />
     <ClCompile Include="..\lparser.c" />
     <ClCompile Include="..\lstate.c" />
     <ClCompile Include="..\lstring.c" />
@@ -50,15 +48,14 @@
     <ClCompile Include="..\ltm.c" />
     <ClCompile Include="..\lua.c" />
     <ClCompile Include="..\lundump.c" />
-    <ClCompile Include="..\lutf8lib.c" />
     <ClCompile Include="..\lvm.c" />
     <ClCompile Include="..\lzio.c" />
+    <ClCompile Include="..\print.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\lapi.h" />
     <ClInclude Include="..\lauxlib.h" />
     <ClInclude Include="..\lcode.h" />
-    <ClInclude Include="..\lctype.h" />
     <ClInclude Include="..\ldebug.h" />
     <ClInclude Include="..\ldo.h" />
     <ClInclude Include="..\lfunc.h" />
@@ -68,14 +65,13 @@
     <ClInclude Include="..\lmem.h" />
     <ClInclude Include="..\lobject.h" />
     <ClInclude Include="..\lopcodes.h" />
+    <ClInclude Include="..\lpack.h" />
     <ClInclude Include="..\lparser.h" />
-    <ClInclude Include="..\lprefix.h" />
     <ClInclude Include="..\lstate.h" />
     <ClInclude Include="..\lstring.h" />
     <ClInclude Include="..\ltable.h" />
     <ClInclude Include="..\ltm.h" />
     <ClInclude Include="..\lua.h" />
-    <ClInclude Include="..\lua.hpp" />
     <ClInclude Include="..\luaconf.h" />
     <ClInclude Include="..\lualib.h" />
     <ClInclude Include="..\lundump.h" />
@@ -130,22 +126,22 @@
     <_ProjectFileVersion>12.0.30501.0</_ProjectFileVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>../bin</OutDir>
+    <OutDir>../../proto</OutDir>
     <IntDir>$(Configuration)\</IntDir>
     <TargetName>$(ProjectName)_win32d</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <OutDir>../bin</OutDir>
+    <OutDir>../../proto</OutDir>
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
     <TargetName>$(ProjectName)_win64d</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>../bin</OutDir>
+    <OutDir>../../proto</OutDir>
     <IntDir>$(Configuration)\</IntDir>
     <TargetName>$(ProjectName)_win32</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <OutDir>../bin</OutDir>
+    <OutDir>../../proto</OutDir>
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
     <TargetName>$(ProjectName)_win64</TargetName>
   </PropertyGroup>
@@ -167,6 +163,9 @@
     <PostBuildEvent>
       <Command />
     </PostBuildEvent>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Midl>
@@ -189,6 +188,9 @@
     <PostBuildEvent>
       <Command />
     </PostBuildEvent>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
