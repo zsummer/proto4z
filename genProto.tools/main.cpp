@@ -88,20 +88,20 @@ int main(int argc, char *argv[])
 		if (pc == PC_ERROR)
 		{
 			LOGE("LoadCache Error. filename=" << filename);
-			return 0;
+			break;
 		}
 		pc = gen.parseConfig();
 		if (pc == PC_ERROR)
 		{
 			LOGE("LoadConfig Error. filename=" << filename);
-			return 0;
+			break;
 		}
 
 		pc = gen.genCode();
 		if (pc == PC_ERROR)
 		{
 			LOGE("GenCPP Error. filename=" << filename);
-			return 0;
+			break;
 		}
 		else if (pc == PC_NEEDSKIP)
 		{
@@ -114,14 +114,14 @@ int main(int argc, char *argv[])
 		if (pc == PC_ERROR)
 		{
 			LOGE("WriteNoCache Error. filename=" << filename);
-			return 0;
+			break;
 		}
 		std::cout << "\r\n\r\n" << std::endl;
 
 	}
 	
 	LOGA("All Success..");
-	zsummer::utility::SleepMillisecond(500);
+	getchar();
 
 	return 0;
 }

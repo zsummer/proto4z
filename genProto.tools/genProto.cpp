@@ -47,7 +47,7 @@ std::string getCppType(std::string type)
 	return type;
 }
 
-bool genCppFileContent(std::string path, std::string filename, std::string attr, std::vector<StoreInfo> & stores)
+bool genCppFile(std::string path, std::string filename, std::string attr, std::vector<StoreInfo> & stores)
 {
 	std::string macroFileName = std::string("_") + filename  + "_H_";
 	std::transform(macroFileName.begin(), macroFileName.end(), macroFileName.begin(), [](char ch){ return std::toupper(ch); });
@@ -189,13 +189,119 @@ bool genCppFileContent(std::string path, std::string filename, std::string attr,
 	os.open(path + filename + attr, std::ios::binary);
 	if (!os.is_open())
 	{
-		LOGE("genCppFileContent open file Error. : " << path + filename + attr);
+		LOGE("genCppFile open file Error. : " << path + filename + attr);
 		return false;
 	}
 	os.write(text.c_str(), text.length());
 	os.close();
 	return true;
 }
+
+
+bool genLuaFile(std::string path, std::string filename, std::string attr, std::vector<StoreInfo> & stores)
+{
+	std::string text;
+	for (auto &info : stores)
+	{
+		if (info._type == GT_DataInclude)
+		{
+			text += "require (\"" + info._include._filename + "\")";
+			if (!info._include._desc.empty())
+			{
+				text += "--" + info._include._desc;
+			}
+			text += LFCR;
+		}
+		else if (info._type == GT_DataConstValue)
+		{
+			text += "Protoz." + info._const._name + " = " + info._const._value;
+			if (!info._const._desc.empty())
+			{
+				text += "--" + info._const._desc;
+			}
+			text += LFCR;
+		}
+		else if (info._type == GT_DataArray)
+		{
+			text += LFCR;
+			text += "Protoz." + info._array._arrayName + " = {} ";
+			if (!info._array._desc.empty())
+			{
+				text += "--" + info._array._desc;
+			}
+			text += LFCR;
+
+			text += "Protoz." + info._array._arrayName + ".__getName = \"" + info._array._arrayName + "\"" + LFCR;
+			text += "Protoz." + info._array._arrayName + ".__getDesc = \"array\"" + LFCR;
+			text += "Protoz." + info._array._arrayName + ".__getTypeV = \"" + info._array._type + "\"" + LFCR;
+		}
+		else if (info._type == GT_DataMap)
+		{
+			text += LFCR;
+			text += "Protoz." + info._map._mapName + " = {} ";
+			if (!info._map._desc.empty())
+			{
+				text += "--" + info._map._desc;
+			}
+			text += LFCR;
+
+			text += "Protoz." + info._map._mapName + ".__getName = \"" + info._map._mapName + "\"" + LFCR;
+			text += "Protoz." + info._map._mapName + ".__getDesc = \"map\"" + LFCR;
+			text += "Protoz." + info._map._mapName + ".__getTypeK = \"" + info._map._typeKey + "\"" + LFCR;
+			text += "Protoz." + info._map._mapName + ".__getTypeV = \"" + info._map._typeValue + "\"" + LFCR;
+		}
+		else if (info._type == GT_DataStruct || info._type == GT_DataProto)
+		{
+			text += LFCR;
+
+			if (info._type == GT_DataProto)
+			{
+				text += "Protoz.register(" + info._proto._const._value + ",\"" + info._proto._struct._name + "\")";
+			}
+
+			text += "Protoz." + info._proto._struct._name + " = {} ";
+			if (!info._proto._struct._desc.empty())
+			{
+				text += "--" + info._proto._struct._desc;
+			}
+			text += LFCR;
+			if (info._type == GT_DataProto)
+			{
+				text += "Protoz." + info._proto._struct._name + ".__getID = " + info._proto._const._value + "" + LFCR;
+			}
+			text += "Protoz." + info._proto._struct._name + ".__getName = \"" + info._proto._struct._name + "\"" + LFCR;
+
+	
+
+			for (size_t i = 0; i < info._proto._struct._members.size(); ++i)
+			{
+				text += "Protoz." + info._proto._struct._name + "[" + boost::lexical_cast<std::string>(i+1) 
+					+ "] = {name=\"" + info._proto._struct._members[i]._name +  "\", type=\"" + info._proto._struct._members[i]._type + "\"} ";
+				if (!info._proto._struct._members[i]._desc.empty())
+				{
+					text += "--" + info._proto._struct._members[i]._desc;
+				}
+				text += LFCR;
+			}
+
+			
+		}
+
+	}
+
+
+	std::ofstream os;
+	os.open(path + filename + attr, std::ios::binary);
+	if (!os.is_open())
+	{
+		LOGE("genCppFile open file Error. : " << path + filename + attr);
+		return false;
+	}
+	os.write(text.c_str(), text.length());
+	os.close();
+	return true;
+}
+
 
 
 ParseCode genProto::parseCache()
@@ -371,6 +477,56 @@ ParseCode genProto::parseConfig()
 				info._type = GT_DataConstValue;
 				_vctStoreInfo.push_back(info);
 			}
+			else if (stype == "enum")
+			{
+				std::string enumType;
+				int lastID = 0;
+				if (!ele->Attribute("type"))
+				{
+					LOGE("Attribute Error. ");
+					return PC_ERROR;
+				}
+				enumType = ele->Attribute("type");
+
+				XMLElement * member = ele->FirstChildElement("member");
+				do
+				{
+					DataConstValue dc;
+					if (member == NULL)
+					{
+						break;
+					}
+					if (!member->Attribute("name"))
+					{
+						LOGE("Attribute Error. ");
+						return PC_ERROR;
+					}
+					dc._type = enumType;
+					dc._name = member->Attribute("name");
+					if (member->Attribute("value"))
+					{
+						int v = atoi(member->Attribute("value"));
+						if (v < lastID)
+						{
+							LOGE("enum value is invalid.");
+							return PC_ERROR;
+						}
+						lastID = v;
+					}
+					dc._value = boost::lexical_cast<std::string>(lastID);
+					lastID++;
+					if (member->Attribute("desc"))
+					{
+						dc._desc = member->Attribute("desc");
+					}
+					StoreInfo info;
+					info._const = dc;
+					info._type = GT_DataConstValue;
+					_vctStoreInfo.push_back(info);
+					member = member->NextSiblingElement("member");
+				} while (true);
+
+			}
 			//数组类型
 			else if (stype == "array")
 			{
@@ -528,17 +684,25 @@ ParseCode genProto::genCode()
 		{
 			LOGE("CreateDir C++ Error. ");
 		}
+		if (!zsummer::utility::IsDirectory("lua") && !zsummer::utility::CreateDir("lua"))
+		{
+			LOGE("CreateDir lua Error. ");
+		}
 		std::string cppFileName = "C++/" + _fileName + ".h";
+		std::string luaFileName = "lua/" + _fileName + ".lua";
 		if (xmlmd5 != _md5 || !zsummer::utility::GetFileStatus(cppFileName, 6))
 		{
-			if (!genCppFileContent("C++/", _fileName, ".h", _vctStoreInfo))
+			if (!genCppFile("C++/", _fileName, ".h", _vctStoreInfo))
 			{
 				return PC_ERROR;
 			}
 		}
-		else
+		if (xmlmd5 != _md5 || !zsummer::utility::GetFileStatus(luaFileName, 6))
 		{
-			LOGD("Skip WriteCppFile. filename=" << _fileName);
+			if (!genLuaFile("lua/", _fileName, ".lua", _vctStoreInfo))
+			{
+				return PC_ERROR;
+			}
 		}
 	}
 
