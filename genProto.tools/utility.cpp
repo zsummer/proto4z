@@ -903,7 +903,7 @@ void zs_ut_s::ShowText(const char *text, const SHOW_TEXT_COLOR color)
 
 	if (SetConsoleTextAttribute(hStd, cs_sColor[color]))
 	{
-		printf(text);
+		printf("%s", text);
 		SetConsoleTextAttribute(hStd, oldInfo.wAttributes);
 	}
 	else
@@ -915,7 +915,7 @@ void zs_ut_s::ShowText(const char *text, const SHOW_TEXT_COLOR color)
 	return;
 
 showfail:
-	printf(text);
+	printf("%s", text);
 }
 
 
