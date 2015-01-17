@@ -256,7 +256,7 @@ bool genLuaFile(std::string path, std::string filename, std::string attr, std::v
 
 			if (info._type == GT_DataProto)
 			{
-				text += "Protoz.register(" + info._proto._const._value + ",\"" + info._proto._struct._name + "\")";
+				text += "Protoz.register(" + info._proto._const._value + ",\"" + info._proto._struct._name + "\")" + LFCR;
 			}
 
 			text += "Protoz." + info._proto._struct._name + " = {} ";
