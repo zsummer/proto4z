@@ -15,16 +15,16 @@ _-- make a struct. genProto tools generate _
 `Protoz.AuthInfo[1] = {name="user", type="string"}  `  
 `Protoz.AuthInfo[2] = {name="pwd", type="string"}  `  
 `Protoz.AuthInfo[3] = {name="accID", type="ui32"} `    
-``  
+`  `  
   
 _-- make a protocol pack desc.  genProto tools generate _  
-``  
+`  `  
 `Protoz.register(30000,"XS2OS_ServerInitNotify")Protoz.XS2OS_ServerInitNotify = {} `  
 `Protoz.XS2OS_ServerInitNotify.__getID = 30000 `  
 `Protoz.XS2OS_ServerInitNotify.__getName = "XS2OS_ServerInitNotify" `  
 `Protoz.XS2OS_ServerInitNotify[1] = {name="serverID", type="i16"}  `  
 `Protoz.XS2OS_ServerInitNotify[2] = {name="info", type="AuthInfo"}  `  
-``  
+`  `  
   
 _--fill data _   
 `local notify = {serverID = 100, info = {user="user", pwd="pwd", accID=200}}`  
@@ -40,7 +40,7 @@ _-- show binary data _
   
 _--show decoded data_  
 `Protoz.dump(dr)`  
-``  
+`  `  
 ## lua output  
 `[len:17]64 00 04 00 75 73 65 72 03 00 70 77 64 c8 00 00 00`  
 `dump from: main.lua:101: in main chunk`  
@@ -111,7 +111,7 @@ _//make a proto pack. genProto tools generate _
 ` 	t >> data.info; `  
 ` 	return t; `  
 ` } `  
-` `  
+`  `  
   
   
 _//  used to encode/decode _  
@@ -122,8 +122,8 @@ _//  used to encode/decode _
 `	notify.info.accID = 100;`  
 `	zsummer::proto4z::WriteStream<FrameStreamTraits> ws(ID_XS2OS_ServerInitNotify);`  
 `	ws << notify;`  
-``  
-``  
+`  `  
+`  `  
 `	zsummer::proto4z::ReadStream<FrameStreamTraits> rs(ws.getStreamBody(), ws.getStreamBodyLen());`  
 `	XS2OS_ServerInitNotify msg;`  
 `	rs >> msg;`  
