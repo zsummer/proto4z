@@ -33,7 +33,7 @@ _--encode protocol to a binary data_
 `local data = Protoz.encode(notify, "XS2OS_ServerInitNotify")`  
   
 _--decode protocol from a binary data_  
-`local dr = Protoz.decode(data, Protoz.XS2OS_ServerInitNotify.__getID)`  
+`local dr = Protoz.decode(data, "XS2OS_ServerInitNotify")`  
   
 _-- show binary data _  
 `Protoz.putbin(data)`  
