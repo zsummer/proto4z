@@ -67,7 +67,7 @@ local now = os.time()
 --for i=1, 100000 do
 
 	local data = Protoz.encode(result, "LoginResult")
-	local dr = Protoz.decode(data, 100)
+	local dr = Protoz.decode(data, Protoz.getName(Protoz.LoginResult.__getID)) -- "LoginResult"
 --end
 now = os.time() - now
 --print(now)
@@ -84,6 +84,6 @@ Protoz.dump(dr)
 local notify = {serverID = 100, info = {user="user", pwd="pwd", accID="12345678"}}
 local data = Protoz.encode(notify, "XS2OS_ServerInitNotify")
 print(Protoz.XS2OS_ServerInitNotify.__getID)
-local dr = Protoz.decode(data, Protoz.XS2OS_ServerInitNotify.__getID)
+local dr = Protoz.decode(data, Protoz.getName(Protoz.XS2OS_ServerInitNotify.__getID))
 Protoz.putbin(data)
 Protoz.dump(dr)
