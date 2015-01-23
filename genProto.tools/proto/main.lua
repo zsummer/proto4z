@@ -3,6 +3,7 @@
 -- mail:yawei_zhang@foxmail.com
 -- date: 2015-01-12
 
+package.path =  "../../?.lua;" .. package.path
 --require
 require("proto4z")
 require("lua.ControlProto")
