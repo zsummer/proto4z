@@ -10,7 +10,7 @@ namespace Proto4z
         {
             return null;
         }
-        public virtual Int32 __decode(ref byte[] binData, Int32 pos)
+        public virtual Int32 __decode(ref byte[] binData, ref Int32 pos)
         {
             return 0;
         }
@@ -19,6 +19,7 @@ namespace Proto4z
     class i8 : ProtoData
     {
         private Char _val;
+        public i8(Char v) {_val = v;}
         public Char val
         {
             get { return _val; }
@@ -28,16 +29,18 @@ namespace Proto4z
         {
             return new System.Collections.Generic.List<Byte>(_val);
         }
-        public override Int32 __decode(ref byte[] binData, Int32 pos)
+        public override Int32 __decode(ref byte[] binData, ref Int32 pos)
         {
             _val = System.BitConverter.ToChar(binData, pos);
-            return pos + 1;
+            pos += 1;
+            return pos;
         }
     }
 
     class ui8 : ProtoData
     {
         private Byte _val;
+        public ui8(Byte v) {_val = v;}
         public Byte val
         {
             get { return _val; }
@@ -47,16 +50,18 @@ namespace Proto4z
         {
             return new System.Collections.Generic.List<Byte>(_val);
         }
-        public override Int32 __decode(ref byte[] binData, Int32 pos)
+        public override Int32 __decode(ref byte[] binData, ref Int32 pos)
         {
             _val = (Byte)System.BitConverter.ToChar(binData, pos);
-            return pos + 1;
+            pos += 1;
+            return pos;
         }
     }
 
     class i16 : ProtoData
     {
         private Int16 _val;
+        public i16(Int16 v) {_val = v;}
         public Int16 val
         {
             get { return _val; }
@@ -70,121 +75,316 @@ namespace Proto4z
                 ret.Reverse();
             return ret;
         }
-        public override Int32 __decode(ref byte[] binData, Int32 pos)
+        public override Int32 __decode(ref byte[] binData, ref Int32 pos)
         {
             if(System.BitConverter.IsLittleEndian)
             {
                 _val = System.BitConverter.ToInt16(binData, pos);
-                return pos + 2;
             }
             else
             {
                 Byte[] reverBin = {binData[pos+1], binData[pos] };
                 _val = System.BitConverter.ToInt16(reverBin, 0);
-                return pos + 2;
             }
+            pos += 2;
+            return pos;
         }
     }
 
-
-
-    class BinaryWrite
+    class ui16 : ProtoData
     {
-
-        public System.Collections.Generic.List<Byte> write(Byte n)
+        private UInt16 _val;
+        public ui16(UInt16 v) {_val = v;}
+        public UInt16 val
         {
-            return new System.Collections.Generic.List<Byte>(n);
+            get { return _val; }
+            set { _val = value; }
         }
-        public System.Collections.Generic.List<Byte> write(Char n)
+        public override System.Collections.Generic.List<Byte> __encode()
         {
-            return new System.Collections.Generic.List<Byte>(n);
-        }
-        public System.Collections.Generic.List<Byte> write(Int16 n)
-        {
-            byte[] bin = System.BitConverter.GetBytes(n);
+            byte[] bin = System.BitConverter.GetBytes(_val);
             var ret = new System.Collections.Generic.List<Byte>(bin);
             if (!System.BitConverter.IsLittleEndian)
                 ret.Reverse();
             return ret;
         }
-        public System.Collections.Generic.List<Byte> write(UInt16 n)
+        public override Int32 __decode(ref byte[] binData, ref Int32 pos)
         {
-            byte[] bin = System.BitConverter.GetBytes(n);
-            var ret = new System.Collections.Generic.List<Byte>(bin);
-            if (!System.BitConverter.IsLittleEndian)
-                ret.Reverse();
-            return ret;
-        }
-        public System.Collections.Generic.List<Byte> write(Int32 n)
-        {
-            byte[] bin = System.BitConverter.GetBytes(n);
-            var ret = new System.Collections.Generic.List<Byte>(bin);
-            if (!System.BitConverter.IsLittleEndian)
-                ret.Reverse();
-            return ret;
-        }
-        public System.Collections.Generic.List<Byte> write(UInt32 n)
-        {
-            byte[] bin = System.BitConverter.GetBytes(n);
-            var ret = new System.Collections.Generic.List<Byte>(bin);
-            if (!System.BitConverter.IsLittleEndian)
-                ret.Reverse();
-            return ret;
-        }
-        public System.Collections.Generic.List<Byte> write(Int64 n)
-        {
-            byte[] bin = System.BitConverter.GetBytes(n);
-            var ret = new System.Collections.Generic.List<Byte>(bin);
-            if (!System.BitConverter.IsLittleEndian)
-                ret.Reverse();
-            return ret;
-        }
-        public System.Collections.Generic.List<Byte> write(UInt64 n)
-        {
-            byte[] bin = System.BitConverter.GetBytes(n);
-            var ret = new System.Collections.Generic.List<Byte>(bin);
-            if (!System.BitConverter.IsLittleEndian)
-                ret.Reverse();
-            return ret;
-        }
-        public System.Collections.Generic.List<Byte> write(string n)
-        {
-            var ret = write((UInt16)n.Length);
-            for (int i = 0; i < n.Length; i++ )
+            if (System.BitConverter.IsLittleEndian)
             {
-                ret.Add((Byte)n[i]);
+                _val = System.BitConverter.ToUInt16(binData, pos);
             }
+            else
+            {
+                Byte[] reverBin = { binData[pos + 1], binData[pos] };
+                _val = System.BitConverter.ToUInt16(reverBin, 0);
+            }
+            pos += 2;
+            return pos;
+        }
+    }
+
+    class i32 : ProtoData
+    {
+        private Int32 _val;
+        public i32(Int32 v) {_val = v;}
+        public Int32 val
+        {
+            get { return _val; }
+            set { _val = value; }
+        }
+        public override System.Collections.Generic.List<Byte> __encode()
+        {
+            byte[] bin = System.BitConverter.GetBytes(_val);
+            var ret = new System.Collections.Generic.List<Byte>(bin);
+            if (!System.BitConverter.IsLittleEndian)
+                ret.Reverse();
             return ret;
         }
-        public System.Collections.Generic.List<Byte> writeData<T>( T t)
+        public override Int32 __decode(ref byte[] binData, ref Int32 pos)
+        {
+            if (System.BitConverter.IsLittleEndian)
+            {
+                _val = System.BitConverter.ToInt32(binData, pos);
+            }
+            else
+            {
+                Byte[] reverBin = { binData[pos + 1], binData[pos] };
+                _val = System.BitConverter.ToInt32(reverBin, 0);
+            }
+            pos += 4;
+            return pos;
+        }
+    }
+
+    class ui32 : ProtoData
+    {
+        private UInt32 _val;
+        public ui32(UInt32 v) {_val = v;}
+        public UInt32 val
+        {
+            get { return _val; }
+            set { _val = value; }
+        }
+        public override System.Collections.Generic.List<Byte> __encode()
+        {
+            byte[] bin = System.BitConverter.GetBytes(_val);
+            var ret = new System.Collections.Generic.List<Byte>(bin);
+            if (!System.BitConverter.IsLittleEndian)
+                ret.Reverse();
+            return ret;
+        }
+        public override Int32 __decode(ref byte[] binData, ref Int32 pos)
+        {
+            if (System.BitConverter.IsLittleEndian)
+            {
+                _val = System.BitConverter.ToUInt32(binData, pos);
+            }
+            else
+            {
+                Byte[] reverBin = { binData[pos + 1], binData[pos] };
+                _val = System.BitConverter.ToUInt32(reverBin, 0);
+            }
+            pos += 4;
+            return pos;
+        }
+    }
+
+    class i64 : ProtoData
+    {
+        private Int64 _val;
+        public i64(Int64 v) {_val = v;}
+        public Int64 val
+        {
+            get { return _val; }
+            set { _val = value; }
+        }
+        public override System.Collections.Generic.List<Byte> __encode()
+        {
+            byte[] bin = System.BitConverter.GetBytes(_val);
+            var ret = new System.Collections.Generic.List<Byte>(bin);
+            if (!System.BitConverter.IsLittleEndian)
+                ret.Reverse();
+            return ret;
+        }
+        public override Int32 __decode(ref byte[] binData, ref Int32 pos)
+        {
+            if (System.BitConverter.IsLittleEndian)
+            {
+                _val = System.BitConverter.ToInt64(binData, pos);
+            }
+            else
+            {
+                Byte[] reverBin = { binData[pos + 1], binData[pos] };
+                _val = System.BitConverter.ToInt64(reverBin, 0);
+            }
+            pos += 8;
+            return pos;
+        }
+    }
+
+    class ui64 : ProtoData
+    {
+        private UInt64 _val;
+        public ui64(UInt64 v) {_val = v;}
+        public UInt64 val
+        {
+            get { return _val; }
+            set { _val = value; }
+        }
+        public override System.Collections.Generic.List<Byte> __encode()
+        {
+            byte[] bin = System.BitConverter.GetBytes(_val);
+            var ret = new System.Collections.Generic.List<Byte>(bin);
+            if (!System.BitConverter.IsLittleEndian)
+                ret.Reverse();
+            return ret;
+        }
+        public override Int32 __decode(ref byte[] binData, ref Int32 pos)
+        {
+            if (System.BitConverter.IsLittleEndian)
+            {
+                _val = System.BitConverter.ToUInt64(binData, pos);
+            }
+            else
+            {
+                Byte[] reverBin = { binData[pos + 1], binData[pos] };
+                _val = System.BitConverter.ToUInt64(reverBin, 0);
+            }
+            pos += 8;
+            return pos;
+        }
+    }
+
+    class Float : ProtoData
+    {
+        private float _val;
+        public Float(float v) {_val = v;}
+        public float val
+        {
+            get { return _val; }
+            set { _val = value; }
+        }
+        public override System.Collections.Generic.List<Byte> __encode()
+        {
+            byte[] bin = System.BitConverter.GetBytes(_val);
+            var ret = new System.Collections.Generic.List<Byte>(bin);
+            if (!System.BitConverter.IsLittleEndian)
+                ret.Reverse();
+            return ret;
+        }
+        public override Int32 __decode(ref byte[] binData, ref Int32 pos)
+        {
+            if (System.BitConverter.IsLittleEndian)
+            {
+                _val = System.BitConverter.ToSingle(binData, pos);
+            }
+            else
+            {
+                Byte[] reverBin = { binData[pos + 1], binData[pos] };
+                _val = System.BitConverter.ToSingle(reverBin, 0);
+            }
+            pos += 4;
+            return pos;
+        }
+    }
+
+    class Double : ProtoData
+    {
+        private double _val;
+        public Double(double v) {_val = v;}
+
+        public double val
+        {
+            get { return _val; }
+            set { _val = value; }
+        }
+        public override System.Collections.Generic.List<Byte> __encode()
+        {
+            byte[] bin = System.BitConverter.GetBytes(_val);
+            var ret = new System.Collections.Generic.List<Byte>(bin);
+            if (!System.BitConverter.IsLittleEndian)
+                ret.Reverse();
+            return ret;
+        }
+        public override Int32 __decode(ref byte[] binData, ref Int32 pos)
+        {
+            if (System.BitConverter.IsLittleEndian)
+            {
+                _val = System.BitConverter.ToDouble(binData, pos);
+            }
+            else
+            {
+                Byte[] reverBin = { binData[pos + 1], binData[pos] };
+                _val = System.BitConverter.ToDouble(reverBin, 0);
+            }
+            pos += 8;
+            return pos;
+        }
+
+    class String : ProtoData
+    {
+        private string _val;
+        public String(string v) {_val = v;}
+        public string val
+        {
+            get { return _val; }
+            set { _val = value; }
+        }
+        public override System.Collections.Generic.List<Byte> __encode()
         {
             var ret = new System.Collections.Generic.List<Byte>();
+            ret.AddRange(new ui16((UInt16)_val.Length).__encode());
+            foreach(Char ch in _val)
+            {
+                ret.Add((Byte)ch);
+            }
             return ret;
         }
-
+        public override Int32 __decode(ref byte[] binData, ref Int32 pos)
+        {
+            _val.Remove(0);
+            ui16 len = new ui16(0);
+            len.__decode(ref binData, ref pos);
+            for (int i=0; i<len.val; i++)
+            {
+                _val += (Char) binData[i];
+            }
+            pos +=2;
+            pos += _val.Length;
+            return pos;
+        }
     }
-    class Proto
-    {
-        
-    }
-
 
 
     class STATIC_EC_SUCCESS //global const 
     {
-        public const UInt16 value = 100;
+        public const ui16 value = new ui16(100);
     }
     class STATIC_EC_ERROR //global const 
     {
-        public const UInt16 value = 100;
+        public const ui16 value = new ui16(100);
     }
-    class HeroInfo //struct
+    class HeroInfo : ProtoData//struct
     {
-        public Int32 id;
-        public string name;
+        public i32 id;
+        public String name;
+        public virtual System.Collections.Generic.List<Byte> __encode()
+        {
+            var ret = new System.Collections.Generic.List<Byte>();
+            ret.AddRange(id.__encode());
+            ret.AddRange(name.__encode());
+            return ret;
+        }
+        public virtual Int32 __decode(ref byte[] binData, Int32 pos)
+        {
+            id.__decode(ref binData, ref pos);
+            name.__decode(ref binData, ref pos);
+            return pos;
+        }
     }
 
-    class HeroInfoDict : System.Collections.Generic.Dictionary<Int32, HeroInfo> { }
+    class HeroInfoDict : System.Collections.Generic.Dictionary<i32, HeroInfo> { }
     class HeroInfoArray : System.Collections.Generic.List<HeroInfo> { }
     class UserInfo //struct
     {
