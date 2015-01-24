@@ -1,12 +1,175 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 using Proto4z;
 
 namespace Proto4z
 {
+    class ProtoData
+    {
+        public virtual System.Collections.Generic.List<Byte> __encode()
+        {
+            return null;
+        }
+        public virtual Int32 __decode(ref byte[] binData, Int32 pos)
+        {
+            return 0;
+        }
+    }
+
+    class i8 : ProtoData
+    {
+        private Char _val;
+        public Char val
+        {
+            get { return _val; }
+            set { _val = value; }
+        }
+        public override System.Collections.Generic.List<Byte> __encode()
+        {
+            return new System.Collections.Generic.List<Byte>(_val);
+        }
+        public override Int32 __decode(ref byte[] binData, Int32 pos)
+        {
+            _val = System.BitConverter.ToChar(binData, pos);
+            return pos + 1;
+        }
+    }
+
+    class ui8 : ProtoData
+    {
+        private Byte _val;
+        public Byte val
+        {
+            get { return _val; }
+            set { _val = value; }
+        }
+        public override System.Collections.Generic.List<Byte> __encode()
+        {
+            return new System.Collections.Generic.List<Byte>(_val);
+        }
+        public override Int32 __decode(ref byte[] binData, Int32 pos)
+        {
+            _val = (Byte)System.BitConverter.ToChar(binData, pos);
+            return pos + 1;
+        }
+    }
+
+    class i16 : ProtoData
+    {
+        private Int16 _val;
+        public Int16 val
+        {
+            get { return _val; }
+            set { _val = value; }
+        }
+        public override System.Collections.Generic.List<Byte> __encode()
+        {
+            byte[] bin = System.BitConverter.GetBytes(_val);
+            var ret = new System.Collections.Generic.List<Byte>(bin);
+            if (!System.BitConverter.IsLittleEndian)
+                ret.Reverse();
+            return ret;
+        }
+        public override Int32 __decode(ref byte[] binData, Int32 pos)
+        {
+            if(System.BitConverter.IsLittleEndian)
+            {
+                _val = System.BitConverter.ToInt16(binData, pos);
+                return pos + 2;
+            }
+            else
+            {
+                Byte[] reverBin = {binData[pos+1], binData[pos] };
+                _val = System.BitConverter.ToInt16(reverBin, 0);
+                return pos + 2;
+            }
+        }
+    }
+
+
+
+    class BinaryWrite
+    {
+
+        public System.Collections.Generic.List<Byte> write(Byte n)
+        {
+            return new System.Collections.Generic.List<Byte>(n);
+        }
+        public System.Collections.Generic.List<Byte> write(Char n)
+        {
+            return new System.Collections.Generic.List<Byte>(n);
+        }
+        public System.Collections.Generic.List<Byte> write(Int16 n)
+        {
+            byte[] bin = System.BitConverter.GetBytes(n);
+            var ret = new System.Collections.Generic.List<Byte>(bin);
+            if (!System.BitConverter.IsLittleEndian)
+                ret.Reverse();
+            return ret;
+        }
+        public System.Collections.Generic.List<Byte> write(UInt16 n)
+        {
+            byte[] bin = System.BitConverter.GetBytes(n);
+            var ret = new System.Collections.Generic.List<Byte>(bin);
+            if (!System.BitConverter.IsLittleEndian)
+                ret.Reverse();
+            return ret;
+        }
+        public System.Collections.Generic.List<Byte> write(Int32 n)
+        {
+            byte[] bin = System.BitConverter.GetBytes(n);
+            var ret = new System.Collections.Generic.List<Byte>(bin);
+            if (!System.BitConverter.IsLittleEndian)
+                ret.Reverse();
+            return ret;
+        }
+        public System.Collections.Generic.List<Byte> write(UInt32 n)
+        {
+            byte[] bin = System.BitConverter.GetBytes(n);
+            var ret = new System.Collections.Generic.List<Byte>(bin);
+            if (!System.BitConverter.IsLittleEndian)
+                ret.Reverse();
+            return ret;
+        }
+        public System.Collections.Generic.List<Byte> write(Int64 n)
+        {
+            byte[] bin = System.BitConverter.GetBytes(n);
+            var ret = new System.Collections.Generic.List<Byte>(bin);
+            if (!System.BitConverter.IsLittleEndian)
+                ret.Reverse();
+            return ret;
+        }
+        public System.Collections.Generic.List<Byte> write(UInt64 n)
+        {
+            byte[] bin = System.BitConverter.GetBytes(n);
+            var ret = new System.Collections.Generic.List<Byte>(bin);
+            if (!System.BitConverter.IsLittleEndian)
+                ret.Reverse();
+            return ret;
+        }
+        public System.Collections.Generic.List<Byte> write(string n)
+        {
+            var ret = write((UInt16)n.Length);
+            for (int i = 0; i < n.Length; i++ )
+            {
+                ret.Add((Byte)n[i]);
+            }
+            return ret;
+        }
+        public System.Collections.Generic.List<Byte> writeData<T>( T t)
+        {
+            var ret = new System.Collections.Generic.List<Byte>();
+            return ret;
+        }
+
+    }
+    class Proto
+    {
+        
+    }
+
+
+
     class STATIC_EC_SUCCESS //global const 
     {
         public const UInt16 value = 100;
@@ -21,8 +184,8 @@ namespace Proto4z
         public string name;
     }
 
-    class HeroInfoDict : Dictionary<Int32, HeroInfo> { }
-    class HeroInfoArray : List<HeroInfo> { }
+    class HeroInfoDict : System.Collections.Generic.Dictionary<Int32, HeroInfo> { }
+    class HeroInfoArray : System.Collections.Generic.List<HeroInfo> { }
     class UserInfo //struct
     {
         public UInt64 uid;
@@ -72,7 +235,18 @@ namespace ConsoleApplication2
             result.info.arrayHeros.Add(hero1);
             result.info.arrayHeros.Add(hero2);
 
-            System.Console.WriteLine(result.retCode);
+            Int32 n = 32;
+
+            byte[] bytes = System.BitConverter.GetBytes(n);
+            
+            System.Collections.Generic.List<Byte> binData = new  System.Collections.Generic.List<Byte>();
+            binData.AddRange( new System.Collections.Generic.List<Byte>(bytes));
+
+            for (int i = 0; i < binData.Count; i++)
+            {
+                System.Console.WriteLine((int)binData[i]);
+            }
+            
         }
     }
 }
