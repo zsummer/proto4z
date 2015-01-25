@@ -37,10 +37,10 @@
 #include "genProto.h"
 #include <algorithm>
 
-std::string getCppType(std::string type)
+std::string getCPPType(std::string type)
 {
-	auto founder = xmlTypeToCppType.find(type);
-	if (founder != xmlTypeToCppType.end() && !founder->second.empty())
+	auto founder = xmlTypeToCPPType.find(type);
+	if (founder != xmlTypeToCPPType.end() && !founder->second.empty())
 	{
 		type = founder->second;
 	}
@@ -69,7 +69,7 @@ bool genCppFile(std::string path, std::string filename, std::string attr, std::v
 		}
 		else if (info._type == GT_DataConstValue)
 		{
-			text += "const " + getCppType(info._const._type) + " " + info._const._name + " = " + info._const._value + "; ";
+			text += "const " + getCPPType(info._const._type) + " " + info._const._name + " = " + info._const._value + "; ";
 			if (!info._const._desc.empty())
 			{
 				text += "//" + info._const._desc;
@@ -78,7 +78,7 @@ bool genCppFile(std::string path, std::string filename, std::string attr, std::v
 		}
 		else if (info._type == GT_DataArray)
 		{
-			text += LFCR + "typedef std::vector<" + getCppType(info._array._type) + "> " + info._array._arrayName + "; ";
+			text += LFCR + "typedef std::vector<" + getCPPType(info._array._type) + "> " + info._array._arrayName + "; ";
 			if (!info._array._desc.empty())
 			{
 				text += "//" + info._array._desc;
@@ -88,7 +88,7 @@ bool genCppFile(std::string path, std::string filename, std::string attr, std::v
 		else if (info._type == GT_DataMap)
 		{
 			text += LFCR + "typedef std::map<"
-				+ getCppType(info._map._typeKey) + ", " + getCppType(info._map._typeValue) 
+				+ getCPPType(info._map._typeKey) + ", " + getCPPType(info._map._typeValue) 
 				+ "> " + info._map._mapName + "; ";
 			if (!info._map._desc.empty())
 			{
@@ -102,7 +102,7 @@ bool genCppFile(std::string path, std::string filename, std::string attr, std::v
 			//write ProtoID
 			if (info._type == GT_DataProto)
 			{
-				text += "const " + getCppType(info._proto._const._type) + " " 
+				text += "const " + getCPPType(info._proto._const._type) + " " 
 					+ info._proto._const._name + " = " + info._proto._const._value + "; ";
 				if (!info._proto._const._desc.empty())
 				{
@@ -122,7 +122,7 @@ bool genCppFile(std::string path, std::string filename, std::string attr, std::v
 
 			for (const auto & m : info._proto._struct._members)
 			{
-				text += "\t" + getCppType(m._type) + " " + m._name + "; ";
+				text += "\t" + getCPPType(m._type) + " " + m._name + "; ";
 				if (!m._desc.empty())
 				{
 					text += "//" + m._desc;
@@ -136,8 +136,8 @@ bool genCppFile(std::string path, std::string filename, std::string attr, std::v
 				std::string memberText;
 				for (const auto &m : info._proto._struct._members)
 				{
-					auto founder = xmlTypeToCppDefaultValue.find(m._type);
-					if (founder != xmlTypeToCppDefaultValue.end() && !founder->second.empty())
+					auto founder = xmlTypeToCPPDefaultValue.find(m._type);
+					if (founder != xmlTypeToCPPDefaultValue.end() && !founder->second.empty())
 					{
 						memberText += "\t\t" + m._name + " = " + founder->second + ";" + LFCR;
 					}
@@ -151,8 +151,8 @@ bool genCppFile(std::string path, std::string filename, std::string attr, std::v
 			}
 			if (info._type == GT_DataProto)
 			{
-				text += std::string("\tinline ") + getCppType(ProtoIDType) + " GetProtoID() { return " + info._proto._const._value + ";}" + LFCR;
-				text += std::string("\tinline ") + getCppType("string") + " GetProtoName() { return \""
+				text += std::string("\tinline ") + getCPPType(ProtoIDType) + " GetProtoID() { return " + info._proto._const._value + ";}" + LFCR;
+				text += std::string("\tinline ") + getCPPType("string") + " GetProtoName() { return \""
 					+ info._proto._const._name + "\";}" + LFCR;
 			}
 			text += "};" + LFCR;
@@ -301,6 +301,208 @@ bool genLuaFile(std::string path, std::string filename, std::string attr, std::v
 	os.close();
 	return true;
 }
+
+
+
+
+
+
+std::string getCSharpType(std::string type)
+{
+	auto founder = xmlTypeToCSharpType.find(type);
+	if (founder != xmlTypeToCSharpType.end() && !founder->second.empty())
+	{
+		type = founder->second;
+	}
+	else
+	{
+		type = std::string("Proto4z.") + type;
+	}
+	return type;
+}
+
+bool genCSharpFile(std::string path, std::string filename, std::string attr, std::vector<StoreInfo> & stores)
+{
+
+	std::string text = LFCR;
+
+	for (auto &info : stores)
+	{
+		if (info._type == GT_DataConstValue)
+		{
+			text += "class STATIC_" + info._const._name + " ";
+			if (!info._const._desc.empty())
+			{
+				text += "//" + info._const._desc;
+			}
+			text += LFCR;
+			text += "{" + LFCR;
+			text += "\tpublic static " + getCSharpType(info._const._type) + " value = new " + getCSharpType(info._const._type) + "(" + info._const._value + "); " + LFCR;
+			text += "}" + LFCR;
+		}
+		else if (info._type == GT_DataArray)
+		{
+			text += LFCR + "class " + info._array._arrayName + " : System.Collections.Generic.List<" + getCSharpType(info._array._type) + ">, IProtoObject ";
+			if (!info._array._desc.empty())
+			{
+				text += "//" + info._array._desc;
+			}
+			text += LFCR;
+			text += "{" + LFCR;
+			text += "\t"   "public System.Collections.Generic.List<byte> __encode()" + LFCR;
+			text += "\t{" + LFCR;
+			text += "\t\t"   "var ret = new System.Collections.Generic.List<Byte>();" + LFCR;
+			text += "\t\t"   " var len = new Proto4z.ui16((UInt16)this.Count);" + LFCR;
+			text += "\t\t"   "ret.AddRange(len.__encode());" + LFCR;
+			text += "\t\t"   "for (int i = 0; i < this.Count; i++ )" + LFCR;
+			text += "\t\t"   "{" + LFCR;
+			text += "\t\t\t"  "ret.AddRange(this[i].__encode());" + LFCR;
+			text += "\t\t"   "}" + LFCR;
+			text += "\t\t"   "return ret;" + LFCR;
+			text += "\t}" + LFCR;
+			text += LFCR;
+
+			text += "\t"   "public System.Int32 __decode(byte[] binData, ref System.Int32 pos)" + LFCR;
+			text += "\t{" + LFCR;
+			text += "\t\t"   "var len = new Proto4z.ui16(0);" + LFCR;
+			text += "\t\t"   "len.__decode(binData, ref pos);" + LFCR;
+			text += "\t\t"  "if(len.val > 0)" + LFCR;
+			text += "\t\t"   "{" + LFCR;
+			text += "\t\t\t"  "for (int i=0; i<len.val; i++)" + LFCR;
+			text += "\t\t\t"   "{" + LFCR;
+			text += "\t\t\t\t" "var data = new " + getCSharpType(info._array._type) + "();" + LFCR;
+			text += "\t\t\t\t"  " data.__decode(binData, ref pos);" + LFCR;
+			text += "\t\t\t\t"  "this.Add(data);" + LFCR;
+			text += "\t\t\t"   "}" + LFCR;
+			text += "\t\t"   "}" + LFCR;
+			text += "\t\t"   "return pos;" + LFCR;
+			text += "\t}" + LFCR;
+			text += "}" + LFCR;
+		}
+		else if (info._type == GT_DataMap)
+		{
+			text += LFCR + "class " + info._map._mapName + " : System.Collections.Generic.Dictionary<" + getCSharpType(info._map._typeKey) + ", " + getCSharpType(info._map._typeValue)  + ">, IProtoObject ";
+			if (!info._array._desc.empty())
+			{
+				text += "//" + info._array._desc;
+			}
+			text += LFCR;
+			text += "{" + LFCR;
+			text += "\t"   "public System.Collections.Generic.List<byte> __encode()" + LFCR;
+			text += "\t{" +  LFCR;
+			text += "\t\t"  "var ret = new System.Collections.Generic.List<Byte>();" + LFCR;
+			text += "\t\t"   " var len = new Proto4z.ui16((UInt16)this.Count);" + LFCR;
+			text += "\t\t"   "ret.AddRange(len.__encode());" + LFCR;
+			text += "\t\t"   "foreach(var kv in this)" + LFCR;
+			text += "\t\t"   "{" + LFCR;
+			text += "\t\t\t"   "ret.AddRange(kv.Key.__encode());" + LFCR;
+			text += "\t\t\t"   "ret.AddRange(kv.Value.__encode());" + LFCR;
+			text += "\t\t"   "}" + LFCR;
+			text += "\t\t"   "return ret;" + LFCR;
+			text += "\t}" +  LFCR;
+			text += LFCR;
+
+			text += "\t"   "public System.Int32 __decode(byte[] binData, ref System.Int32 pos)" + LFCR;
+			text += "\t{" + LFCR;
+			text += "\t\t"   "var len = new Proto4z.ui16(0);" + LFCR;
+			text += "\t\t"   "len.__decode(binData, ref pos);" + LFCR;
+			text += "\t\t"   "if(len.val > 0)" + LFCR;
+			text += "\t\t"   "{" + LFCR;
+			text += "\t\t\t"   "for (int i=0; i<len.val; i++)" + LFCR;
+			text += "\t\t\t"   "{" + LFCR;
+			text += "\t\t\t\t"   "var key = new " + getCSharpType(info._map._typeKey) + "();" + LFCR;
+			text += "\t\t\t\t"   "var val = new " + getCSharpType(info._map._typeValue) + "();" + LFCR;
+			text += "\t\t\t\t"    "key.__decode(binData, ref pos);" + LFCR;
+			text += "\t\t\t\t"   "val.__decode(binData, ref pos);" + LFCR;
+			text += "\t\t\t\t"   "this.Add(key, val);" + LFCR;
+			text += "\t\t\t"   "}" + LFCR;
+			text += "\t\t"   "}" + LFCR;
+			text += "\t\t"   "return pos;" + LFCR;
+			text += "\t}" + LFCR;
+			text += "}" + LFCR;
+
+		}
+		else if (info._type == GT_DataStruct || info._type == GT_DataProto)
+		{
+			text += LFCR;
+			text += "class " + info._proto._struct._name + ": Proto4z.IProtoObject";
+			if (!info._proto._struct._desc.empty())
+			{
+				text += " //" + info._proto._struct._desc;
+			}
+			text += LFCR;
+			text += "{\t" + LFCR;
+
+			//write ProtoID
+			if (info._type == GT_DataProto)
+			{
+				text += "\t public Proto4z.ui16 getProtoID() { return new Proto4z.ui16(" + info._proto._const._value + "); }" + LFCR;
+				text += "\t  public string getProtoName() { return \"" + info._proto._struct._name + "\"; }" + LFCR;
+			}
+
+			for (const auto & m : info._proto._struct._members)
+			{
+				text += "\tpublic " + getCSharpType(m._type) + " " + m._name + "; ";
+				if (!m._desc.empty())
+				{
+					text += "//" + m._desc;
+				}
+				text += LFCR;
+			}
+
+
+
+			//encode
+			text += "\tpublic System.Collections.Generic.List<byte> __encode()" + LFCR;
+			text += "\t{" + LFCR;
+			text += "\t\t"   "var ret = new System.Collections.Generic.List<byte>();" + LFCR;
+			for (const auto &m : info._proto._struct._members)
+			{
+				text += "\t\t"  "ret.AddRange(" + m._name + ".__encode());" + LFCR;
+			}
+			text += "\t\t"  "return ret;" + LFCR;
+			text += "\t}" + LFCR;
+
+			//decode
+			text += "\tpublic System.Int32 __decode(byte[] binData, ref System.Int32 pos)" + LFCR;
+			text += "\t{" + LFCR;
+			for (const auto &m : info._proto._struct._members)
+			{
+				text += "\t\t" + m._name + " = new " + m._type + "();" + LFCR;
+				text += "\t\t" + m._name + ".__decode(binData, ref pos);" + LFCR;
+			}
+			text += "\t}" + LFCR;
+			text += "}" + LFCR;
+		}
+
+	}
+	text += LFCR + LFCR;
+
+	std::ofstream os;
+	os.open(path + filename + attr, std::ios::binary);
+	if (!os.is_open())
+	{
+		LOGE("genCppFile open file Error. : " << path + filename + attr);
+		return false;
+	}
+	os.write(text.c_str(), text.length());
+	os.close();
+	return true;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -688,8 +890,13 @@ ParseCode genProto::genCode()
 		{
 			LOGE("CreateDir lua Error. ");
 		}
+		if (!zsummer::utility::IsDirectory("CSharp") && !zsummer::utility::CreateDir("CSharp"))
+		{
+			LOGE("CreateDir lua Error. ");
+		}
 		std::string cppFileName = "C++/" + _fileName + ".h";
 		std::string luaFileName = "lua/" + _fileName + ".lua";
+		std::string csFileName = "CSharp/" + _fileName + ".CSharp";
 		if (xmlmd5 != _md5 || !zsummer::utility::GetFileStatus(cppFileName, 6))
 		{
 			if (!genCppFile("C++/", _fileName, ".h", _vctStoreInfo))
@@ -700,6 +907,13 @@ ParseCode genProto::genCode()
 		if (xmlmd5 != _md5 || !zsummer::utility::GetFileStatus(luaFileName, 6))
 		{
 			if (!genLuaFile("lua/", _fileName, ".lua", _vctStoreInfo))
+			{
+				return PC_ERROR;
+			}
+		}
+		if (xmlmd5 != _md5 || !zsummer::utility::GetFileStatus(csFileName, 6))
+		{
+			if (!genCSharpFile("CSharp/", _fileName, ".cs", _vctStoreInfo))
 			{
 				return PC_ERROR;
 			}

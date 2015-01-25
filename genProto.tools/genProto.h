@@ -61,7 +61,7 @@
 using namespace tinyxml2;
 
 //support data type
-static  std::map<std::string, std::string> xmlTypeToCppType = {
+static  std::map<std::string, std::string> xmlTypeToCPPType = {
 		{ "i8", "char" },
 		{ "ui8", "unsigned char" },
 		{ "i16", "short" },
@@ -76,7 +76,7 @@ static  std::map<std::string, std::string> xmlTypeToCppType = {
 };
 
 //data default init value
-static  std::map<std::string, std::string> xmlTypeToCppDefaultValue = {
+static  std::map<std::string, std::string> xmlTypeToCPPDefaultValue = {
 		{ "i8", "'\0'" },
 		{ "ui8", "0" },
 		{ "i16", "0" },
@@ -88,6 +88,41 @@ static  std::map<std::string, std::string> xmlTypeToCppDefaultValue = {
 		{ "float", "0.0" },
 		{ "double", "0.0" },
 };
+
+
+//support data type
+static  std::map<std::string, std::string> xmlTypeToCSharpType = {
+	{ "i8", "Proto4z.i8" },
+	{ "ui8", "Proto4z.ui8" },
+	{ "i16", "Proto4z.i16" },
+	{ "ui16", "Proto4z.ui16" },
+	{ "i32", "Proto4z.i32" },
+	{ "ui32", "Proto4z.ui32" },
+	{ "i64", "Proto4z.i64" },
+	{ "ui64", "Proto4z.ui64" },
+	{ "float", "Proto4z.Float" },
+	{ "double", "Proto4z.Double" },
+	{ "string", "Proto4z.String" },
+};
+
+//data default init value
+static  std::map<std::string, std::string> xmlTypeToCSharpDefaultValue = {
+	{ "i8", "'\0'" },
+	{ "ui8", "0" },
+	{ "i16", "0" },
+	{ "ui16", "0" },
+	{ "i32", "0" },
+	{ "ui32", "0" },
+	{ "i64", "0" },
+	{ "ui64", "0" },
+	{ "float", "0.0" },
+	{ "double", "0.0" },
+	{ "string", "\"\"" },
+};
+
+
+
+
 
 //include file name, without suffix
 struct DataInclude
