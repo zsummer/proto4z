@@ -252,14 +252,14 @@ namespace ConsoleApplication2
 
                 StressReqAndResult req = new StressReqAndResult();
                 req.text = new Proto4z.String("this is an test text.");
-              
+                var content = req.__encode();
 
                 NetHeader head = new NetHeader();
-                head.packLen = new Proto4z.ui16((UInt16)(2 + 2 + req.__encode().Count));
+                head.packLen = new Proto4z.ui16((UInt16)(2 + 2 + content.Count));
                 head.protoID = new Proto4z.ui16((UInt16)10002);
 
                 sendData.AddRange(head.__encode());
-                sendData.AddRange(req.__encode());
+                sendData.AddRange(content);
                 clientSocket.Send(sendData.ToArray());
 
                 
