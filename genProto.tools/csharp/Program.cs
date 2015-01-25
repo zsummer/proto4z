@@ -38,11 +38,6 @@
 
 
 
-
-
-
-using System;
-
 using Proto4z;
 
 
@@ -59,14 +54,14 @@ class HeroInfo : IProtoObject//struct
 {
     public i32 id;
     public Proto4z.String name;
-    public System.Collections.Generic.List<Byte> __encode()
+    public System.Collections.Generic.List<byte> __encode()
     {
-        var ret = new System.Collections.Generic.List<Byte>();
+        var ret = new System.Collections.Generic.List<byte>();
         ret.AddRange(id.__encode());
         ret.AddRange(name.__encode());
         return ret;
     }
-    public Int32 __decode(byte[] binData, ref Int32 pos)
+    public System.Int32 __decode(byte[] binData, ref System.Int32 pos)
     {
         id = new i32(0);
         name = new Proto4z.String("");
@@ -78,10 +73,10 @@ class HeroInfo : IProtoObject//struct
 
 class HeroInfoDict : System.Collections.Generic.Dictionary<i32, HeroInfo> , IProtoObject
 {
-    public System.Collections.Generic.List<Byte> __encode()
+    public System.Collections.Generic.List<byte> __encode()
     {
-        var ret = new System.Collections.Generic.List<Byte>();
-        var len = new ui16((UInt16)this.Count);
+        var ret = new System.Collections.Generic.List<byte>();
+        var len = new ui16((System.UInt16)this.Count);
         ret.AddRange(len.__encode());
         foreach(var kv in this)
         {
@@ -90,7 +85,7 @@ class HeroInfoDict : System.Collections.Generic.Dictionary<i32, HeroInfo> , IPro
         }
         return ret;
     }
-    public Int32 __decode(byte[] binData, ref Int32 pos)
+    public System.Int32 __decode(byte[] binData, ref System.Int32 pos)
     {
         var len = new ui16(0);
         len.__decode(binData, ref pos);
@@ -110,10 +105,10 @@ class HeroInfoDict : System.Collections.Generic.Dictionary<i32, HeroInfo> , IPro
 }
 class HeroInfoArray : System.Collections.Generic.List<HeroInfo>, IProtoObject
 {
-    public System.Collections.Generic.List<Byte> __encode()
+    public System.Collections.Generic.List<byte> __encode()
     {
-        var ret = new System.Collections.Generic.List<Byte>();
-        var len = new ui16((UInt16)this.Count);
+        var ret = new System.Collections.Generic.List<byte>();
+        var len = new ui16((System.UInt16)this.Count);
         ret.AddRange(len.__encode());
         for (int i = 0; i < this.Count; i++ )
         {
@@ -121,9 +116,9 @@ class HeroInfoArray : System.Collections.Generic.List<HeroInfo>, IProtoObject
         }
         return ret;
     }
-    public Int32 __decode(byte[] binData, ref Int32 pos)
+    public System.Int32 __decode(byte[] binData, ref System.Int32 pos)
     {
-        var len = new ui16(0);
+        var len = new Proto4z.ui16(0);
         len.__decode(binData, ref pos);
         if(len.val > 0)
         {
@@ -143,16 +138,16 @@ class UserInfo : IProtoObject//struct
     public HeroInfo hero;
     public HeroInfoDict dictHeros;
     public HeroInfoArray arrayHeros;
-    public System.Collections.Generic.List<Byte> __encode()
+    public System.Collections.Generic.List<byte> __encode()
     {
-        var ret = new System.Collections.Generic.List<Byte>();
+        var ret = new System.Collections.Generic.List<byte>();
         ret.AddRange(uid.__encode());
         ret.AddRange(hero.__encode());
         ret.AddRange(dictHeros.__encode());
         ret.AddRange(arrayHeros.__encode());
         return ret;
     }
-    public Int32 __decode(byte[] binData, ref Int32 pos)
+    public System.Int32 __decode(byte[] binData, ref System.Int32 pos)
     {
         uid = new ui64(0);
         hero = new HeroInfo();
@@ -168,16 +163,18 @@ class UserInfo : IProtoObject//struct
 
 class LS2C_LoginResult: IProtoObject
 {
+    public Proto4z.ui16 getProtoID() { return new Proto4z.ui16(1000); }
+    public string getProtoName() { return "LS2C_LoginResult"; }
     public ui16 retCode;
     public UserInfo info;
-    public System.Collections.Generic.List<Byte> __encode()
+    public System.Collections.Generic.List<byte> __encode()
     {
-        var ret = new System.Collections.Generic.List<Byte>();
+        var ret = new System.Collections.Generic.List<byte>();
         ret.AddRange(retCode.__encode());
         ret.AddRange(info.__encode());
         return ret;
     }
-    public Int32 __decode(byte[] binData, ref Int32 pos)
+    public System.Int32 __decode(byte[] binData, ref System.Int32 pos)
     {
         retCode = new ui16(0);
         info = new UserInfo();
