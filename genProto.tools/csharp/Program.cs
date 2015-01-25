@@ -39,7 +39,10 @@
 
 
 using Proto4z;
-
+using System;
+using System.Net;
+using System.Net.Sockets;
+using System.Threading;  
 
 
 class STATIC_EC_SUCCESS //global const 
@@ -189,6 +192,118 @@ class LS2C_LoginResult: IProtoObject
 
 namespace ConsoleApplication2
 {
+    class Client
+    {
+        class NetHeader : IProtoObject
+        {
+            public Proto4z.ui16 packLen;
+            public Proto4z.ui16 protoID;
+            public System.Collections.Generic.List<byte> __encode()
+            {
+                var ret = new System.Collections.Generic.List<byte>();
+                ret.AddRange(packLen.__encode());
+                ret.AddRange(protoID.__encode());
+                return ret;
+            }
+            public System.Int32 __decode(byte[] binData, ref System.Int32 pos)
+            {
+                packLen = new Proto4z.ui16();
+                protoID = new Proto4z.ui16();
+                packLen.__decode(binData, ref pos);
+                protoID.__decode(binData, ref pos);
+                return pos;
+            }
+        }
+        class StressReqAndResult : IProtoObject
+        {
+            public Proto4z.String text;
+            public System.Collections.Generic.List<byte> __encode()
+            {
+                var ret = new System.Collections.Generic.List<byte>();
+                ret.AddRange(text.__encode());
+                return ret;
+            }
+            public System.Int32 __decode(byte[] binData, ref System.Int32 pos)
+            {
+                text = new Proto4z.String();
+                text.__decode(binData, ref pos);
+                return pos;
+            }
+        }
+
+        public void Run()
+        {
+
+            IPAddress ip = IPAddress.Parse("127.0.0.1");
+            Socket clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            try
+            {
+                clientSocket.Connect(new IPEndPoint(ip, 8081)); //zsummerX/example/frameStressTest server default port 
+                Console.WriteLine("connect Success.");
+            }
+            catch
+            {
+                Console.WriteLine("connect Failed");
+                return;
+            }
+            do
+            {
+                var sendData = new System.Collections.Generic.List<byte>();
+
+                StressReqAndResult req = new StressReqAndResult();
+                req.text = new Proto4z.String("this is an test text.");
+              
+
+                NetHeader head = new NetHeader();
+                head.packLen = new Proto4z.ui16((UInt16)(2 + 2 + req.__encode().Count));
+                head.protoID = new Proto4z.ui16((UInt16)10002);
+
+                sendData.AddRange(head.__encode());
+                sendData.AddRange(req.__encode());
+                clientSocket.Send(sendData.ToArray());
+
+                
+                
+                var recvBytes = new byte[2000];
+                int curLen = 0;
+                int needLen = 4;
+                int recvLen = 0;
+                NetHeader recvHead = new NetHeader();
+                do
+                {
+                    recvLen = clientSocket.Receive(recvBytes, curLen, needLen, System.Net.Sockets.SocketFlags.None);
+                    if (recvLen == 0)
+                    {
+                        return;
+                    }
+                    curLen += recvLen;
+                    needLen -= recvLen;
+                    if (needLen == 0 && curLen == 4) //head already read finish
+                    {
+                        int pos = 0;
+                        recvHead.__decode(recvBytes, ref pos);
+                        needLen = recvHead.packLen.val - 4;
+                    }
+                    else if (needLen == 0)
+                    {
+                        if (recvHead.protoID.val == 10003)
+                        {
+                            StressReqAndResult result = new StressReqAndResult();
+                            int pos = 4;
+                            result.__decode(recvBytes, ref pos);
+                            //System.Console.WriteLine("echo =" + result.text.val);
+                        }
+                        break;
+                    }
+                    recvLen = 0;
+                } while (true);
+
+
+            } while (true);
+
+        }
+    }  
+
     class Program
     {
         static void Main(string[] args)
@@ -242,6 +357,18 @@ namespace ConsoleApplication2
 
             int pos = 0;
             v.__decode(binData, ref pos);
+
+
+            Client client = new Client();
+            client.Run();
+
+
+
+
+
+
+
+
         }
     }
 }
