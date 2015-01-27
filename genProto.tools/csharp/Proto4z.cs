@@ -41,14 +41,14 @@ namespace Proto4z
 {
     class RC4Encryption //rc4 encrypt
     {
-        private int m_x;
-	    private int m_y;
+        private int _x;
+	    private int _y;
         private int[] m_box;
 	    public void makeSBox(string obscure)
 	    {
             m_box = new int[256];
-		    m_x = 0;
-		    m_y = 0;
+		    _x = 0;
+		    _y = 0;
 		    for (int i = 0; i < 256; i++)
 		    {
 			    m_box[i] = i;
@@ -77,8 +77,8 @@ namespace Proto4z
 	    {
 		    int  x, y;
 
-		    x = m_x;
-		    y = m_y;
+		    x = _x;
+		    y = _y;
 
 		    for (int i = 0; i < length; i++)
 		    {
@@ -90,8 +90,8 @@ namespace Proto4z
                 data[i] ^= (byte)m_box[(byte)(a + b)];
 		    }
 
-		    m_x = x;
-		    m_y = y;
+		    _x = x;
+		    _y = y;
 	    }
 
 
@@ -102,7 +102,7 @@ namespace Proto4z
     interface IProtoObject
     {
         System.Collections.Generic.List<byte> __encode();
-        System.Int32 __decode(byte[] binData, ref System.Int32 pos);
+        int __decode(byte[] binData, ref int pos);
     }
 
     class i8 : IProtoObject, System.Collections.Generic.IEqualityComparer<i8>
@@ -119,7 +119,7 @@ namespace Proto4z
         {
             return new System.Collections.Generic.List<byte>(_val);
         }
-        public System.Int32 __decode(byte[] binData, ref System.Int32 pos)
+        public int __decode(byte[] binData, ref int pos)
         {
             _val = System.BitConverter.ToChar(binData, pos);
             pos += 1;
@@ -146,7 +146,18 @@ namespace Proto4z
         {
             return obj.val.GetHashCode();
         }
+
+        public static implicit operator i8(char val)
+        {
+            return new i8(val);
+        }
+        public static implicit operator char(i8 val)
+        {
+            return val.val;
+        }
     }
+
+
 
     class ui8 : IProtoObject, System.Collections.Generic.IEqualityComparer<ui8>
     {
@@ -163,7 +174,7 @@ namespace Proto4z
         {
             return new System.Collections.Generic.List<byte>(_val);
         }
-        public System.Int32 __decode(byte[] binData, ref System.Int32 pos)
+        public int __decode(byte[] binData, ref int pos)
         {
             _val = (byte)System.BitConverter.ToChar(binData, pos);
             pos += 1;
@@ -190,6 +201,14 @@ namespace Proto4z
         {
             return obj.val.GetHashCode();
         }
+        public static implicit operator ui8(byte val)
+        {
+            return new ui8(val);
+        }
+        public static implicit operator byte(ui8 val)
+        {
+            return val.val;
+        }
     }
 
     class i16 : IProtoObject, System.Collections.Generic.IEqualityComparer<i16>
@@ -211,7 +230,7 @@ namespace Proto4z
                 ret.Reverse();
             return ret;
         }
-        public System.Int32 __decode(byte[] binData, ref System.Int32 pos)
+        public int __decode(byte[] binData, ref int pos)
         {
             if(System.BitConverter.IsLittleEndian)
             {
@@ -246,6 +265,14 @@ namespace Proto4z
         {
             return obj.val.GetHashCode();
         }
+        public static implicit operator i16(System.Int16 val)
+        {
+            return new i16(val);
+        }
+        public static implicit operator System.Int16(i16 val)
+        {
+            return val.val;
+        }
     }
 
     class ui16 : IProtoObject, System.Collections.Generic.IEqualityComparer<ui16>
@@ -266,7 +293,7 @@ namespace Proto4z
                 ret.Reverse();
             return ret;
         }
-        public System.Int32 __decode(byte[] binData, ref System.Int32 pos)
+        public int __decode(byte[] binData, ref int pos)
         {
             if (System.BitConverter.IsLittleEndian)
             {
@@ -301,6 +328,14 @@ namespace Proto4z
         {
             return obj.val.GetHashCode();
         }
+        public static implicit operator ui16(System.UInt16 val)
+        {
+            return new ui16(val);
+        }
+        public static implicit operator System.UInt16(ui16 val)
+        {
+            return val.val;
+        }
     }
 
     class i32 : IProtoObject, System.Collections.Generic.IEqualityComparer<i32>
@@ -321,7 +356,7 @@ namespace Proto4z
                 ret.Reverse();
             return ret;
         }
-        public System.Int32 __decode(byte[] binData, ref System.Int32 pos)
+        public int __decode(byte[] binData, ref int pos)
         {
             if (System.BitConverter.IsLittleEndian)
             {
@@ -356,6 +391,15 @@ namespace Proto4z
         {
             return obj.val.GetHashCode();
         }
+
+        public static implicit operator i32(System.Int32 val)
+        {
+            return new i32(val);
+        }
+        public static implicit operator System.Int32(i32 val)
+        {
+            return val.val;
+        }
     }
 
     class ui32 : IProtoObject, System.Collections.Generic.IEqualityComparer<ui32>
@@ -376,7 +420,7 @@ namespace Proto4z
                 ret.Reverse();
             return ret;
         }
-        public System.Int32 __decode(byte[] binData, ref System.Int32 pos)
+        public int __decode(byte[] binData, ref int pos)
         {
             if (System.BitConverter.IsLittleEndian)
             {
@@ -411,6 +455,15 @@ namespace Proto4z
         {
             return obj.val.GetHashCode();
         }
+
+        public static implicit operator ui32(System.UInt32 val)
+        {
+            return new ui32(val);
+        }
+        public static implicit operator System.UInt32(ui32 val)
+        {
+            return val.val;
+        }
     }
 
     class i64 : IProtoObject, System.Collections.Generic.IEqualityComparer<i64>
@@ -431,7 +484,7 @@ namespace Proto4z
                 ret.Reverse();
             return ret;
         }
-        public System.Int32 __decode(byte[] binData, ref System.Int32 pos)
+        public int __decode(byte[] binData, ref int pos)
         {
             if (System.BitConverter.IsLittleEndian)
             {
@@ -466,6 +519,15 @@ namespace Proto4z
         {
             return obj.val.GetHashCode();
         }
+
+        public static implicit operator i64(System.Int64 val)
+        {
+            return new i64(val);
+        }
+        public static implicit operator System.Int64(i64 val)
+        {
+            return val.val;
+        }
     }
 
     class ui64 : IProtoObject, System.Collections.Generic.IEqualityComparer<ui64>
@@ -486,7 +548,7 @@ namespace Proto4z
                 ret.Reverse();
             return ret;
         }
-        public System.Int32 __decode(byte[] binData, ref System.Int32 pos)
+        public int __decode(byte[] binData, ref int pos)
         {
             if (System.BitConverter.IsLittleEndian)
             {
@@ -521,9 +583,18 @@ namespace Proto4z
         {
             return obj.val.GetHashCode();
         }
+
+        public static implicit operator ui64(System.UInt64 val)
+        {
+            return new ui64(val);
+        }
+        public static implicit operator System.UInt64(ui64 val)
+        {
+            return val.val;
+        }
     }
 
-    class Float : IProtoObject, System.Collections.Generic.IEqualityComparer<Float>
+    class Float : IProtoObject
     {
         private float _val;
         public Float() { _val = 0; }
@@ -541,7 +612,7 @@ namespace Proto4z
                 ret.Reverse();
             return ret;
         }
-        public System.Int32 __decode(byte[] binData, ref System.Int32 pos)
+        public int __decode(byte[] binData, ref int pos)
         {
             if (System.BitConverter.IsLittleEndian)
             {
@@ -555,30 +626,23 @@ namespace Proto4z
             pos += 4;
             return pos;
         }
-        public override bool Equals(System.Object obj)
-        {
-            if (obj == null) return false;
-            Float child = obj as Float;
-            if (child == null) return false;
-            return child.val == val;
-        }
-        public override int GetHashCode()
-        {
-            return val.GetHashCode();
-        }
-
-        public bool Equals(Float x, Float y)
-        {
-            return x == y;
-        }
 
         public int GetHashCode(Float obj)
         {
             return obj.val.GetHashCode();
         }
+
+        public static implicit operator Float(float val)
+        {
+            return new Float(val);
+        }
+        public static implicit operator float(Float val)
+        {
+            return val.val;
+        }
     }
 
-    class Double : IProtoObject, System.Collections.Generic.IEqualityComparer<Double>
+    class Double : IProtoObject
     {
         private double _val;
         public Double() { _val = 0; }
@@ -597,7 +661,7 @@ namespace Proto4z
                 ret.Reverse();
             return ret;
         }
-        public System.Int32 __decode(byte[] binData, ref System.Int32 pos)
+        public int __decode(byte[] binData, ref int pos)
         {
             if (System.BitConverter.IsLittleEndian)
             {
@@ -611,26 +675,15 @@ namespace Proto4z
             pos += 8;
             return pos;
         }
-        public override bool Equals(System.Object obj)
-        {
-            if (obj == null) return false;
-            Double child = obj as Double;
-            if (child == null) return false;
-            return child.val == val;
-        }
-        public override int GetHashCode()
-        {
-            return val.GetHashCode();
-        }
 
-        public bool Equals(Double x, Double y)
-        {
-            return x == y;
-        }
 
-        public int GetHashCode(Double obj)
+        public static implicit operator Double(double val)
         {
-            return obj.val.GetHashCode();
+            return new Double(val);
+        }
+        public static implicit operator double(Double val)
+        {
+            return val.val;
         }
     }
 
@@ -654,7 +707,7 @@ namespace Proto4z
             }
             return ret;
         }
-        public System.Int32 __decode(byte[] binData, ref System.Int32 pos)
+        public int __decode(byte[] binData, ref int pos)
         {
             _val = "";
             ui16 len = new ui16(0);
@@ -686,6 +739,15 @@ namespace Proto4z
         public int GetHashCode(String obj)
         {
             return obj.val.GetHashCode();
+        }
+
+        public static implicit operator Proto4z.String(string val)
+        {
+            return new Proto4z.String(val);
+        }
+        public static implicit operator string(Proto4z.String val)
+        {
+            return val.val;
         }
     }
 }

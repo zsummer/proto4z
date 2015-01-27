@@ -45,14 +45,6 @@ using System.Net.Sockets;
 using System.Threading;  
 
 
-class STATIC_EC_SUCCESS //global const 
-{
-    public static ui16 value = new ui16(100);
-}
-class STATIC_EC_ERROR //global const 
-{
-    public static ui16 value = new ui16(100);
-}
 class HeroInfo : IProtoObject//struct
 {
     public i32 id;
@@ -66,8 +58,8 @@ class HeroInfo : IProtoObject//struct
     }
     public System.Int32 __decode(byte[] binData, ref System.Int32 pos)
     {
-        id = new i32(0);
-        name = new Proto4z.String("");
+        id = 0;
+        name = "";
         id.__decode(binData, ref pos);
         name.__decode(binData, ref pos);
         return pos;
@@ -255,8 +247,8 @@ namespace ConsoleApplication2
                 var content = req.__encode();
 
                 NetHeader head = new NetHeader();
-                head.packLen = new Proto4z.ui16((UInt16)(2 + 2 + content.Count));
-                head.protoID = new Proto4z.ui16((UInt16)10002);
+                head.packLen = (UInt16)(2 + 2 + content.Count);
+                head.protoID = 10002;
 
                 sendData.AddRange(head.__encode());
                 sendData.AddRange(content);
@@ -286,7 +278,7 @@ namespace ConsoleApplication2
                     }
                     else if (needLen == 0)
                     {
-                        if (recvHead.protoID.val == 10003)
+                        if (recvHead.protoID == 10003)
                         {
                             StressReqAndResult result = new StressReqAndResult();
                             int pos = 4;
@@ -361,7 +353,6 @@ namespace ConsoleApplication2
 
             Client client = new Client();
             client.Run();
-
 
 
 
