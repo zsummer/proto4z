@@ -39,7 +39,7 @@
 
 namespace Proto4z
 {
-    class RC4Encryption //rc4 encrypt
+    sealed  class RC4Encryption //rc4 encrypt
     {
         private int _x;
 	    private int _y;
@@ -105,7 +105,7 @@ namespace Proto4z
         int __decode(byte[] binData, ref int pos);
     }
 
-    class i8 : IProtoObject, System.Collections.Generic.IEqualityComparer<i8>
+    sealed class i8 : IProtoObject, System.Collections.Generic.IEqualityComparer<i8>
     {
         private char _val;
         public i8() { _val = '\0'; }
@@ -159,7 +159,7 @@ namespace Proto4z
 
 
 
-    class ui8 : IProtoObject, System.Collections.Generic.IEqualityComparer<ui8>
+    sealed class ui8 : IProtoObject, System.Collections.Generic.IEqualityComparer<ui8>
     {
         private byte _val;
         public ui8() { _val = 0; }
@@ -211,7 +211,7 @@ namespace Proto4z
         }
     }
 
-    class i16 : IProtoObject, System.Collections.Generic.IEqualityComparer<i16>
+    sealed class i16 : IProtoObject, System.Collections.Generic.IEqualityComparer<i16>
     {
         private System.Int16 _val;
         public i16() { _val = 0; }
@@ -275,7 +275,7 @@ namespace Proto4z
         }
     }
 
-    class ui16 : IProtoObject, System.Collections.Generic.IEqualityComparer<ui16>
+    sealed class ui16 : IProtoObject, System.Collections.Generic.IEqualityComparer<ui16>
     {
         private System.UInt16 _val;
         public ui16() { _val = 0; }
@@ -338,7 +338,7 @@ namespace Proto4z
         }
     }
 
-    class i32 : IProtoObject, System.Collections.Generic.IEqualityComparer<i32>
+    sealed class i32 : IProtoObject, System.Collections.Generic.IEqualityComparer<i32>
     {
         private System.Int32 _val;
         public i32() { _val = 0; }
@@ -402,7 +402,7 @@ namespace Proto4z
         }
     }
 
-    class ui32 : IProtoObject, System.Collections.Generic.IEqualityComparer<ui32>
+    sealed class ui32 : IProtoObject, System.Collections.Generic.IEqualityComparer<ui32>
     {
         private System.UInt32 _val;
         public ui32() { _val = 0; }
@@ -466,7 +466,7 @@ namespace Proto4z
         }
     }
 
-    class i64 : IProtoObject, System.Collections.Generic.IEqualityComparer<i64>
+    sealed class i64 : IProtoObject, System.Collections.Generic.IEqualityComparer<i64>
     {
         private System.Int64 _val;
         public i64() { _val = 0; }
@@ -530,7 +530,7 @@ namespace Proto4z
         }
     }
 
-    class ui64 : IProtoObject, System.Collections.Generic.IEqualityComparer<ui64>
+    sealed class ui64 : IProtoObject, System.Collections.Generic.IEqualityComparer<ui64>
     {
         private System.UInt64 _val;
         public ui64() { _val = 0; }
@@ -594,7 +594,7 @@ namespace Proto4z
         }
     }
 
-    class Float : IProtoObject
+    sealed class Float : IProtoObject
     {
         private float _val;
         public Float() { _val = 0; }
@@ -642,7 +642,7 @@ namespace Proto4z
         }
     }
 
-    class Double : IProtoObject
+    sealed class Double : IProtoObject
     {
         private double _val;
         public Double() { _val = 0; }
@@ -687,7 +687,7 @@ namespace Proto4z
         }
     }
 
-    class String : IProtoObject, System.Collections.Generic.IEqualityComparer<Proto4z.String>
+    sealed class String : IProtoObject, System.Collections.Generic.IEqualityComparer<Proto4z.String>
     {
         private string _val;
         public String() { _val = ""; }
