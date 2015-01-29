@@ -300,22 +300,26 @@ namespace ConsoleApplication2
     {
         static void Main(string[] args)
         {
-            LS2C_LoginResult result = new LS2C_LoginResult();
-            result.retCode = new ui16(0);
-            result.info = new UserInfo();
-            result.info.uid = new ui64(100);
-            result.info.hero = new HeroInfo();
-            result.info.hero.id = new i32(100);
-            result.info.hero.name = new Proto4z.String("hero");
+            RC4Encryption rc4Server = new RC4Encryption();
+            RC4Encryption rc4Client = new RC4Encryption();
+            rc4Server.makeSBox("zhangyawei");
+            rc4Client.makeSBox("zhangyawei");
 
             HeroInfo hero1 = new HeroInfo();
-            hero1.id = new i32(100);
-            hero1.name = new Proto4z.String("hero1");
+            hero1.id = 100;
+            hero1.name = "hero1";
 
             HeroInfo hero2 = new HeroInfo();
-            hero2.id = new i32(101);
-            hero2.name = new Proto4z.String("hero2");
+            hero2.id = 101;
+            hero2.name = "hero2";
 
+            LS2C_LoginResult result = new LS2C_LoginResult();
+            result.retCode = 0;
+            result.info = new UserInfo();
+            result.info.uid = 100;
+            result.info.hero = new HeroInfo();
+            result.info.hero.id = 100;
+            result.info.hero.name = "hero";
 
             result.info.dictHeros = new HeroInfoDict();
             result.info.dictHeros.Add(hero1.id, hero1);
@@ -324,12 +328,6 @@ namespace ConsoleApplication2
             result.info.arrayHeros = new HeroInfoArray();
             result.info.arrayHeros.Add(hero1);
             result.info.arrayHeros.Add(hero2);
-
-            RC4Encryption rc4Server = new RC4Encryption();
-            RC4Encryption rc4Client = new RC4Encryption();
-            rc4Server.makeSBox("zhangyawei");
-            rc4Client.makeSBox("zhangyawei");
-
 
             var byteData = result.__encode();
             var binData = byteData.ToArray();
