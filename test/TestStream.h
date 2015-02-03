@@ -68,8 +68,8 @@ inline bool operator!=(const tagTestData & tag1, const tagTestData &tag2)
 {
 	return !(tag1 == tag2);
 }
-template<class StreamHeadTrait>
-inline ReadStream<StreamHeadTrait> & operator >>(ReadStream<StreamHeadTrait> & rs, tagTestData & data)
+
+inline ReadStream & operator >>(ReadStream & rs, tagTestData & data)
 {
 	rs >> data.bl;
 	rs >> data.ch;
@@ -94,8 +94,8 @@ inline ReadStream<StreamHeadTrait> & operator >>(ReadStream<StreamHeadTrait> & r
 	rs >> data.dq;
 	return rs;
 }
-template<class StreamHeadTrait>
-inline WriteStream<StreamHeadTrait> & operator <<(WriteStream<StreamHeadTrait> & ws, const tagTestData & data)
+
+inline WriteStream & operator <<(WriteStream & ws, const tagTestData & data)
 {
 	ws << data.bl;
 	ws << data.ch;
@@ -147,7 +147,7 @@ struct UDStreamHeadTraits
 };
 
 
-template <class StreamHeadTrait>
+
 class TestBase
 {
 public:
@@ -188,54 +188,49 @@ public:
 
 	inline bool CheckLenght()
 	{
-		const char * className = typeid(StreamHeadTrait).name();
-		WriteStream<StreamHeadTrait> ws(120);
+		WriteStream ws(120);
 		try
 		{
 			ws << _testData;
 			_packLen = ws.getStreamLen();
 			_bodyLen = ws.getStreamBodyLen();
-			if (_packLen - _bodyLen != sizeof(typename StreamHeadTrait::Integer) + sizeof(typename StreamHeadTrait::ProtoInteger))
+			if (_packLen - _bodyLen != sizeof(Integer) + sizeof(ProtoInteger))
 			{
-				cout << "CheckLenght -> " << className 
-				<< " HeadLen is error.  packLen=" << _packLen << ", bodyLen=" << _bodyLen << endl;
+				cout << "CheckLenght -> " " HeadLen is error.  packLen=" << _packLen << ", bodyLen=" << _bodyLen << endl;
 				return false;
 			}
 			if (120 != 
-				streamToInteger<typename StreamHeadTrait::ProtoInteger, StreamHeadTrait>(ws.getStream() + sizeof(typename StreamHeadTrait::Integer)) )
+				streamToInteger<ProtoInteger>(ws.getStream() + sizeof(Integer)) )
 			{
-				cout << "CheckLenght -> " << className 
-				<< " write protocol ID error.  packLen=" << _packLen << ", bodyLen=" << _bodyLen << endl;
+				cout << "CheckLenght -> " " write protocol ID error.  packLen=" << _packLen << ", bodyLen=" << _bodyLen << endl;
 				return false;
 			}
 		}
 		catch (std::runtime_error e)
 		{
-			cout << "CheckLenght -> " << className << " write Fail. error msg=" << e.what() << endl;
+			cout << "CheckLenght -> "  " write Fail. error msg=" << e.what() << endl;
 			return false;
 		}
-		cout << "CheckLenght -> " << className << " _packLen=" << _packLen << ", _bodyLen=" << _bodyLen << endl;
+		cout << "CheckLenght -> "  " _packLen=" << _packLen << ", _bodyLen=" << _bodyLen << endl;
 		return true;
 	}
 
-	inline bool CheckProtocol(WriteStream<StreamHeadTrait> &ws, const char * desc);
+	inline bool CheckProtocol(WriteStream &ws, const char * desc);
 
 	inline bool CheckAttachProtocol()
 	{
 		char * writeBuff = new char[_packLen];
 		memset(writeBuff, 0, _packLen);
-		WriteStream<StreamHeadTrait> ws(120, writeBuff, _packLen);
+		WriteStream ws(120, writeBuff, _packLen);
 		std::string str = "Check Attach Write. protocolTrits=";
-		str += typeid(StreamHeadTrait).name();
 		str += ":  ";
 		return CheckProtocol(ws, str.c_str());
 	}
 
 	inline bool CheckNoAttachProtocol()
 	{
-		WriteStream<StreamHeadTrait> ws(120, NULL, _packLen);
+		WriteStream ws(120, NULL, _packLen);
 		std::string str = "Check NoAttach Write. protocolTrits=";
-		str += typeid(StreamHeadTrait).name();
 		str += ":  ";
 		return CheckProtocol(ws, str.c_str());
 	}
@@ -247,14 +242,14 @@ public:
 		try
 		{
 			//analog recv message buff.
-			WriteStream<UDStreamHeadTraits> ws(120);
+			WriteStream ws(120);
 			unsigned int _roomID = 1;
 			ws << _roomID << _testData;
 			
 
 
 			//analog recv msg
-			std::pair<INTEGRITY_RET_TYPE, UDStreamHeadTraits::Integer> ret = checkBuffIntegrity<UDStreamHeadTraits>(ws.getStream(), ws.getStreamLen(), UDStreamHeadTraits::MaxPackLen);
+			std::pair<INTEGRITY_RET_TYPE, Integer> ret = checkBuffIntegrity(ws.getStream(), ws.getStreamLen(), MaxPackLen);
 			if (ret.first == IRT_CORRUPTION || ret.first == IRT_SHORTAGE)
 			{
 				cout << "CheckRouteProtocol -> " << className << "  checkBuffIntegrity error" << endl;
@@ -262,7 +257,7 @@ public:
 			}
 
 			//check
-			ReadStream<UDStreamHeadTraits> rs(ws.getStream(), ws.getStreamLen());
+			ReadStream rs(ws.getStream(), ws.getStreamLen());
 			if (rs.getProtoID() != 120)
 			{
 				cout << "CheckRouteProtocol -> " << className << "  check Proto ID error" << endl;
@@ -277,9 +272,9 @@ public:
 				return false;
 			}
 			//check route
-			WriteStream<UDStreamHeadTraits> ws2(120);
+			WriteStream ws2(120);
 			ws2.appendOriginalData(rs.getStreamUnread(), rs.getStreamUnreadLen());
-			ReadStream<UDStreamHeadTraits> rs2(ws2.getStream(), ws2.getStreamLen());
+			ReadStream rs2(ws2.getStream(), ws2.getStreamLen());
 			tagTestData testData;
 			rs2 >> testData;
 			if (testData != _testData)
@@ -302,8 +297,8 @@ public:
 	}
 
 
-	typename StreamHeadTrait::Integer _packLen;
-	typename StreamHeadTrait::Integer _bodyLen;
+	Integer _packLen;
+	Integer _bodyLen;
 	tagTestData _testData;
 };
 
@@ -313,8 +308,8 @@ public:
 
 
 
-template < class StreamHeadTrait>
-bool TestBase<StreamHeadTrait>::CheckProtocol(WriteStream<StreamHeadTrait> &ws, const char * desc)
+
+bool TestBase::CheckProtocol(WriteStream &ws, const char * desc)
 {
 	//check write
 	{
@@ -364,8 +359,8 @@ bool TestBase<StreamHeadTrait>::CheckProtocol(WriteStream<StreamHeadTrait> &ws, 
 
 	//check checkBuffIntegrity
 	{
-		size_t headLen = sizeof(typename StreamHeadTrait::Integer) + sizeof(typename StreamHeadTrait::ProtoInteger);
-		std::pair<INTEGRITY_RET_TYPE, typename StreamHeadTrait::Integer> ret = checkBuffIntegrity<StreamHeadTrait>(ws.getStream(), 1, _packLen);
+		size_t headLen = sizeof(Integer) + sizeof(ProtoInteger);
+		std::pair<INTEGRITY_RET_TYPE, Integer> ret = checkBuffIntegrity(ws.getStream(), 1, _packLen);
 		if (ret.first == IRT_SHORTAGE && ret.second == headLen - 1)
 		{
 			cout << desc << " checkBuffIntegrity check header len OK" << endl;
@@ -375,7 +370,7 @@ bool TestBase<StreamHeadTrait>::CheckProtocol(WriteStream<StreamHeadTrait> &ws, 
 			cout << desc << " checkBuffIntegrity check header len failed" << endl;
 			return false;
 		}
-		ret = checkBuffIntegrity<StreamHeadTrait>(ws.getStream(), ws.getStreamLen(), ws.getStreamLen());
+		ret = checkBuffIntegrity(ws.getStream(), ws.getStreamLen(), ws.getStreamLen());
 		if (ret.first == IRT_SUCCESS && ret.second == _packLen)
 		{
 			cout << desc << " checkBuffIntegrity check integrity  OK" << endl;
@@ -391,7 +386,7 @@ bool TestBase<StreamHeadTrait>::CheckProtocol(WriteStream<StreamHeadTrait> &ws, 
 	//check read
 	{
 		tagTestData readTestData;
-		ReadStream<StreamHeadTrait> rs(ws.getStream(), ws.getStreamLen());
+		ReadStream rs(ws.getStream(), ws.getStreamLen());
 
 		try
 		{
@@ -428,7 +423,7 @@ bool TestBase<StreamHeadTrait>::CheckProtocol(WriteStream<StreamHeadTrait> &ws, 
 		cout << desc << "check OK." << endl;
 
 
-		ReadStream<StreamHeadTrait> rs2(rs.getStreamBody(), rs.getStreamBodyLen(), false);
+		ReadStream rs2(rs.getStreamBody(), rs.getStreamBodyLen(), false);
 		tagTestData readTestData2;
 		try
 		{

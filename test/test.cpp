@@ -36,7 +36,7 @@ int main()
 	bool bAllCheckOK = false;
 	do 
 	{
-		TestBase<DefaultStreamHeadTraits> test1;
+		TestBase test1;
 		if (!test1.CheckLenght()) break;
 		cout << endl;
 		if (!test1.CheckAttachProtocol()) break;
@@ -47,7 +47,7 @@ int main()
 		cout << endl << endl;
 
 		
-		TestBase<TestBigStreamHeadTraits> test2;
+		TestBase test2;
 		if (!test2.CheckLenght()) break;
 		cout << endl;
 		if (!test2.CheckAttachProtocol()) break;
@@ -94,7 +94,7 @@ int main()
 	int len = 0;
 	for( int i=0; i<100*10000; i++)
 	{
-		WriteStream<DefaultStreamHeadTraits> ws(100, buf, 1000);
+		WriteStream ws(100, buf, 1000);
 		{
 			
 			//StressTest t1;
@@ -107,7 +107,7 @@ int main()
 			t2 = t1;
 			ws << t1.name << t1.id << t1.mail << t1.number << t1.type << t2.name << t2.id << t2.mail << t2.number << t2.type;
 			if(i == 0) len = ws.getStreamLen();
-			ReadStream<DefaultStreamHeadTraits> rs(ws.getStream(), ws.getStreamLen());
+			ReadStream rs(ws.getStream(), ws.getStreamLen());
 			StressTest t3;
 			StressTest t4;
 			rs >> t3.name >> t3.id >> t3.mail >>t3.number >> t3.type  >> t4.name >> t4.id >> t4.mail >> t4.number >> t4.type;
@@ -118,7 +118,7 @@ int main()
 	now = GetTimeMillisecond();
 	for (int i = 0; i < 100 * 10000; i++)
 	{
-		WriteStream<DefaultStreamHeadTraits> ws(100, buf, 1000);
+		WriteStream ws(100, buf, 1000);
 		{
 
 			//StressTest t1;
@@ -135,7 +135,7 @@ int main()
 	std::cout << "encode:" << GetTimeMillisecond() - now << std::endl;
 	
 	now = GetTimeMillisecond();
-	WriteStream<DefaultStreamHeadTraits> ws(100);
+	WriteStream ws(100);
 	//StressTest t1;
 	t1.name = "Alice";
 	t1.id = 10000;
@@ -149,7 +149,7 @@ int main()
 	{
 
 		{
-			ReadStream<DefaultStreamHeadTraits> rs(ws.getStream(), ws.getStreamLen());
+			ReadStream rs(ws.getStream(), ws.getStreamLen());
 			//StressTest t3;
 			//StressTest t4;
 			rs >> t3.name >> t3.id >> t3.mail >> t3.number >> t3.type >> t4.name >> t4.id >> t4.mail >> t4.number >> t4.type;
