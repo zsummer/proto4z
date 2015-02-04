@@ -102,9 +102,9 @@ inline bool operator==(const std::map<K,V> & data1, const std::map<K,V> &data2)
 	{
 		return false;
 	}
-	for (auto iter = data1.begin(); iter != data1.end(); iter++)
+	for (typename std::map<K, V>::const_iterator iter = data1.begin(); iter != data1.end(); iter++)
 	{
-		auto founder = data2.find(iter->first);
+		typename std::map<K, V>::const_iterator founder = data2.find(iter->first);
 		if (founder == data2.end())
 		{
 			return false;
