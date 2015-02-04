@@ -12,12 +12,15 @@
 
 
 #define lua_c
-
+extern "C"
+{
 #include "lua.h"
 
 #include "lauxlib.h"
 #include "lualib.h"
 #include "lpack.h"
+}
+
 
 
 static lua_State *globalL = NULL;
@@ -337,7 +340,7 @@ struct Smain {
   int status;
 };
 
-
+int luaopen_protoz_bit(lua_State *L);
 static int pmain (lua_State *L) {
   struct Smain *s = (struct Smain *)lua_touserdata(L, 1);
   char **argv = s->argv;
@@ -348,6 +351,7 @@ static int pmain (lua_State *L) {
   lua_gc(L, LUA_GCSTOP, 0);  /* stop collector during initialization */
   luaL_openlibs(L);  /* open libraries */
   luaopen_pack(L);
+  luaopen_protoz_bit(L);
   lua_gc(L, LUA_GCRESTART, 0);
   s->status = handle_luainit(L);
   if (s->status != 0) return 0;

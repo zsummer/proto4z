@@ -339,7 +339,7 @@ function Protoz.__decode(binData, pos, name, result)
 	if proto.__getDesc == "array" then
 		local len
 
-		len, p = Protoz.__unpack(binData, p, "ui16")
+		len, p = Protoz.__unpack(binData, p, "ui32")
 		for i=1, len do
 			v, p = Protoz.__unpack(binData, p, proto.__getTypeV)
 			if v ~= nil then
@@ -352,7 +352,7 @@ function Protoz.__decode(binData, pos, name, result)
 	elseif proto.__getDesc == "map" then
 		local len
 		local k
-		len, p = Protoz.__unpack(binData, p, "ui16")
+		len, p = Protoz.__unpack(binData, p, "ui32")
 		for j=1, len do
 			k, p = Protoz.__unpack(binData, p, proto.__getTypeK)
 			v, p = Protoz.__unpack(binData, p, proto.__getTypeV)
@@ -364,16 +364,23 @@ function Protoz.__decode(binData, pos, name, result)
 			end
 		end
 	else
+		local offset, tag
+		offset, p = Protoz.__unpack(binData, p, "ui32")
+		offset = p + offset
+		tag, p = Protoz.__unpack(binData, p, "ui64")
 		for i = 1, #proto do
-			local desc = proto[i]
-			v, p = Protoz.__unpack(binData, p, desc.type)
-			if v ~= nil then
-				result[desc.name] = v
-			else
-				result[desc.name] = {}
-				p = Protoz.__decode(binData, p, desc.type, result[desc.name])
+			if Protoz_bit.checkBitTrue(tag, i-1) then
+				local desc = proto[i]
+				v, p = Protoz.__unpack(binData, p, desc.type)
+				if v ~= nil then
+					result[desc.name] = v
+				else
+					result[desc.name] = {}
+					p = Protoz.__decode(binData, p, desc.type, result[desc.name])
+				end
 			end
 		end
+		p = offset
 	end
 	return p
 end
@@ -395,7 +402,7 @@ function Protoz.__encode(obj, name, data)
 	--------------------------------------
 	if proto.__getDesc == "array" then
 		Protoz.__checkType(proto.__getTypeV)
-		data.data = data.data .. string.pack("<H", #obj) --this line lua5.3 or lua5.1+lpack all compatibility 
+		data.data = data.data .. string.pack("<I", #obj) --this line lua5.3 or lua5.1+lpack all compatibility 
 		for i =1, #obj do
 			if type(obj[i]) ~= "table" then
 				data.data = data.data .. Protoz.__pack(obj[i], proto.__getTypeV)
@@ -408,7 +415,7 @@ function Protoz.__encode(obj, name, data)
 	elseif proto.__getDesc == "map" then
 		Protoz.__checkType(proto.__getTypeK)
 		Protoz.__checkType(proto.__getTypeV)
-		data.data = data.data .. string.pack("<H", #obj)--this line lua5.3 or lua5.1+lpack all compatibility 
+		data.data = data.data .. string.pack("<I", #obj)--this line lua5.3 or lua5.1+lpack all compatibility 
 		for i =1, #obj do
 			if not Protoz.__isInnerType(proto.__getTypeK) or type(obj[i].k) == "table" then
 				error("unknown member type(obj[i].k)=" .. type(obj[i].k) .. ", type=" .. name .. "." .. proto.__getTypeK)
@@ -425,25 +432,36 @@ function Protoz.__encode(obj, name, data)
 	--base typ or struct or proto
 	--------------------------------------
 	else
+		local curdata, offset, tag
+		tag = ""
+		curdata = {data=""}
 		for i=1, #proto do
 			local desc = proto[i]
 			if type(desc) ~= "table" or type(desc.name) ~= "string" or type(desc.type) ~= "string" then
 				error("parse Proto error. name[" .. name .. "] " .. debug.traceback())
 			end
-
-			local val = obj[desc.name]
-			if val == nil then
-				error("not found the dest object. name[" ..name .. "." .. desc.name .. "] " .. debug.traceback())
-			end
-
-			if type(val) ~= "table" and Protoz.__isInnerType(desc.type) then
-				data.data = data.data .. Protoz.__pack(val, desc.type)
-			elseif type(val) == "table" and Protoz.__isUserType(desc.type) then
-				Protoz.__encode(val, desc.type, data)
+			if type(desc.del) == nil then
+				tag = tag .. "0"
 			else
-				error("unknown member type(val)=" .. type(val) .. ", type=" .. name .. "." .. desc.type)
+				tag = tag .. "1"
+				local val = obj[desc.name]
+				if val == nil then
+					error("not found the dest object. name[" ..name .. "." .. desc.name .. "] " .. debug.traceback())
+				end
+
+				if type(val) ~= "table" and Protoz.__isInnerType(desc.type) then
+					curdata.data = curdata.data .. Protoz.__pack(val, desc.type)
+				elseif type(val) == "table" and Protoz.__isUserType(desc.type) then
+					Protoz.__encode(val, desc.type, curdata)
+				else
+					error("unknown member type(val)=" .. type(val) .. ", type=" .. name .. "." .. desc.type)
+				end
 			end
 		end
+		tag = Protoz_bit.checkStringToBit(tag)
+		offset = #curdata.data + #tag
+		offset = Protoz.__pack(offset, "ui32")
+		data.data = data.data .. offset .. tag .. curdata.data
 	end
 end
 

@@ -1,46 +1,74 @@
-Protoz.DBServer = 1 
- Protoz.GameServer = 2 
- Protoz.BattleServer = 3--BattleServer 
- Protoz.CenterServer = 4 
- Protoz.AgentServer = 5 
- Protoz.EC_SUCCESS = 0--success 
- Protoz.EC_ERROR = 1--error 
- Protoz.EC_INVALID_PARAM = 1000--invalid param 
- Protoz.EC_UNKNOWN_ID = 1001--unknwon id 
-  
- Protoz.AuthInfo = {} --认证信息 
- Protoz.AuthInfo.__getName = "AuthInfo" 
- Protoz.AuthInfo[1] = {name="user", type="string"}  
- Protoz.AuthInfo[2] = {name="pwd", type="string"}  
- Protoz.AuthInfo[3] = {name="accID", type="ui64"} --帐号ID 
-  
- Protoz.intVct = {} -- -- - -- 
- Protoz.intVct.__getName = "intVct" 
- Protoz.intVct.__getDesc = "array" 
- Protoz.intVct.__getTypeV = "ui32" 
-  
- Protoz.AuthInfoVct = {}  
- Protoz.AuthInfoVct.__getName = "AuthInfoVct" 
- Protoz.AuthInfoVct.__getDesc = "array" 
- Protoz.AuthInfoVct.__getTypeV = "AuthInfo" 
-  
- Protoz.MapUserAuth = {} --22323 
- Protoz.MapUserAuth.__getName = "MapUserAuth" 
- Protoz.MapUserAuth.__getDesc = "map" 
- Protoz.MapUserAuth.__getTypeK = "string" 
- Protoz.MapUserAuth.__getTypeV = "AuthInfoVct" 
-  
- Protoz.register(30000,"XS2OS_ServerInitNotify")Protoz.XS2OS_ServerInitNotify = {} --服务初始化通知 
- Protoz.XS2OS_ServerInitNotify.__getID = 30000 
- Protoz.XS2OS_ServerInitNotify.__getName = "XS2OS_ServerInitNotify" 
- Protoz.XS2OS_ServerInitNotify[1] = {name="serverID", type="i16"}  
- Protoz.XS2OS_ServerInitNotify[2] = {name="info", type="AuthInfo"}  
-  
- Protoz.register(30001,"XS2OS_StopServer")Protoz.XS2OS_StopServer = {} --服务关闭通知 
- Protoz.XS2OS_StopServer.__getID = 30001 
- Protoz.XS2OS_StopServer.__getName = "XS2OS_StopServer" 
-  
- Protoz.register(30002,"XS2OS_ServerPulse")Protoz.XS2OS_ServerPulse = {} --服务心跳 
- Protoz.XS2OS_ServerPulse.__getID = 30002 
- Protoz.XS2OS_ServerPulse.__getName = "XS2OS_ServerPulse" 
+Protoz.EC_SUCCESS = 0--success 
+Protoz.EC_ERROR = 1--error 
+Protoz.EC_INVALID_PARAM = 1000--invalid param 
+Protoz.EC_UNKNOWN_ID = 1001--unknwon id 
  
+Protoz.TestIntegerData = {} --测试 
+Protoz.TestIntegerData.__getName = "TestIntegerData" 
+Protoz.TestIntegerData[1] = {name="_char", type="i8"}  
+Protoz.TestIntegerData[2] = {name="_uchar", type="ui8"}  
+Protoz.TestIntegerData[3] = {name="_short", type="i16"}  
+Protoz.TestIntegerData[4] = {name="_ushort", type="ui16"}  
+Protoz.TestIntegerData[5] = {name="_int", type="i32"}  
+Protoz.TestIntegerData[6] = {name="_uint", type="ui32"}  
+Protoz.TestIntegerData[7] = {name="_i64", type="i64"}  
+Protoz.TestIntegerData[8] = {name="_ui128", type="ui64"}  
+Protoz.TestIntegerData[9] = {name="_ui64", type="ui64"}  
+ 
+Protoz.TestFloatData = {} --测试 
+Protoz.TestFloatData.__getName = "TestFloatData" 
+Protoz.TestFloatData[1] = {name="_float", type="float"}  
+Protoz.TestFloatData[2] = {name="_double", type="double"}  
+ 
+Protoz.TestStringData = {} --测试 
+Protoz.TestStringData.__getName = "TestStringData" 
+Protoz.TestStringData[1] = {name="_string", type="string"}  
+ 
+Protoz.IntArray = {}  
+Protoz.IntArray.__getName = "IntArray" 
+Protoz.IntArray.__getDesc = "array" 
+Protoz.IntArray.__getTypeV = "ui32" 
+ 
+Protoz.TestIntegerDataArray = {}  
+Protoz.TestIntegerDataArray.__getName = "TestIntegerDataArray" 
+Protoz.TestIntegerDataArray.__getDesc = "array" 
+Protoz.TestIntegerDataArray.__getTypeV = "TestIntegerData" 
+ 
+Protoz.TestFloatDataArray = {}  
+Protoz.TestFloatDataArray.__getName = "TestFloatDataArray" 
+Protoz.TestFloatDataArray.__getDesc = "array" 
+Protoz.TestFloatDataArray.__getTypeV = "TestFloatData" 
+ 
+Protoz.TestStringDataArray = {}  
+Protoz.TestStringDataArray.__getName = "TestStringDataArray" 
+Protoz.TestStringDataArray.__getDesc = "array" 
+Protoz.TestStringDataArray.__getTypeV = "TestStringData" 
+ 
+Protoz.TestIntegerDataMap = {}  
+Protoz.TestIntegerDataMap.__getName = "TestIntegerDataMap" 
+Protoz.TestIntegerDataMap.__getDesc = "map" 
+Protoz.TestIntegerDataMap.__getTypeK = "string" 
+Protoz.TestIntegerDataMap.__getTypeV = "TestIntegerData" 
+ 
+Protoz.TestFloatDataMap = {}  
+Protoz.TestFloatDataMap.__getName = "TestFloatDataMap" 
+Protoz.TestFloatDataMap.__getDesc = "map" 
+Protoz.TestFloatDataMap.__getTypeK = "string" 
+Protoz.TestFloatDataMap.__getTypeV = "TestFloatData" 
+ 
+Protoz.TestStringDataMap = {}  
+Protoz.TestStringDataMap.__getName = "TestStringDataMap" 
+Protoz.TestStringDataMap.__getDesc = "map" 
+Protoz.TestStringDataMap.__getTypeK = "string" 
+Protoz.TestStringDataMap.__getTypeV = "TestStringData" 
+ 
+Protoz.register(30000,"P2P_EchoPack") 
+Protoz.P2P_EchoPack = {}  
+Protoz.P2P_EchoPack.__getID = 30000 
+Protoz.P2P_EchoPack.__getName = "P2P_EchoPack" 
+Protoz.P2P_EchoPack[1] = {name="_iarray", type="TestIntegerDataArray"}  
+Protoz.P2P_EchoPack[2] = {name="_farray", type="TestFloatDataArray"}  
+Protoz.P2P_EchoPack[3] = {name="_sarray", type="TestStringDataArray"}  
+Protoz.P2P_EchoPack[4] = {name="_imap", type="TestIntegerDataMap"}  
+Protoz.P2P_EchoPack[5] = {name="_fmap", type="TestFloatDataMap"}  
+Protoz.P2P_EchoPack[6] = {name="_smap", type="TestStringDataMap"}  

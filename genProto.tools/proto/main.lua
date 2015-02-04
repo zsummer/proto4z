@@ -40,7 +40,7 @@ Protoz.UserInfo.__getTypeV = nil
 Protoz.UserInfo[1] = {name = "_uID", type = "ui32"}
 Protoz.UserInfo[2] = {name = "_user", type = "string"}
 Protoz.UserInfo[3] = {name = "_items", type = "Items"}
-Protoz.UserInfo[4] = {name = "_heros", type = "Heros"}
+Protoz.UserInfo[4] = {name = "_heros", type = "Heros", del=true}
 
 
 --proto
