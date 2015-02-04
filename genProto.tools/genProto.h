@@ -77,7 +77,7 @@ static  std::map<std::string, std::string> xmlTypeToCPPType = {
 
 //data default init value
 static  std::map<std::string, std::string> xmlTypeToCPPDefaultValue = {
-		{ "i8", "'\0'" },
+		{ "i8", "'\\0'" },
 		{ "ui8", "0" },
 		{ "i16", "0" },
 		{ "ui16", "0" },
@@ -107,7 +107,7 @@ static  std::map<std::string, std::string> xmlTypeToCSharpType = {
 
 //data default init value
 static  std::map<std::string, std::string> xmlTypeToCSharpDefaultValue = {
-	{ "i8", "'\0'" },
+	{ "i8", "'\\0'" },
 	{ "ui8", "0" },
 	{ "i16", "0" },
 	{ "ui16", "0" },
@@ -162,11 +162,13 @@ struct DataStruct
 {
 	std::string _name;
 	std::string _desc;
+	unsigned long long _tag;
 	struct DataMember
 	{
 		std::string _type;
 		std::string _name;
 		std::string _desc;
+		bool _isDel;
 	};
 	std::vector<DataMember> _members;
 };
@@ -183,7 +185,7 @@ struct DataProto
 const std::string ProtoIDType = "ui16";
 
 //lfcr
-const std::string LFCR = " \r\n ";
+const std::string LFCR = " \r\n";
 
 
 //store type enum

@@ -124,9 +124,23 @@ bool genCppFile(std::string path, std::string filename, std::string attr, std::v
 			text += LFCR;
 			text += "{" + LFCR;
 
+			info._proto._struct._tag = 0;
+			int curTagIndex = 0;
 			for (const auto & m : info._proto._struct._members)
 			{
+				{
+					if (!m._isDel)
+					{
+						info._proto._struct._tag |= (1ULL << curTagIndex);
+					}
+					curTagIndex++;
+				}
+				
 				text += "\t" + getCPPType(m._type) + " " + m._name + "; ";
+				if (m._isDel)
+				{
+					text += "//[already deleted]";
+				}
 				if (!m._desc.empty())
 				{
 					text += "//" + m._desc;
@@ -163,26 +177,48 @@ bool genCppFile(std::string path, std::string filename, std::string attr, std::v
 
 
 			//input stream operator
-			text += "template<class T>" + LFCR;
-			text += "T & operator << (T & t, const " + info._proto._struct._name + " & data)" + LFCR;
+			text += "zsummer::proto4z::WriteStream & operator << (zsummer::proto4z::WriteStream & ws, const " + info._proto._struct._name + " & data)" + LFCR;
 			text += "{" + LFCR;
+			text += "\tzsummer::proto4z::Integer offset = ws.getStreamLen();" +LFCR;
+			text += "\tunsigned long long tag = " + boost::lexical_cast<std::string, unsigned long long>(info._proto._struct._tag) + "ULL;" + LFCR;
+			text += "\tws << offset;" + LFCR;
+			text += "\tws << tag;" + LFCR;
 			for (const auto &m : info._proto._struct._members)
 			{
-				text += "\tt << data." + m._name + ";" + LFCR;
+				if (m._isDel)
+				{
+					text += "//\tws << data." + m._name + "; //[already deleted]" + LFCR;
+				}
+				else
+				{
+					text += "\tws << data." + m._name + ";" + LFCR;
+				}
 			}
-			text += "\treturn t;" + LFCR;
+			text += "\tws.fixOriginalData(offset, ws.getStreamLen() - offset);" + LFCR;
+			text += "\treturn ws;" + LFCR;
 			text += "}" + LFCR;
 
 
 			//output stream operator
-			text += "template<class T>" + LFCR;
-			text += "T & operator >> (T & t, " + info._proto._struct._name + " & data)" + LFCR;
+			text += "zsummer::proto4z::ReadStream & operator >> (zsummer::proto4z::ReadStream & rs, " + info._proto._struct._name + " & data)" + LFCR;
 			text += "{" + LFCR;
+			text += "\tzsummer::proto4z::Integer cursor = rs.getStreamUnreadLen();" + LFCR;
+			text += "\tzsummer::proto4z::Integer sttLen = 0;" + LFCR;
+			text += "\tunsigned long long tag = 0;" + LFCR;
+			text += "\trs >> sttLen;" + LFCR;
+			text += "\trs >> tag;" + LFCR;
+			curTagIndex = 0;
 			for (const auto &m : info._proto._struct._members)
 			{
-				text += "\tt >> data." + m._name + ";" + LFCR;
+				text += "\tif ( (1ULL << " + boost::lexical_cast<std::string, int>(curTagIndex)+") & tag)" + LFCR;
+				text += "\t{" + LFCR;
+				text += "\t\trs >> data." + m._name + "; " + LFCR;
+				text += "\t}" + LFCR;
+				curTagIndex++;
 			}
-			text += "\treturn t;" + LFCR;
+			text += "\tcursor = cursor - rs.getStreamUnreadLen();" + LFCR;
+			text += "\trs.skipOriginalData(sttLen - cursor);" + LFCR;
+			text += "\treturn rs;" + LFCR;
 			text += "}" + LFCR;
 		}
 
@@ -863,6 +899,21 @@ ParseCode genProto::parseConfig()
 					}
 					dm._type = member->Attribute("type");
 					dm._name = member->Attribute("name");
+					if (member->Attribute("del"))
+					{
+						if (strcmp(member->Attribute("del"), "true") == 0)
+						{
+							dm._isDel = true;
+						}
+						else
+						{
+							dm._isDel = false;
+						}
+					}
+					else
+					{
+						dm._isDel = false;
+					}
 					if (member->Attribute("desc"))
 					{
 						dm._desc = member->Attribute("desc");

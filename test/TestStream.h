@@ -9,174 +9,190 @@
 #include <deque>
 #include <queue>
 #include <typeinfo>
-#include "../proto4z.h"
+#include "../genProto.tools/proto/C++/ControlProto.h"
 using namespace  std;
 using namespace zsummer::proto4z;
 
-struct tagTestData
+inline bool operator==(const TestIntegerData & data1, const TestIntegerData &data2)
 {
-	bool bl;
-	char ch;
-	unsigned char uch;
-	short sh;
-	unsigned short ush;
-	int n;
-	unsigned int u;
-	long l;
-	unsigned long ul;
-	long long ll;
-	unsigned long long ull;
-	float f;
-	double lf;
-	std::string str;
-	std::vector<int> vct;
-	std::map<int, int> kv;
-	std::set<int> st;
-	std::multimap<int, int> mkv;
-	std::multiset<int> mst;
-	std::list<int> lt;
-	std::deque<int> dq;
-	std::queue<int> qu;
-};
-
-
-
-inline bool operator==(const tagTestData & tag1, const tagTestData &tag2)
-{
-	return tag1.bl == tag2.bl
-		&& tag1.ch == tag2.ch
-		&& tag1.uch == tag2.uch
-		&& tag1.ush == tag2.ush
-		&& tag1.n == tag2.n
-		&& tag1.u == tag2.u
-		&& tag1.l == tag2.l
-		&& tag1.ul == tag2.ul
-		&& tag1.ll == tag2.ll
-		&& tag1.ull == tag2.ull
-		&& tag1.f == tag2.f
-		&& tag1.lf == tag2.lf
-		&& tag1.str == tag2.str
-		&& tag1.vct.size() == tag2.vct.size()
-		&& tag1.kv.size() == tag2.kv.size()
-		&& tag1.st.size() == tag2.st.size()
-		&& tag1.mkv.size() == tag2.mkv.size()
-		&& tag1.mst.size() == tag2.mst.size()
-		&& tag1.lt.size() == tag2.lt.size()
-		&& tag1.dq.size() == tag2.dq.size();
+	if (data1._char != data2._char)
+	{
+		return false;
+	}
+	if (data1._uchar != data2._uchar)
+	{
+		return false;
+	}
+	if (data1._short != data2._short)
+	{
+		return false;
+	}
+	if (data1._ushort != data2._ushort)
+	{
+		return false;
+	}
+	if (data1._int != data2._int)
+	{
+		return false;
+	}
+	if (data1._uint != data2._uint)
+	{
+		return false;
+	}
+	if (data1._i64 != data2._i64)
+	{
+		return false;
+	}
+	if (data1._ui64 != data2._ui64)
+	{
+		return false;
+	}
+	return true;
 }
-inline bool operator!=(const tagTestData & tag1, const tagTestData &tag2)
+inline bool operator!=(const TestIntegerData & data1, const TestIntegerData &data2) { return !(data1 == data2); }
+
+inline bool operator==(const TestFloatData & data1, const TestFloatData &data2)
 {
-	return !(tag1 == tag2);
+
+	if ((unsigned long long)(data1._float*100.0) != (unsigned long long)(data2._float*100.0))
+	{
+		return false;
+	}
+	if ((unsigned long long)(data1._double*100.0) != (unsigned long long)(data2._double*100.0))
+	{
+		return false;
+	}
+	return true;
 }
 
-inline ReadStream & operator >>(ReadStream & rs, tagTestData & data)
+inline bool operator!=(const TestFloatData & data1, const TestFloatData &data2) { return !(data1 == data2); }
+
+inline bool operator==(const TestStringData & data1, const TestStringData &data2)
 {
-	rs >> data.bl;
-	rs >> data.ch;
-	rs >> data.uch;
-	rs >> data.sh;
-	rs >> data.ush;
-	rs >> data.n;
-	rs >> data.u;
-	rs >> data.l;
-	rs >> data.ul;
-	rs >> data.ll;
-	rs >> data.ull;
-	rs >> data.f;
-	rs >> data.lf;
-	rs >> data.str;
-	rs >> data.vct;
-	rs >> data.kv;
-	rs >> data.st;
-	rs >> data.mkv;
-	rs >> data.mst;
-	rs >> data.lt;
-	rs >> data.dq;
-	return rs;
+	if (data1._string != data2._string)
+	{
+		return false;
+	}
+	return true;
 }
+inline bool operator!=(const TestStringData & data1, const TestStringData &data2){ return !(data1 == data2); }
 
-inline WriteStream & operator <<(WriteStream & ws, const tagTestData & data)
+template<class T>
+inline bool operator==(const std::vector<T> & data1, const std::vector<T> &data2)
 {
-	ws << data.bl;
-	ws << data.ch;
-	ws << data.uch;
-	ws << data.sh;
-	ws << data.ush;
-	ws << data.n;
-	ws << data.u;
-	ws << data.l;
-	ws << data.ul;
-	ws << data.ll;
-	ws << data.ull;
-	ws << data.f;
-	ws << data.lf;
-	ws << data.str;
-	ws << data.vct;
-	ws << data.kv;
-	ws << data.st;
-	ws << data.mkv;
-	ws << data.mst;
-	ws << data.lt;
-	ws << data.dq;
-	return ws;
+	if (data1.size() != data2.size())
+	{
+		return false;
+	}
+	for (size_t i = 0; i < data1.size(); i++)
+	{
+		if (data1[i] != data2[i])
+		{
+			return false;
+		}
+	}
+	return true;
 }
-
-
-
-
-
-#pragma pack(push)
-#pragma pack(1)
-struct tagStreamHead
+template<class T>
+inline bool operator!=(const std::vector<T> & data1, const std::vector<T> &data2){ return !(data1 == data2); }
+template<class K, class V>
+inline bool operator==(const std::map<K,V> & data1, const std::map<K,V> &data2)
 {
-	unsigned int _protocolID;
-	unsigned int _packLen;
-	unsigned int _sessionID;
-	unsigned int _agentID;
-};
-#pragma pack(pop)
+	if (data1.size() != data2.size())
+	{
+		return false;
+	}
+	for (auto iter = data1.begin(); iter != data1.end(); iter++)
+	{
+		auto founder = data2.find(iter->first);
+		if (founder == data2.end())
+		{
+			return false;
+		}
+		if (founder->second != iter->second)
+		{
+			return false;
+		}
+	}
+	return true;
+}
+template<class K, class V>
+inline bool operator!=(const std::map<K, V> & data1, const std::map<K, V> &data2){ return !(data1 == data2); }
 
-struct UDStreamHeadTraits
+inline bool operator==(const P2P_EchoPack & pack1, const P2P_EchoPack &pack2)
 {
-	typedef unsigned int Integer;
-	typedef unsigned int ProtoInteger;
-	const static Integer MaxPackLen = 1024*1024*10;//10M
-	const static bool PackLenIsContainHead = true;
-	const static ZSummer_EndianType EndianType = LittleEndian;
-	const static Integer HeadLen = sizeof(Integer); //Don't Touch.
-};
-
-
+	if (pack1._iarray != pack2._iarray)
+	{
+		return false;
+	}
+	if (pack1._farray != pack2._farray)
+	{
+		return false;
+	}
+	if (pack1._sarray != pack2._sarray)
+	{
+		return false;
+	}
+	if (pack1._imap != pack2._imap)
+	{
+		return false;
+	}
+	if (pack1._fmap != pack2._fmap)
+	{
+		return false;
+	}
+	if (pack1._smap != pack2._smap)
+	{
+		return false;
+	}
+	return true;
+}
+inline bool operator!=(const P2P_EchoPack & pack1, const P2P_EchoPack &pack2){ return !(pack1 == pack2); }
 
 class TestBase
 {
 public:
 	TestBase()
 	{
-		_testData.bl = true;
-		_testData.ch = 'a';
-		_testData.uch = 200;
-		_testData.ush = -1;
-		_testData.n = 65000;
-		_testData.u = -2;
-		_testData.l = 333;
-		_testData.ul = -3;
-		_testData.ll = 111;
-		_testData.ull = -4;
-		_testData.f = (float)123.2;
-		_testData.lf = 123.4;
-		_testData.str = "1234567";
-		_testData.vct.push_back(1);
-		_testData.vct.push_back(2);
-		_testData.kv[1] = 1;
-		_testData.kv[100] = 100;
-		_testData.st.insert(10);
-		_testData.mkv.insert(std::make_pair(10, 10));
-		_testData.mkv.insert(std::make_pair(10, 100));
-		_testData.mst.insert(100);
-		_testData.mst.insert(100);
-		_testData.lt.push_back(10);
-		_testData.dq.push_back(100);
+		TestIntegerData idata;
+		idata._char = 'z';
+		idata._uchar = 234;
+		idata._short = -1000;
+		idata._ushort = 65500;
+		idata._int = -2000;
+		idata._uint = 123456789;
+		idata._i64 = -3000;
+		idata._ui64 = 12345678900ULL;
+		TestFloatData fdata;
+		fdata._float = (float)1.2345;
+		fdata._double = 12345.1235567;
+		TestStringData sdata;
+		sdata._string = "lovexx";
+
+		_testData._iarray.push_back(idata);
+		_testData._iarray.push_back(idata);
+		_testData._iarray.push_back(idata);
+
+		_testData._farray.push_back(fdata);
+		_testData._farray.push_back(fdata);
+		_testData._farray.push_back(fdata);
+
+		_testData._sarray.push_back(sdata);
+		_testData._sarray.push_back(sdata);
+		_testData._sarray.push_back(sdata);
+
+		_testData._imap.insert(std::make_pair("123", idata));
+		_testData._imap.insert(std::make_pair("223", idata));
+		_testData._imap.insert(std::make_pair("323", idata));
+
+		_testData._fmap.insert(std::make_pair("123", fdata));
+		_testData._fmap.insert(std::make_pair("223", fdata));
+		_testData._fmap.insert(std::make_pair("323", fdata));
+
+		_testData._smap.insert(std::make_pair("123", sdata));
+		_testData._smap.insert(std::make_pair("223", sdata));
+		_testData._smap.insert(std::make_pair("323", sdata));
+
 		_packLen = 0;
 		_bodyLen = 0;
 	}
@@ -237,7 +253,7 @@ public:
 
 	inline bool CheckRouteProtocol()
 	{
-		const char * className = "TestBigStreamHeadTrait";
+		const char * className = "Test";
 
 		try
 		{
@@ -275,9 +291,9 @@ public:
 			WriteStream ws2(120);
 			ws2.appendOriginalData(rs.getStreamUnread(), rs.getStreamUnreadLen());
 			ReadStream rs2(ws2.getStream(), ws2.getStreamLen());
-			tagTestData testData;
+			P2P_EchoPack testData;
 			rs2 >> testData;
-			if (testData != _testData)
+			if (!(testData == _testData))
 			{
 				cout << "CheckRouteProtocol -> " << className << "  check route error" << endl;
 				return false;
@@ -299,7 +315,7 @@ public:
 
 	Integer _packLen;
 	Integer _bodyLen;
-	tagTestData _testData;
+	P2P_EchoPack _testData;
 };
 
 
@@ -385,7 +401,7 @@ bool TestBase::CheckProtocol(WriteStream &ws, const char * desc)
 
 	//check read
 	{
-		tagTestData readTestData;
+		P2P_EchoPack readTestData;
 		ReadStream rs(ws.getStream(), ws.getStreamLen());
 
 		try
@@ -424,7 +440,7 @@ bool TestBase::CheckProtocol(WriteStream &ws, const char * desc)
 
 
 		ReadStream rs2(rs.getStreamBody(), rs.getStreamBodyLen(), false);
-		tagTestData readTestData2;
+		P2P_EchoPack readTestData2;
 		try
 		{
 

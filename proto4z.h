@@ -133,10 +133,10 @@ enum ZSummer_EndianType
 //|--packlen-|-protoID--|-------  body  --------|
 
 
-typedef unsigned short Integer;
+typedef unsigned int Integer;
 typedef unsigned short ProtoInteger;
 
-const static Integer MaxPackLen = 1023*64;
+const static Integer MaxPackLen = 1024*1024;
 
 //stream translate to Integer with endian type.
 template<class Integer>
@@ -197,6 +197,7 @@ public:
 
 	//write original data.
 	inline WriteStream & appendOriginalData(const void * data, Integer unit);
+	inline WriteStream & fixOriginalData(Integer offset, Integer unit);
 
 	inline WriteStream & operator << (bool data) { return writeSimpleData(data); }
 	inline WriteStream & operator << (char data) { return writeSimpleData(data); }
@@ -764,7 +765,22 @@ inline WriteStream & WriteStream::appendOriginalData(const void * data, Integer 
 	fixPackLen();
 	return *this;
 }
-
+inline WriteStream & WriteStream::fixOriginalData(Integer offset, Integer unit)
+{
+	if (offset + sizeof(Integer) > _cursor)
+	{
+		throw std::runtime_error("fixOriginalData over stream.");
+	}
+	if (_attachData)
+	{
+		integerToStream<Integer>(unit, &_attachData[offset]);
+	}
+	else
+	{
+		integerToStream<Integer>(unit, &_data[offset]);
+	}
+	return *this;
+}
  template <class T> 
 inline WriteStream & WriteStream::writeIntegerData(T t)
 {

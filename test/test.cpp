@@ -1,6 +1,7 @@
 ﻿//! yawei_zhang@foxmail.com
 
 #include "../proto4z.h"
+
 #include <iostream>
 #include <time.h>
 #include <stdio.h>
@@ -33,30 +34,21 @@ struct StressTest
 
 int main()
 {
+	unsigned long long tag = 0ULL;
+	tag |= (1ULL << 1);
 	bool bAllCheckOK = false;
 	do 
 	{
-		TestBase test1;
-		if (!test1.CheckLenght()) break;
+		TestBase test;
+		if (!test.CheckLenght()) break;
 		cout << endl;
-		if (!test1.CheckAttachProtocol()) break;
+		if (!test.CheckAttachProtocol()) break;
 		cout << endl;
-		if (!test1.CheckNoAttachProtocol()) break;
+		if (!test.CheckNoAttachProtocol()) break;
 		cout << endl;
-		if (!test1.CheckRouteProtocol()) break;
+		if (!test.CheckRouteProtocol()) break;
 		cout << endl << endl;
-
-		
-		TestBase test2;
-		if (!test2.CheckLenght()) break;
-		cout << endl;
-		if (!test2.CheckAttachProtocol()) break;
-		cout << endl;
-		if (!test2.CheckNoAttachProtocol()) break;
-		cout << endl;
-		if (!test2.CheckRouteProtocol()) break;
 		bAllCheckOK = true;
-
 	} while (0);
 	cout << endl;
 	if (bAllCheckOK) cout << "all check OK . " << endl;

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 
 <ProtoTraits>
   <MinNo>30000</MinNo>
@@ -25,12 +25,6 @@
 
 <Proto>
   <!-- <include name="stdio" desc="stdio.h or stdio.lua" /> -->
-  <!-- 支持常量类型-->
-  <const name="DBServer" type="ui16" value="1" desc=""/>
-  <const name="GameServer" type="ui16" value="2" desc=""/>
-  <const name="BattleServer" type="ui16" value="3" desc="BattleServer"/>
-  <const name="CenterServer" type="ui16" value="4" desc=""/>
-  <const name="AgentServer" type="ui16" value="5" desc=""/>
 
   <!-- 匿名枚举类型 -->
   <enum type="ui16" >
@@ -40,30 +34,49 @@
   	<member name="EC_UNKNOWN_ID" desc="unknwon id" />
   </enum>
 
-  <!-- 结构体类型-->
-  <struct name="AuthInfo" desc="认证信息">
-    <member name="user" type="string"   desc=""/>
-    <member name="pwd"  type="string"  desc=""/>
-    <member name="accID"  type="ui64" desc="帐号ID"/>
+  <!-- 整形-->
+  <struct name="TestIntegerData" desc="测试">
+    <member name="_char"  type="i8"  desc=""/>
+    <member name="_uchar"  type="ui8"  desc=""/>
+    <member name="_short"  type="i16"  desc=""/>
+    <member name="_ushort"  type="ui16"   desc=""/>
+    <member name="_int"  type="i32"   desc=""/>
+    <member name="_uint"  type="ui32"   desc=""/>
+    <member name="_i64"  type="i64"   desc=""/>
+    <member name="_ui128"  type="ui64"  del="true" desc=""/>
+    <member name="_ui64"  type="ui64"   desc=""/>
+  </struct>
+  <!-- 浮点-->
+  <struct name="TestFloatData" desc="测试">
+    <member name="_float"  type="float"  desc=""/>
+    <member name="_double"  type="double"  desc=""/>
+  </struct>
+
+  <!-- 字符串-->
+  <struct name="TestStringData" desc="测试">
+    <member name="_string"  type="string"  desc=""/>
   </struct>
 
   <!-- 支持数组类型-->
-  <array name="intVct" type="ui32" desc=" -- - --"/>
-  <array name="AuthInfoVct" type="AuthInfo" desc=""/>
+  <array name="IntArray" type="ui32" desc=""/>
+  <array name="TestIntegerDataArray" type="TestIntegerData" desc=""/>
+  <array name="TestFloatDataArray" type="TestFloatData" desc=""/>
+  <array name="TestStringDataArray" type="TestStringData" desc=""/>
   
   <!-- 支持字典类型-->
-  <map name="MapUserAuth" key="string" value="AuthInfoVct" desc="22323"/>
+  <map key="string" name="TestIntegerDataMap" value="TestIntegerData" desc=""/>
+  <map key="string" name="TestFloatDataMap" value="TestFloatData" desc=""/>
+  <map key="string" name="TestStringDataMap" value="TestStringData" desc=""/>
+
   
   <!-- 协议类型-->
-  <proto from="XS" to="OS" name="ServerInitNotify" desc= "服务初始化通知">
-  	<member name="serverID" type="i16"   desc=""/>
-    <member name="info" type="AuthInfo"   desc=""/>
-  </proto>
-
-  <proto from="XS" to="OS" name="StopServer" desc= "服务关闭通知" >
-  </proto>
-  
-  <proto from="XS" to="OS" name="ServerPulse" desc= "服务心跳" >
+  <proto from="P" to="P" name="EchoPack" desc= "">
+  	<member name="_iarray" type="TestIntegerDataArray"   desc=""/>
+  	<member name="_farray" type="TestFloatDataArray"   desc=""/>
+  	<member name="_sarray" type="TestStringDataArray"   desc=""/>
+  	<member name="_imap" type="TestIntegerDataMap"   desc=""/>
+  	<member name="_fmap" type="TestFloatDataMap"   desc=""/>
+  	<member name="_smap" type="TestStringDataMap"   desc=""/>
   </proto>
 
   
