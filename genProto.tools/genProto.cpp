@@ -408,7 +408,7 @@ bool genCSharpFile(std::string path, std::string filename, std::string attr, std
 			text += "\t\t"   "public System.Collections.Generic.List<byte> __encode()" + LFCR;
 			text += "\t\t{" + LFCR;
 			text += "\t\t\t"   "var ret = new System.Collections.Generic.List<byte>();" + LFCR;
-			text += "\t\t\t"   " var len = new Proto4z.ui16((System.UInt16)this.Count);" + LFCR;
+			text += "\t\t\t"   " var len = new Proto4z.ui32((System.UInt32)this.Count);" + LFCR;
 			text += "\t\t\t"   "ret.AddRange(len.__encode());" + LFCR;
 			text += "\t\t\t"   "for (int i = 0; i < this.Count; i++ )" + LFCR;
 			text += "\t\t\t"   "{" + LFCR;
@@ -420,7 +420,7 @@ bool genCSharpFile(std::string path, std::string filename, std::string attr, std
 
 			text += "\t\t"   "public int __decode(byte[] binData, ref int pos)" + LFCR;
 			text += "\t\t{" + LFCR;
-			text += "\t\t\t"   "var len = new Proto4z.ui16(0);" + LFCR;
+			text += "\t\t\t"   "var len = new Proto4z.ui32(0);" + LFCR;
 			text += "\t\t\t"   "len.__decode(binData, ref pos);" + LFCR;
 			text += "\t\t\t"  "if(len.val > 0)" + LFCR;
 			text += "\t\t\t"   "{" + LFCR;
@@ -447,7 +447,7 @@ bool genCSharpFile(std::string path, std::string filename, std::string attr, std
 			text += "\t\t"   "public System.Collections.Generic.List<byte> __encode()" + LFCR;
 			text += "\t\t{" +  LFCR;
 			text += "\t\t\t"  "var ret = new System.Collections.Generic.List<byte>();" + LFCR;
-			text += "\t\t\t"   " var len = new Proto4z.ui16((System.UInt16)this.Count);" + LFCR;
+			text += "\t\t\t"   " var len = new Proto4z.ui32((System.UInt32)this.Count);" + LFCR;
 			text += "\t\t\t"   "ret.AddRange(len.__encode());" + LFCR;
 			text += "\t\t\t"   "foreach(var kv in this)" + LFCR;
 			text += "\t\t\t"   "{" + LFCR;
@@ -511,23 +511,47 @@ bool genCSharpFile(std::string path, std::string filename, std::string attr, std
 			//encode
 			text += "\t\tpublic System.Collections.Generic.List<byte> __encode()" + LFCR;
 			text += "\t\t{" + LFCR;
-			text += "\t\t\t"   "var ret = new System.Collections.Generic.List<byte>();" + LFCR;
+			text += "\t\t\t"   "Proto4z.ui32 sttLen = 0;" + LFCR;
+			text += "\t\t\t"   " Proto4z.ui64 tag = " + boost::lexical_cast<std::string, unsigned long long>(info._proto._struct._tag) + ";" + LFCR;
+			text += "\t\t\t"   "" + LFCR;
+			text += "\t\t\t"   "var data = new System.Collections.Generic.List<byte>();" + LFCR;
 			for (const auto &m : info._proto._struct._members)
 			{
-				text += "\t\t\t"  "ret.AddRange(" + m._name + ".__encode());" + LFCR;
+				if (m._isDel)
+				{
+					text += "//\t\t\t"  "data.AddRange(" + m._name + ".__encode());//[already deleted]" + LFCR;
+				}
+				else
+				{
+					text += "\t\t\t"  "data.AddRange(" + m._name + ".__encode());" + LFCR;
+				}
 			}
+			text += "\t\t\t" "sttLen = (System.UInt32)data.Count + 8;";
+			text += "\t\t\t"  "var ret = new System.Collections.Generic.List<byte>();" + LFCR;
+			text += "\t\t\t"  "ret.AddRange(sttLen.__encode());" + LFCR;
+			text += "\t\t\t"  "ret.AddRange(tag.__encode());" + LFCR;
+			text += "\t\t\t"  "ret.AddRange(data);" + LFCR;
 			text += "\t\t\t"  "return ret;" + LFCR;
 			text += "\t\t}" + LFCR;
 
 			//decode
 			text += "\t\tpublic int __decode(byte[] binData, ref int pos)" + LFCR;
 			text += "\t\t{" + LFCR;
+			text += "\t\t\t" "Proto4z.ui32 offset = 0;" + LFCR;
+			text += "\t\t\t" "Proto4z.ui64 tag = 0;" + LFCR;
+			text += "\t\t\t" "offset.__decode(binData, ref pos);" + LFCR;
+			text += "\t\t\t" "offset.val += (System.UInt32)pos;" + LFCR;
+			text += "\t\t\t" "tag.__decode(binData, ref pos);" + LFCR;
+			int i = 0;
 			for (const auto &m : info._proto._struct._members)
 			{
 				text += "\t\t\t" + m._name + " = new " + getCSharpType(m._type) + "();" + LFCR;
-				text += "\t\t\t" + m._name + ".__decode(binData, ref pos);" + LFCR;
+				text += "\t\t\t" "if ((tag.val & ((System.UInt64)1 << " + boost::lexical_cast<std::string, int>(i) + ")) != 0)" + LFCR;
+				text += "\t\t\t" "{" + LFCR;
+				text += "\t\t\t\t" + m._name + ".__decode(binData, ref pos);" + LFCR;
+				text += "\t\t\t" "}" + LFCR;
 			}
-			text += "\t\t\treturn pos;" + LFCR;
+			text += "\t\t\treturn (int)offset.val;" + LFCR;
 			text += "\t\t}" + LFCR;
 			text += "\t}" + LFCR;
 		}

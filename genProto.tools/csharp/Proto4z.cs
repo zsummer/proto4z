@@ -700,7 +700,7 @@ namespace Proto4z
         public System.Collections.Generic.List<byte> __encode()
         {
             var ret = new System.Collections.Generic.List<byte>();
-            ret.AddRange(new ui16((System.UInt16)_val.Length).__encode());
+            ret.AddRange(new ui32((System.UInt32)_val.Length).__encode());
             foreach (char ch in _val)
             {
                 ret.Add((byte)ch);
@@ -710,7 +710,7 @@ namespace Proto4z
         public int __decode(byte[] binData, ref int pos)
         {
             _val = "";
-            ui16 len = new ui16(0);
+            ui32 len = new ui32(0);
             len.__decode(binData, ref pos);
             for (int i = pos; i < pos + len.val; i++)
             {

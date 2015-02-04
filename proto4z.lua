@@ -194,7 +194,9 @@ function Protoz.__pack(val, tp)
 
 	-- string type
 	elseif tp == "string" then
-		return string.pack("<P", val)
+		local i = string.pack("<I", #val)
+		i = i .. string.pack("A", val)
+		return i
 
 	-- float type
 	elseif tp == "float" then
@@ -285,7 +287,8 @@ function Protoz.__unpack(binData, pos, tp)
 		v = tmp
 	-- string type
 	elseif tp == "string" then
-		n, v = string.unpack(binData, "<P", pos)
+		n, v = string.unpack(binData, "<I", pos)
+		n, v = string.unpack(binData, "<A" .. v, pos+4)
 
 	-- float type
 	elseif tp == "float" then

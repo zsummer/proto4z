@@ -59,7 +59,9 @@
     <Compile Include="ControlProto.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Proto4z.cs" />
+    <Compile Include="Proto4z.cs">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

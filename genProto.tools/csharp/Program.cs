@@ -45,140 +45,6 @@ using System.Net.Sockets;
 using System.Threading;  
 
 
-class HeroInfo : IProtoObject//struct
-{
-    public i32 id;
-    public Proto4z.String name;
-    public System.Collections.Generic.List<byte> __encode()
-    {
-        var ret = new System.Collections.Generic.List<byte>();
-        ret.AddRange(id.__encode());
-        ret.AddRange(name.__encode());
-        return ret;
-    }
-    public System.Int32 __decode(byte[] binData, ref System.Int32 pos)
-    {
-        id = 0;
-        name = "";
-        id.__decode(binData, ref pos);
-        name.__decode(binData, ref pos);
-        return pos;
-    }
-}
-
-class HeroInfoDict : System.Collections.Generic.Dictionary<i32, HeroInfo> , IProtoObject
-{
-    public System.Collections.Generic.List<byte> __encode()
-    {
-        var ret = new System.Collections.Generic.List<byte>();
-        var len = new ui16((System.UInt16)this.Count);
-        ret.AddRange(len.__encode());
-        foreach(var kv in this)
-        {
-            ret.AddRange(kv.Key.__encode());
-            ret.AddRange(kv.Value.__encode());
-        }
-        return ret;
-    }
-    public System.Int32 __decode(byte[] binData, ref System.Int32 pos)
-    {
-        var len = new ui16(0);
-        len.__decode(binData, ref pos);
-        if (len.val > 0)
-        {
-            for (int i = 0; i < len.val; i++)
-            {
-                var key = new i32(0);
-                var val = new HeroInfo();
-                key.__decode(binData, ref pos);
-                val.__decode(binData, ref pos);
-                this.Add(key, val);
-            }
-        }
-        return pos;
-    }
-}
-class HeroInfoArray : System.Collections.Generic.List<HeroInfo>, IProtoObject
-{
-    public System.Collections.Generic.List<byte> __encode()
-    {
-        var ret = new System.Collections.Generic.List<byte>();
-        var len = new ui16((System.UInt16)this.Count);
-        ret.AddRange(len.__encode());
-        for (int i = 0; i < this.Count; i++ )
-        {
-            ret.AddRange(this[i].__encode());
-        }
-        return ret;
-    }
-    public System.Int32 __decode(byte[] binData, ref System.Int32 pos)
-    {
-        var len = new Proto4z.ui16(0);
-        len.__decode(binData, ref pos);
-        if(len.val > 0)
-        {
-            for (int i=0; i<len.val; i++)
-            {
-                var data = new HeroInfo();
-                data.__decode(binData, ref pos);
-                this.Add(data);
-            }
-        }
-        return pos;
-    }
-}
-class UserInfo : IProtoObject//struct
-{
-    public ui64 uid;
-    public HeroInfo hero;
-    public HeroInfoDict dictHeros;
-    public HeroInfoArray arrayHeros;
-    public System.Collections.Generic.List<byte> __encode()
-    {
-        var ret = new System.Collections.Generic.List<byte>();
-        ret.AddRange(uid.__encode());
-        ret.AddRange(hero.__encode());
-        ret.AddRange(dictHeros.__encode());
-        ret.AddRange(arrayHeros.__encode());
-        return ret;
-    }
-    public System.Int32 __decode(byte[] binData, ref System.Int32 pos)
-    {
-        uid = new ui64(0);
-        hero = new HeroInfo();
-        dictHeros = new HeroInfoDict();
-        arrayHeros = new HeroInfoArray();
-        uid.__decode(binData, ref pos);
-        hero.__decode(binData, ref pos);
-        dictHeros.__decode(binData, ref pos);
-        arrayHeros.__decode(binData, ref pos);
-        return pos;
-    }
-}
-
-class LS2C_LoginResult: IProtoObject
-{
-    public Proto4z.ui16 getProtoID() { return new Proto4z.ui16(1000); }
-    public string getProtoName() { return "LS2C_LoginResult"; }
-    public ui16 retCode;
-    public UserInfo info;
-    public System.Collections.Generic.List<byte> __encode()
-    {
-        var ret = new System.Collections.Generic.List<byte>();
-        ret.AddRange(retCode.__encode());
-        ret.AddRange(info.__encode());
-        return ret;
-    }
-    public System.Int32 __decode(byte[] binData, ref System.Int32 pos)
-    {
-        retCode = new ui16(0);
-        info = new UserInfo();
-        retCode.__decode(binData, ref pos);
-        info.__decode(binData, ref pos);
-        return pos;
-    }
-}
-
 
 
 
@@ -188,7 +54,7 @@ namespace ConsoleApplication2
     {
         class NetHeader : IProtoObject
         {
-            public Proto4z.ui16 packLen;
+            public Proto4z.ui32 packLen;
             public Proto4z.ui16 protoID;
             public System.Collections.Generic.List<byte> __encode()
             {
@@ -199,7 +65,7 @@ namespace ConsoleApplication2
             }
             public System.Int32 __decode(byte[] binData, ref System.Int32 pos)
             {
-                packLen = new Proto4z.ui16();
+                packLen = new Proto4z.ui32();
                 protoID = new Proto4z.ui16();
                 packLen.__decode(binData, ref pos);
                 protoID.__decode(binData, ref pos);
@@ -257,13 +123,13 @@ namespace ConsoleApplication2
                 
                 
                 var recvBytes = new byte[2000];
-                int curLen = 0;
-                int needLen = 4;
-                int recvLen = 0;
+                uint curLen = 0;
+                uint needLen = 4;
+                uint recvLen = 0;
                 NetHeader recvHead = new NetHeader();
                 do
                 {
-                    recvLen = clientSocket.Receive(recvBytes, curLen, needLen, System.Net.Sockets.SocketFlags.None);
+                    recvLen = (uint)clientSocket.Receive(recvBytes, (int)curLen, (int)needLen, System.Net.Sockets.SocketFlags.None);
                     if (recvLen == 0)
                     {
                         return;
@@ -304,32 +170,47 @@ namespace ConsoleApplication2
             RC4Encryption rc4Client = new RC4Encryption();
             rc4Server.makeSBox("zhangyawei");
             rc4Client.makeSBox("zhangyawei");
+            TestIntegerData idata = new TestIntegerData();
+            idata._char = 'a';
+            idata._uchar = 1;
+            idata._short = 5;
+            idata._ushort = 20;
+            idata._int = 30;
+            idata._uint = 40;
+            idata._i64 = 60;
+            idata._ui64 = 80;
 
-            HeroInfo hero1 = new HeroInfo();
-            hero1.id = 100;
-            hero1.name = "hero1";
+            TestFloatData fdata = new TestFloatData();
+            fdata._float = 243.2222F;
+            fdata._double = 3423.11123;
+            TestStringData sdata = new TestStringData();
+            sdata._string = "love";
 
-            HeroInfo hero2 = new HeroInfo();
-            hero2.id = 101;
-            hero2.name = "hero2";
+            P2P_EchoPack pack = new P2P_EchoPack();
+            pack._iarray = new Proto4z.TestIntegerDataArray();
+            pack._iarray.Add(idata);
+            pack._iarray.Add(idata);
+            pack._iarray.Add(idata);
+            pack._farray = new Proto4z.TestFloatDataArray();
+            pack._farray.Add(fdata);
+            pack._farray.Add(fdata);
+            pack._farray.Add(fdata);
+            pack._sarray = new Proto4z.TestStringDataArray();
+            pack._sarray.Add(sdata);
+            pack._sarray.Add(sdata);
+            pack._sarray.Add(sdata);
 
-            LS2C_LoginResult result = new LS2C_LoginResult();
-            result.retCode = 0;
-            result.info = new UserInfo();
-            result.info.uid = 100;
-            result.info.hero = new HeroInfo();
-            result.info.hero.id = 100;
-            result.info.hero.name = "hero";
+            pack._imap = new Proto4z.TestIntegerDataMap();
+            pack._imap.Add("123", idata);
+            pack._imap.Add("223", idata);
 
-            result.info.dictHeros = new HeroInfoDict();
-            result.info.dictHeros.Add(hero1.id, hero1);
-            result.info.dictHeros.Add(hero2.id, hero2);
-
-            result.info.arrayHeros = new HeroInfoArray();
-            result.info.arrayHeros.Add(hero1);
-            result.info.arrayHeros.Add(hero2);
-
-            var byteData = result.__encode();
+            pack._fmap = new Proto4z.TestFloatDataMap();
+            pack._fmap.Add("523", fdata);
+            pack._fmap.Add("623", fdata);
+            pack._smap = new Proto4z.TestStringDataMap();
+            pack._smap.Add("723", sdata);
+            pack._smap.Add("823", sdata);
+            var byteData = pack.__encode();
             var binData = byteData.ToArray();
 
             for (int i = 0; i < binData.Length; i++)
@@ -343,7 +224,7 @@ namespace ConsoleApplication2
                 System.Console.WriteLine((int)binData[i]);
             }
 
-            var v = new LS2C_LoginResult();
+            var v = new P2P_EchoPack();
 
             int pos = 0;
             v.__decode(binData, ref pos);
