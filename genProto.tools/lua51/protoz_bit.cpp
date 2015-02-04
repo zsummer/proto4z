@@ -81,13 +81,14 @@ static int checkBitTrue(lua_State *L)
 {
 	size_t len = 0;
 	const char * log = luaL_checklstring(L, 1, &len);
-	size_t pos = luaL_checkinteger(L, 1);
+	size_t pos = luaL_checkinteger(L, 2);
 	if (len != 8)
 	{
 		return 0;
 	}
+	lua_settop(L, 0);
 	unsigned long long val = streamToInteger<unsigned long long>(log);
-	if (val | (1ULL << pos))
+	if (val & (1ULL << pos))
 	{
 		lua_pushboolean(L, 1);
 	}

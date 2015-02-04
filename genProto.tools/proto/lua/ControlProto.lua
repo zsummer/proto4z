@@ -5,24 +5,24 @@ Protoz.EC_UNKNOWN_ID = 1001--unknwon id
  
 Protoz.TestIntegerData = {} --测试 
 Protoz.TestIntegerData.__getName = "TestIntegerData" 
-Protoz.TestIntegerData[1] = {name="_char", type="i8"}  
-Protoz.TestIntegerData[2] = {name="_uchar", type="ui8"}  
-Protoz.TestIntegerData[3] = {name="_short", type="i16"}  
-Protoz.TestIntegerData[4] = {name="_ushort", type="ui16"}  
-Protoz.TestIntegerData[5] = {name="_int", type="i32"}  
-Protoz.TestIntegerData[6] = {name="_uint", type="ui32"}  
-Protoz.TestIntegerData[7] = {name="_i64", type="i64"}  
-Protoz.TestIntegerData[8] = {name="_ui128", type="ui64"}  
-Protoz.TestIntegerData[9] = {name="_ui64", type="ui64"}  
+Protoz.TestIntegerData[1] = {name="_char", type="i8" }  
+Protoz.TestIntegerData[2] = {name="_uchar", type="ui8" }  
+Protoz.TestIntegerData[3] = {name="_short", type="i16" }  
+Protoz.TestIntegerData[4] = {name="_ushort", type="ui16" }  
+Protoz.TestIntegerData[5] = {name="_int", type="i32" }  
+Protoz.TestIntegerData[6] = {name="_uint", type="ui32" }  
+Protoz.TestIntegerData[7] = {name="_i64", type="i64" }  
+Protoz.TestIntegerData[8] = {name="_ui128", type="ui64", del = true }  
+Protoz.TestIntegerData[9] = {name="_ui64", type="ui64" }  
  
 Protoz.TestFloatData = {} --测试 
 Protoz.TestFloatData.__getName = "TestFloatData" 
-Protoz.TestFloatData[1] = {name="_float", type="float"}  
-Protoz.TestFloatData[2] = {name="_double", type="double"}  
+Protoz.TestFloatData[1] = {name="_float", type="float" }  
+Protoz.TestFloatData[2] = {name="_double", type="double" }  
  
 Protoz.TestStringData = {} --测试 
 Protoz.TestStringData.__getName = "TestStringData" 
-Protoz.TestStringData[1] = {name="_string", type="string"}  
+Protoz.TestStringData[1] = {name="_string", type="string" }  
  
 Protoz.IntArray = {}  
 Protoz.IntArray.__getName = "IntArray" 
@@ -62,13 +62,13 @@ Protoz.TestStringDataMap.__getDesc = "map"
 Protoz.TestStringDataMap.__getTypeK = "string" 
 Protoz.TestStringDataMap.__getTypeV = "TestStringData" 
  
-Protoz.register(30000,"P2P_EchoPack") 
+Protoz.register(30003,"P2P_EchoPack") 
 Protoz.P2P_EchoPack = {}  
-Protoz.P2P_EchoPack.__getID = 30000 
+Protoz.P2P_EchoPack.__getID = 30003 
 Protoz.P2P_EchoPack.__getName = "P2P_EchoPack" 
-Protoz.P2P_EchoPack[1] = {name="_iarray", type="TestIntegerDataArray"}  
-Protoz.P2P_EchoPack[2] = {name="_farray", type="TestFloatDataArray"}  
-Protoz.P2P_EchoPack[3] = {name="_sarray", type="TestStringDataArray"}  
-Protoz.P2P_EchoPack[4] = {name="_imap", type="TestIntegerDataMap"}  
-Protoz.P2P_EchoPack[5] = {name="_fmap", type="TestFloatDataMap"}  
-Protoz.P2P_EchoPack[6] = {name="_smap", type="TestStringDataMap"}  
+Protoz.P2P_EchoPack[1] = {name="_iarray", type="TestIntegerDataArray" }  
+Protoz.P2P_EchoPack[2] = {name="_farray", type="TestFloatDataArray" }  
+Protoz.P2P_EchoPack[3] = {name="_sarray", type="TestStringDataArray" }  
+Protoz.P2P_EchoPack[4] = {name="_imap", type="TestIntegerDataMap" }  
+Protoz.P2P_EchoPack[5] = {name="_fmap", type="TestFloatDataMap" }  
+Protoz.P2P_EchoPack[6] = {name="_smap", type="TestStringDataMap" }  

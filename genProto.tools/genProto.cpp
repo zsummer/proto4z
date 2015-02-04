@@ -315,8 +315,13 @@ bool genLuaFile(std::string path, std::string filename, std::string attr, std::v
 
 			for (size_t i = 0; i < info._proto._struct._members.size(); ++i)
 			{
-				text += "Protoz." + info._proto._struct._name + "[" + boost::lexical_cast<std::string>(i+1) 
-					+ "] = {name=\"" + info._proto._struct._members[i]._name +  "\", type=\"" + info._proto._struct._members[i]._type + "\"} ";
+				text += "Protoz." + info._proto._struct._name + "[" + boost::lexical_cast<std::string>(i + 1)
+					+ "] = {name=\"" + info._proto._struct._members[i]._name + "\", type=\"" + info._proto._struct._members[i]._type + "\"";
+				if (info._proto._struct._members[i]._isDel)
+				{
+					text += ", del = true";
+				}
+				text += " } ";
 				if (!info._proto._struct._members[i]._desc.empty())
 				{
 					text += "--" + info._proto._struct._members[i]._desc;

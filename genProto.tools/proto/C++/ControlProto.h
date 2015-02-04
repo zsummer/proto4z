@@ -182,7 +182,7 @@ typedef std::map<std::string, TestFloatData> TestFloatDataMap;
  
 typedef std::map<std::string, TestStringData> TestStringDataMap;  
  
-const unsigned short ID_P2P_EchoPack = 30000;  
+const unsigned short ID_P2P_EchoPack = 30003;  
 struct P2P_EchoPack 
 { 
 	TestIntegerDataArray _iarray;  
@@ -191,7 +191,7 @@ struct P2P_EchoPack
 	TestIntegerDataMap _imap;  
 	TestFloatDataMap _fmap;  
 	TestStringDataMap _smap;  
-	inline unsigned short GetProtoID() { return 30000;} 
+	inline unsigned short GetProtoID() { return 30003;} 
 	inline std::string GetProtoName() { return "ID_P2P_EchoPack";} 
 }; 
 zsummer::proto4z::WriteStream & operator << (zsummer::proto4z::WriteStream & ws, const P2P_EchoPack & data) 

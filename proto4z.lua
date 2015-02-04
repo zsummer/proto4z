@@ -187,14 +187,8 @@ function Protoz.__pack(val, tp)
 	elseif tp == "ui32" or tp == "unsigned int" then
 		return string.pack("<I", val)	
 	elseif tp == "i64" or tp == "long long" or tp == "ui64" or tp == "unsigned long long" then
-		local i = string.pack("<b", string.byte(val, 1))
-		i = i .. string.pack("<b", string.byte(val, 2))
-		i = i .. string.pack("<b", string.byte(val, 3))
-		i = i .. string.pack("<b", string.byte(val, 4))
-		i = i .. string.pack("<b", string.byte(val, 5))
-		i = i .. string.pack("<b", string.byte(val, 6))
-		i = i .. string.pack("<b", string.byte(val, 7))
-		i = i .. string.pack("<b", string.byte(val, 8))
+		local i = string.pack("<I", string.sub(val,1,5))
+		i = i .. string.pack("<I", string.sub(val,5,10))
 		return i
 
 
@@ -284,23 +278,11 @@ function Protoz.__unpack(binData, pos, tp)
 		n, v = string.unpack(binData, "<I", pos)
 	elseif tp == "i64" or tp == "long long" or tp == "ui64" or tp == "unsigned long long" then
 		local tmp
-		n, tmp = string.unpack(binData, "<b", pos)
+		n, v = string.unpack(binData, "<I", pos)
+		tmp = string.pack("<I", v)
+		n, v = string.unpack(binData, "<I", pos+4)
+		tmp = tmp .. string.pack("<I", v)
 		v = tmp
-		n, tmp = string.unpack(binData, "<b", pos+1)
-		v = v .. tmp
-		n, tmp = string.unpack(binData, "<b", pos+2)
-		v = v .. tmp
-		n, tmp = string.unpack(binData, "<b", pos+3)
-		v = v .. tmp
-		n, tmp = string.unpack(binData, "<b", pos+4)
-		v = v .. tmp
-		n, tmp = string.unpack(binData, "<b", pos+5)
-		v = v .. tmp
-		n, tmp = string.unpack(binData, "<b", pos+6)
-		v = v .. tmp
-		n, tmp = string.unpack(binData, "<b", pos+7)
-		v = v .. tmp
-
 	-- string type
 	elseif tp == "string" then
 		n, v = string.unpack(binData, "<P", pos)
@@ -369,7 +351,7 @@ function Protoz.__decode(binData, pos, name, result)
 		offset = p + offset
 		tag, p = Protoz.__unpack(binData, p, "ui64")
 		for i = 1, #proto do
-			if Protoz_bit.checkBitTrue(tag, i-1) then
+			if Protoz_bit.checkBitTrue(tag, i-1) ~= nil then
 				local desc = proto[i]
 				v, p = Protoz.__unpack(binData, p, desc.type)
 				if v ~= nil then
@@ -440,7 +422,7 @@ function Protoz.__encode(obj, name, data)
 			if type(desc) ~= "table" or type(desc.name) ~= "string" or type(desc.type) ~= "string" then
 				error("parse Proto error. name[" .. name .. "] " .. debug.traceback())
 			end
-			if type(desc.del) == nil then
+			if desc.del ~= nil then
 				tag = tag .. "0"
 			else
 				tag = tag .. "1"
