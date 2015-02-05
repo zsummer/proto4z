@@ -347,7 +347,6 @@ function Protoz.__decode(binData, pos, name, result)
 		offset, p = Protoz.__unpack(binData, p, "ui32")
 		offset = p + offset
 		tag, p = Protoz.__unpack(binData, p, "ui64")
-		print(type(tag))
 		for i = 1, #proto do
 			if Protoz_bit.checkBitTrue(tag, i-1) ~= nil then
 				local desc = proto[i]
