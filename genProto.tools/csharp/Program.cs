@@ -72,24 +72,9 @@ namespace ConsoleApplication2
                 return pos;
             }
         }
-        class StressReqAndResult : IProtoObject
-        {
-            public Proto4z.String text;
-            public System.Collections.Generic.List<byte> __encode()
-            {
-                var ret = new System.Collections.Generic.List<byte>();
-                ret.AddRange(text.__encode());
-                return ret;
-            }
-            public System.Int32 __decode(byte[] binData, ref System.Int32 pos)
-            {
-                text = new Proto4z.String();
-                text.__decode(binData, ref pos);
-                return pos;
-            }
-        }
+ 
 
-        public void Run()
+        public void Run(byte[] binData)
         {
 
             IPAddress ip = IPAddress.Parse("127.0.0.1");
@@ -108,23 +93,20 @@ namespace ConsoleApplication2
             {
                 var sendData = new System.Collections.Generic.List<byte>();
 
-                StressReqAndResult req = new StressReqAndResult();
-                req.text = new Proto4z.String("this is an test text.");
-                var content = req.__encode();
-
                 NetHeader head = new NetHeader();
-                head.packLen = (UInt16)(2 + 2 + content.Count);
-                head.protoID = 10002;
+                head.packLen = (UInt32)(4 + 2 + binData.Length);
+                head.protoID = Proto4z.P2P_EchoPack.getProtoID();
 
                 sendData.AddRange(head.__encode());
-                sendData.AddRange(content);
+                sendData.AddRange(binData);
                 clientSocket.Send(sendData.ToArray());
+
 
                 
                 
                 var recvBytes = new byte[2000];
                 uint curLen = 0;
-                uint needLen = 4;
+                uint needLen = 4 + 2;
                 uint recvLen = 0;
                 NetHeader recvHead = new NetHeader();
                 do
@@ -136,18 +118,18 @@ namespace ConsoleApplication2
                     }
                     curLen += recvLen;
                     needLen -= recvLen;
-                    if (needLen == 0 && curLen == 4) //head already read finish
+                    if (needLen == 0 && curLen == 4 + 2) //head already read finish
                     {
                         int pos = 0;
                         recvHead.__decode(recvBytes, ref pos);
-                        needLen = recvHead.packLen.val - 4;
+                        needLen = recvHead.packLen.val - 4 - 2;
                     }
                     else if (needLen == 0)
                     {
-                        if (recvHead.protoID == 10003)
+                        if (recvHead.protoID == Proto4z.P2P_EchoPack.getProtoID())
                         {
-                            StressReqAndResult result = new StressReqAndResult();
-                            int pos = 4;
+                            Proto4z.P2P_EchoPack result = new Proto4z.P2P_EchoPack();
+                            int pos = 4+2;
                             result.__decode(recvBytes, ref pos);
                             //System.Console.WriteLine("echo =" + result.text.val);
                         }
@@ -231,7 +213,7 @@ namespace ConsoleApplication2
 
 
             Client client = new Client();
-            client.Run();
+            client.Run(binData);
 
 
 

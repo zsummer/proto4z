@@ -150,7 +150,7 @@ bool genCSharpFile(std::string path, std::string filename, std::string attr, std
 
 			text += "\t\t"   "public int __decode(byte[] binData, ref int pos)" + LFCR;
 			text += "\t\t{" + LFCR;
-			text += "\t\t\t"   "var len = new Proto4z.ui16(0);" + LFCR;
+			text += "\t\t\t"   "var len = new Proto4z.ui32(0);" + LFCR;
 			text += "\t\t\t"   "len.__decode(binData, ref pos);" + LFCR;
 			text += "\t\t\t"   "if(len.val > 0)" + LFCR;
 			text += "\t\t\t"   "{" + LFCR;
@@ -182,12 +182,21 @@ bool genCSharpFile(std::string path, std::string filename, std::string attr, std
 			//write ProtoID
 			if (info._type == GT_DataProto)
 			{
-				text += "\t\t public Proto4z.ui16 getProtoID() { return new Proto4z.ui16(" + info._proto._const._value + "); }" + LFCR;
-				text += "\t\t  public string getProtoName() { return \"" + info._proto._struct._name + "\"; }" + LFCR;
+				text += "\t\t" "static public Proto4z.ui16 getProtoID() { return new Proto4z.ui16(" + info._proto._const._value + "); }" + LFCR;
+				text += "\t\t" "static public string getProtoName() { return \"" + info._proto._struct._name + "\"; }" + LFCR;
 			}
 
+			info._proto._struct._tag = 0;
+			int curTagIndex = 0;
 			for (const auto & m : info._proto._struct._members)
 			{
+				{
+					if (!m._isDel)
+					{
+						info._proto._struct._tag |= (1ULL << curTagIndex);
+					}
+					curTagIndex++;
+				}
 				text += "\t\tpublic " + getCSharpType(m._type) + " " + m._name + "; ";
 				if (!m._desc.empty())
 				{
@@ -202,7 +211,7 @@ bool genCSharpFile(std::string path, std::string filename, std::string attr, std
 			text += "\t\tpublic System.Collections.Generic.List<byte> __encode()" + LFCR;
 			text += "\t\t{" + LFCR;
 			text += "\t\t\t"   "Proto4z.ui32 sttLen = 0;" + LFCR;
-			text += "\t\t\t"   " Proto4z.ui64 tag = " + boost::lexical_cast<std::string, unsigned long long>(info._proto._struct._tag) + ";" + LFCR;
+			text += "\t\t\t"   "Proto4z.ui64 tag = " + boost::lexical_cast<std::string, unsigned long long>(info._proto._struct._tag) + ";" + LFCR;
 			text += "\t\t\t"   "" + LFCR;
 			text += "\t\t\t"   "var data = new System.Collections.Generic.List<byte>();" + LFCR;
 			for (const auto &m : info._proto._struct._members)
@@ -216,7 +225,7 @@ bool genCSharpFile(std::string path, std::string filename, std::string attr, std
 					text += "\t\t\t"  "data.AddRange(" + m._name + ".__encode());" + LFCR;
 				}
 			}
-			text += "\t\t\t" "sttLen = (System.UInt32)data.Count + 8;";
+			text += "\t\t\t" "sttLen = (System.UInt32)data.Count + 8;" + LFCR;
 			text += "\t\t\t"  "var ret = new System.Collections.Generic.List<byte>();" + LFCR;
 			text += "\t\t\t"  "ret.AddRange(sttLen.__encode());" + LFCR;
 			text += "\t\t\t"  "ret.AddRange(tag.__encode());" + LFCR;
@@ -240,6 +249,7 @@ bool genCSharpFile(std::string path, std::string filename, std::string attr, std
 				text += "\t\t\t" "{" + LFCR;
 				text += "\t\t\t\t" + m._name + ".__decode(binData, ref pos);" + LFCR;
 				text += "\t\t\t" "}" + LFCR;
+				i++;
 			}
 			text += "\t\t\treturn (int)offset.val;" + LFCR;
 			text += "\t\t}" + LFCR;
