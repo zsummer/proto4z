@@ -62,9 +62,9 @@ Protoz.TestStringDataMap.__getDesc = "map"
 Protoz.TestStringDataMap.__getTypeK = "string" 
 Protoz.TestStringDataMap.__getTypeV = "TestStringData" 
  
-Protoz.register(30003,"P2P_EchoPack") 
+Protoz.register(30000,"P2P_EchoPack") 
 Protoz.P2P_EchoPack = {}  
-Protoz.P2P_EchoPack.__getID = 30003 
+Protoz.P2P_EchoPack.__getID = 30000 
 Protoz.P2P_EchoPack.__getName = "P2P_EchoPack" 
 Protoz.P2P_EchoPack[1] = {name="_iarray", type="TestIntegerDataArray" }  
 Protoz.P2P_EchoPack[2] = {name="_farray", type="TestFloatDataArray" }  

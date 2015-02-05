@@ -187,9 +187,7 @@ function Protoz.__pack(val, tp)
 	elseif tp == "ui32" or tp == "unsigned int" then
 		return string.pack("<I", val)	
 	elseif tp == "i64" or tp == "long long" or tp == "ui64" or tp == "unsigned long long" then
-		local i = string.pack("<I", string.sub(val,1,5))
-		i = i .. string.pack("<I", string.sub(val,5,10))
-		return i
+		return string.sub(val, 1, 8)
 
 
 	-- string type
@@ -279,12 +277,8 @@ function Protoz.__unpack(binData, pos, tp)
 	elseif tp == "ui32" or tp == "unsigned int" then
 		n, v = string.unpack(binData, "<I", pos)
 	elseif tp == "i64" or tp == "long long" or tp == "ui64" or tp == "unsigned long long" then
-		local tmp
-		n, v = string.unpack(binData, "<I", pos)
-		tmp = string.pack("<I", v)
-		n, v = string.unpack(binData, "<I", pos+4)
-		tmp = tmp .. string.pack("<I", v)
-		v = tmp
+		v = string.sub(binData, pos, pos+7)
+		n = pos +8
 	-- string type
 	elseif tp == "string" then
 		n, v = string.unpack(binData, "<I", pos)
@@ -353,6 +347,7 @@ function Protoz.__decode(binData, pos, name, result)
 		offset, p = Protoz.__unpack(binData, p, "ui32")
 		offset = p + offset
 		tag, p = Protoz.__unpack(binData, p, "ui64")
+		print(type(tag))
 		for i = 1, #proto do
 			if Protoz_bit.checkBitTrue(tag, i-1) ~= nil then
 				local desc = proto[i]
