@@ -46,7 +46,7 @@ zsummer::proto4z::WriteStream & operator << (zsummer::proto4z::WriteStream & ws,
 	ws << data._i64; 
 //	ws << data._ui128; //[already deleted] 
 	ws << data._ui64; 
-	ws.fixOriginalData(offset - 8, ws.getStreamLen() - offset); 
+	ws.fixOriginalData(offset - 4, ws.getStreamLen() - offset); 
 	return ws; 
 } 
 zsummer::proto4z::ReadStream & operator >> (zsummer::proto4z::ReadStream & rs, TestIntegerData & data) 
@@ -115,7 +115,7 @@ zsummer::proto4z::WriteStream & operator << (zsummer::proto4z::WriteStream & ws,
 	ws << tag; 
 	ws << data._float; 
 	ws << data._double; 
-	ws.fixOriginalData(offset - 8, ws.getStreamLen() - offset); 
+	ws.fixOriginalData(offset - 4, ws.getStreamLen() - offset); 
 	return ws; 
 } 
 zsummer::proto4z::ReadStream & operator >> (zsummer::proto4z::ReadStream & rs, TestFloatData & data) 
@@ -149,7 +149,7 @@ zsummer::proto4z::WriteStream & operator << (zsummer::proto4z::WriteStream & ws,
 	zsummer::proto4z::Integer offset = ws.getStreamLen(); 
 	ws << tag; 
 	ws << data._string; 
-	ws.fixOriginalData(offset - 8, ws.getStreamLen() - offset); 
+	ws.fixOriginalData(offset - 4, ws.getStreamLen() - offset); 
 	return ws; 
 } 
 zsummer::proto4z::ReadStream & operator >> (zsummer::proto4z::ReadStream & rs, TestStringData & data) 
@@ -206,7 +206,7 @@ zsummer::proto4z::WriteStream & operator << (zsummer::proto4z::WriteStream & ws,
 	ws << data._imap; 
 	ws << data._fmap; 
 	ws << data._smap; 
-	ws.fixOriginalData(offset - 8, ws.getStreamLen() - offset); 
+	ws.fixOriginalData(offset - 4, ws.getStreamLen() - offset); 
 	return ws; 
 } 
 zsummer::proto4z::ReadStream & operator >> (zsummer::proto4z::ReadStream & rs, P2P_EchoPack & data) 
@@ -257,7 +257,7 @@ zsummer::proto4z::WriteStream & operator << (zsummer::proto4z::WriteStream & ws,
 	ws << (zsummer::proto4z::Integer)0; 
 	zsummer::proto4z::Integer offset = ws.getStreamLen(); 
 	ws << tag; 
-	ws.fixOriginalData(offset - 8, ws.getStreamLen() - offset); 
+	ws.fixOriginalData(offset - 4, ws.getStreamLen() - offset); 
 	return ws; 
 } 
 zsummer::proto4z::ReadStream & operator >> (zsummer::proto4z::ReadStream & rs, C2S_Pulse & data) 
@@ -284,7 +284,7 @@ zsummer::proto4z::WriteStream & operator << (zsummer::proto4z::WriteStream & ws,
 	ws << (zsummer::proto4z::Integer)0; 
 	zsummer::proto4z::Integer offset = ws.getStreamLen(); 
 	ws << tag; 
-	ws.fixOriginalData(offset - 8, ws.getStreamLen() - offset); 
+	ws.fixOriginalData(offset - 4, ws.getStreamLen() - offset); 
 	return ws; 
 } 
 zsummer::proto4z::ReadStream & operator >> (zsummer::proto4z::ReadStream & rs, S2C_Pulse & data) 

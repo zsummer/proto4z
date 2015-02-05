@@ -19,6 +19,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="genCPP.cpp" />
+    <ClCompile Include="genCSharp.cpp" />
+    <ClCompile Include="genLUA.cpp" />
     <ClCompile Include="genProto.cpp" />
     <ClCompile Include="log4z.cpp" />
     <ClCompile Include="main.cpp" />
