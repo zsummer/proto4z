@@ -182,7 +182,7 @@ class WriteStream
 public:
 	//! bNoWrite : if true then WriteStream will not do any write operation.
 	//! attachData : Attach to the existing memory.
-	WriteStream(ProtoInteger pID, char * attachData = NULL, Integer maxStreamLen = 0, bool bNoWrite = false);
+	inline WriteStream(ProtoInteger pID, char * attachData = NULL, Integer maxStreamLen = 0, bool bNoWrite = false);
 	~WriteStream(){}
 public:
 	//get total stream buff, the pointer must be used immediately.
@@ -246,7 +246,7 @@ private:
 class ReadStream
 {
 public:
-	ReadStream(const char *attachData, Integer attachDataLen, bool isHaveHeader = true);
+	inline ReadStream(const char *attachData, Integer attachDataLen, bool isHaveHeader = true);
 	~ReadStream(){}
 public:
 	//reset cursor
@@ -635,7 +635,7 @@ inline std::pair<INTEGRITY_RET_TYPE, Integer> checkBuffIntegrity(const char * bu
 //////////////////////////////////////////////////////////////////////////
 
 
-WriteStream::WriteStream(ProtoInteger pID, char * attachData, Integer maxStreamLen, bool bNoWrite)
+inline WriteStream::WriteStream(ProtoInteger pID, char * attachData, Integer maxStreamLen, bool bNoWrite)
 {
 	_pID = pID;
 	_attachData = attachData;
@@ -838,7 +838,7 @@ inline WriteStream & WriteStream::writeSimpleData(T t)
 //! implement 
 //////////////////////////////////////////////////////////////////////////
 
-ReadStream::ReadStream(const char *attachData, Integer attachDataLen, bool isHaveHeader)
+inline ReadStream::ReadStream(const char *attachData, Integer attachDataLen, bool isHaveHeader)
 {
 	_attachData = attachData;
 	_maxDataLen = attachDataLen;
