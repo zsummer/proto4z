@@ -72,3 +72,13 @@ Protoz.P2P_EchoPack[3] = {name="_sarray", type="TestStringDataArray" }
 Protoz.P2P_EchoPack[4] = {name="_imap", type="TestIntegerDataMap" }  
 Protoz.P2P_EchoPack[5] = {name="_fmap", type="TestFloatDataMap" }  
 Protoz.P2P_EchoPack[6] = {name="_smap", type="TestStringDataMap" }  
+ 
+Protoz.register(30001,"C2S_Pulse") 
+Protoz.C2S_Pulse = {}  
+Protoz.C2S_Pulse.__getID = 30001 
+Protoz.C2S_Pulse.__getName = "C2S_Pulse" 
+ 
+Protoz.register(30002,"S2C_Pulse") 
+Protoz.S2C_Pulse = {}  
+Protoz.S2C_Pulse.__getID = 30002 
+Protoz.S2C_Pulse.__getName = "S2C_Pulse" 

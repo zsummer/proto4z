@@ -79,5 +79,10 @@
   	<member name="_smap" type="TestStringDataMap"   desc=""/>
   </proto>
 
-  
+  <!-- 协议类型-->
+  <proto from="C" to="S" name="Pulse" desc= "">
+  </proto>
+   <!-- 协议类型-->
+  <proto from="S" to="C" name="Pulse" desc= "">
+  </proto>
 </Proto>

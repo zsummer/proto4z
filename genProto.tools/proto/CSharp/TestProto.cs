@@ -32,7 +32,7 @@ namespace Proto4z
 		public System.Collections.Generic.List<byte> __encode() 
 		{ 
 			Proto4z.ui32 sttLen = 0; 
-			 Proto4z.ui64 tag = 14757395258967641292; 
+			 Proto4z.ui64 tag = 383; 
 			 
 			var data = new System.Collections.Generic.List<byte>(); 
 			data.AddRange(_char.__encode()); 
@@ -113,7 +113,7 @@ namespace Proto4z
 		public System.Collections.Generic.List<byte> __encode() 
 		{ 
 			Proto4z.ui32 sttLen = 0; 
-			 Proto4z.ui64 tag = 14757395258967641292; 
+			 Proto4z.ui64 tag = 3; 
 			 
 			var data = new System.Collections.Generic.List<byte>(); 
 			data.AddRange(_float.__encode()); 
@@ -151,7 +151,7 @@ namespace Proto4z
 		public System.Collections.Generic.List<byte> __encode() 
 		{ 
 			Proto4z.ui32 sttLen = 0; 
-			 Proto4z.ui64 tag = 14757395258967641292; 
+			 Proto4z.ui64 tag = 1; 
 			 
 			var data = new System.Collections.Generic.List<byte>(); 
 			data.AddRange(_string.__encode()); 
@@ -416,7 +416,7 @@ namespace Proto4z
 		public System.Collections.Generic.List<byte> __encode() 
 		{ 
 			Proto4z.ui32 sttLen = 0; 
-			 Proto4z.ui64 tag = 14757395258967641292; 
+			 Proto4z.ui64 tag = 63; 
 			 
 			var data = new System.Collections.Generic.List<byte>(); 
 			data.AddRange(_iarray.__encode()); 
@@ -468,6 +468,60 @@ namespace Proto4z
 			{ 
 				_smap.__decode(binData, ref pos); 
 			} 
+			return (int)offset.val; 
+		} 
+	} 
+ 
+	class C2S_Pulse: Proto4z.IProtoObject 
+	{	 
+		 public Proto4z.ui16 getProtoID() { return new Proto4z.ui16(30001); } 
+		  public string getProtoName() { return "C2S_Pulse"; } 
+		public System.Collections.Generic.List<byte> __encode() 
+		{ 
+			Proto4z.ui32 sttLen = 0; 
+			 Proto4z.ui64 tag = 0; 
+			 
+			var data = new System.Collections.Generic.List<byte>(); 
+			sttLen = (System.UInt32)data.Count + 8;			var ret = new System.Collections.Generic.List<byte>(); 
+			ret.AddRange(sttLen.__encode()); 
+			ret.AddRange(tag.__encode()); 
+			ret.AddRange(data); 
+			return ret; 
+		} 
+		public int __decode(byte[] binData, ref int pos) 
+		{ 
+			Proto4z.ui32 offset = 0; 
+			Proto4z.ui64 tag = 0; 
+			offset.__decode(binData, ref pos); 
+			offset.val += (System.UInt32)pos; 
+			tag.__decode(binData, ref pos); 
+			return (int)offset.val; 
+		} 
+	} 
+ 
+	class S2C_Pulse: Proto4z.IProtoObject 
+	{	 
+		 public Proto4z.ui16 getProtoID() { return new Proto4z.ui16(30002); } 
+		  public string getProtoName() { return "S2C_Pulse"; } 
+		public System.Collections.Generic.List<byte> __encode() 
+		{ 
+			Proto4z.ui32 sttLen = 0; 
+			 Proto4z.ui64 tag = 0; 
+			 
+			var data = new System.Collections.Generic.List<byte>(); 
+			sttLen = (System.UInt32)data.Count + 8;			var ret = new System.Collections.Generic.List<byte>(); 
+			ret.AddRange(sttLen.__encode()); 
+			ret.AddRange(tag.__encode()); 
+			ret.AddRange(data); 
+			return ret; 
+		} 
+		public int __decode(byte[] binData, ref int pos) 
+		{ 
+			Proto4z.ui32 offset = 0; 
+			Proto4z.ui64 tag = 0; 
+			offset.__decode(binData, ref pos); 
+			offset.val += (System.UInt32)pos; 
+			tag.__decode(binData, ref pos); 
 			return (int)offset.val; 
 		} 
 	} 

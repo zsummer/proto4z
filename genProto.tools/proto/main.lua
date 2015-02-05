@@ -44,7 +44,7 @@
 package.path =  "../../?.lua;" .. package.path
 --require
 require("proto4z")
-require("lua.ControlProto")
+require("lua.TestProto")
 
 
 local echo = {  _iarray = {{_char=1,_uchar=2,_short=3,_ushort=4,_int=5,_uint=6,_i64="12345678",_ui64="12345678"},{_char=1,_uchar=2,_short=3,_ushort=4,_int=5,_uint=6,_i64="12345678",_ui64="12345678"}},

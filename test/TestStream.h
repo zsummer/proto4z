@@ -9,7 +9,7 @@
 #include <deque>
 #include <queue>
 #include <typeinfo>
-#include "../genProto.tools/proto/C++/ControlProto.h"
+#include "../genProto.tools/proto/C++/TestProto.h"
 using namespace  std;
 using namespace zsummer::proto4z;
 
