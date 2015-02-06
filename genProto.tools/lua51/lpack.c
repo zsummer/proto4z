@@ -30,7 +30,7 @@
 
 #include <ctype.h>
 #include <string.h>
-
+ #include <math.h>
 #include "lua.h"
 #include "lualib.h"
 #include "lauxlib.h"

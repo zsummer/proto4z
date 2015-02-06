@@ -9,17 +9,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
+ #include <math.h>
 
 #define lua_c
-extern "C"
-{
 #include "lua.h"
 
 #include "lauxlib.h"
 #include "lualib.h"
 #include "lpack.h"
-}
+
 
 
 
