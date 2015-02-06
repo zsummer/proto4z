@@ -5,4 +5,4 @@ aux_source_directory(./ source)
 set(EXECUTABLE_OUTPUT_PATH ../proto)
 
 add_executable(lpack ${source})
-
+target_link_libraries(lpack m)
