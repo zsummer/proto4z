@@ -177,7 +177,7 @@ bool genCppFile(std::string path, std::string filename, std::string attr, std::v
 
 
 			//input stream operator
-			text += "zsummer::proto4z::WriteStream & operator << (zsummer::proto4z::WriteStream & ws, const " + info._proto._struct._name + " & data)" + LFCR;
+			text += "inline zsummer::proto4z::WriteStream & operator << (zsummer::proto4z::WriteStream & ws, const " + info._proto._struct._name + " & data)" + LFCR;
 			text += "{" + LFCR;
 			text += "\tunsigned long long tag = " + boost::lexical_cast<std::string, unsigned long long>(info._proto._struct._tag) + "ULL;" + LFCR;
 			text += "\tws << (zsummer::proto4z::Integer)0;" + LFCR;
@@ -200,7 +200,7 @@ bool genCppFile(std::string path, std::string filename, std::string attr, std::v
 
 
 			//output stream operator
-			text += "zsummer::proto4z::ReadStream & operator >> (zsummer::proto4z::ReadStream & rs, " + info._proto._struct._name + " & data)" + LFCR;
+			text += "inline zsummer::proto4z::ReadStream & operator >> (zsummer::proto4z::ReadStream & rs, " + info._proto._struct._name + " & data)" + LFCR;
 			text += "{" + LFCR;
 			text += "\tzsummer::proto4z::Integer sttLen = 0;" + LFCR;
 			text += "\trs >> sttLen;" + LFCR;
