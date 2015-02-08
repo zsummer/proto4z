@@ -116,7 +116,20 @@ bool genLuaFile(std::string path, std::string filename, std::string attr, std::v
 			text += "Protoz." + info._proto._struct._name + ".__getName = \"" + info._proto._struct._name + "\"" + LFCR;
 
 	
-
+			info._proto._struct._tag = 0;
+			std::string tag = "";
+			for (auto &m : info._proto._struct._members)
+			{
+				if (m._isDel)
+				{
+					tag.append("0");
+				}
+				else
+				{
+					tag.append("1");
+				}
+			}
+			text += "Protoz." + info._proto._struct._name + ".__getTag = \"" + tag + "\"" + LFCR;
 			for (size_t i = 0; i < info._proto._struct._members.size(); ++i)
 			{
 				text += "Protoz." + info._proto._struct._name + "[" + boost::lexical_cast<std::string>(i + 1)

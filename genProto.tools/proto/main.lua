@@ -58,15 +58,15 @@ local echo = {  _iarray = {{_char=1,_uchar=2,_short=3,_ushort=4,_int=5,_uint=6,_
 Protoz.dump(echo)
 
 local now = os.time()
---for i=1, 100000 do
+for i=1, 100000 do
 	local data = Protoz.encode(echo, "P2P_EchoPack")
-	Protoz.putbin(data)
+	--Protoz.putbin(data)
 	local dr = Protoz.decode(data, Protoz.getName(Protoz.P2P_EchoPack.__getID)) -- "P2P_EchoPack"
-	Protoz.dump(dr)
+	--Protoz.dump(dr)
 
---end
+end
 now = os.time() - now
---print(now)
+print(now)
 
 
 
