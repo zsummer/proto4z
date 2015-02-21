@@ -31,7 +31,7 @@ struct TestIntegerData //测试
 		_ui64 = 0; 
 	} 
 }; 
-zsummer::proto4z::WriteStream & operator << (zsummer::proto4z::WriteStream & ws, const TestIntegerData & data) 
+inline zsummer::proto4z::WriteStream & operator << (zsummer::proto4z::WriteStream & ws, const TestIntegerData & data) 
 { 
 	unsigned long long tag = 383ULL; 
 	ws << (zsummer::proto4z::Integer)0; 
@@ -49,7 +49,7 @@ zsummer::proto4z::WriteStream & operator << (zsummer::proto4z::WriteStream & ws,
 	ws.fixOriginalData(offset - 4, ws.getStreamLen() - offset); 
 	return ws; 
 } 
-zsummer::proto4z::ReadStream & operator >> (zsummer::proto4z::ReadStream & rs, TestIntegerData & data) 
+inline zsummer::proto4z::ReadStream & operator >> (zsummer::proto4z::ReadStream & rs, TestIntegerData & data) 
 { 
 	zsummer::proto4z::Integer sttLen = 0; 
 	rs >> sttLen; 
@@ -107,7 +107,7 @@ struct TestFloatData //测试
 		_double = 0.0; 
 	} 
 }; 
-zsummer::proto4z::WriteStream & operator << (zsummer::proto4z::WriteStream & ws, const TestFloatData & data) 
+inline zsummer::proto4z::WriteStream & operator << (zsummer::proto4z::WriteStream & ws, const TestFloatData & data) 
 { 
 	unsigned long long tag = 3ULL; 
 	ws << (zsummer::proto4z::Integer)0; 
@@ -118,7 +118,7 @@ zsummer::proto4z::WriteStream & operator << (zsummer::proto4z::WriteStream & ws,
 	ws.fixOriginalData(offset - 4, ws.getStreamLen() - offset); 
 	return ws; 
 } 
-zsummer::proto4z::ReadStream & operator >> (zsummer::proto4z::ReadStream & rs, TestFloatData & data) 
+inline zsummer::proto4z::ReadStream & operator >> (zsummer::proto4z::ReadStream & rs, TestFloatData & data) 
 { 
 	zsummer::proto4z::Integer sttLen = 0; 
 	rs >> sttLen; 
@@ -142,7 +142,7 @@ struct TestStringData //测试
 { 
 	std::string _string;  
 }; 
-zsummer::proto4z::WriteStream & operator << (zsummer::proto4z::WriteStream & ws, const TestStringData & data) 
+inline zsummer::proto4z::WriteStream & operator << (zsummer::proto4z::WriteStream & ws, const TestStringData & data) 
 { 
 	unsigned long long tag = 1ULL; 
 	ws << (zsummer::proto4z::Integer)0; 
@@ -152,7 +152,7 @@ zsummer::proto4z::WriteStream & operator << (zsummer::proto4z::WriteStream & ws,
 	ws.fixOriginalData(offset - 4, ws.getStreamLen() - offset); 
 	return ws; 
 } 
-zsummer::proto4z::ReadStream & operator >> (zsummer::proto4z::ReadStream & rs, TestStringData & data) 
+inline zsummer::proto4z::ReadStream & operator >> (zsummer::proto4z::ReadStream & rs, TestStringData & data) 
 { 
 	zsummer::proto4z::Integer sttLen = 0; 
 	rs >> sttLen; 
@@ -194,7 +194,7 @@ struct P2P_EchoPack
 	inline unsigned short GetProtoID() { return 30000;} 
 	inline std::string GetProtoName() { return "ID_P2P_EchoPack";} 
 }; 
-zsummer::proto4z::WriteStream & operator << (zsummer::proto4z::WriteStream & ws, const P2P_EchoPack & data) 
+inline zsummer::proto4z::WriteStream & operator << (zsummer::proto4z::WriteStream & ws, const P2P_EchoPack & data) 
 { 
 	unsigned long long tag = 63ULL; 
 	ws << (zsummer::proto4z::Integer)0; 
@@ -209,7 +209,7 @@ zsummer::proto4z::WriteStream & operator << (zsummer::proto4z::WriteStream & ws,
 	ws.fixOriginalData(offset - 4, ws.getStreamLen() - offset); 
 	return ws; 
 } 
-zsummer::proto4z::ReadStream & operator >> (zsummer::proto4z::ReadStream & rs, P2P_EchoPack & data) 
+inline zsummer::proto4z::ReadStream & operator >> (zsummer::proto4z::ReadStream & rs, P2P_EchoPack & data) 
 { 
 	zsummer::proto4z::Integer sttLen = 0; 
 	rs >> sttLen; 
@@ -251,7 +251,7 @@ struct C2S_Pulse
 	inline unsigned short GetProtoID() { return 30001;} 
 	inline std::string GetProtoName() { return "ID_C2S_Pulse";} 
 }; 
-zsummer::proto4z::WriteStream & operator << (zsummer::proto4z::WriteStream & ws, const C2S_Pulse & data) 
+inline zsummer::proto4z::WriteStream & operator << (zsummer::proto4z::WriteStream & ws, const C2S_Pulse & data) 
 { 
 	unsigned long long tag = 0ULL; 
 	ws << (zsummer::proto4z::Integer)0; 
@@ -260,7 +260,7 @@ zsummer::proto4z::WriteStream & operator << (zsummer::proto4z::WriteStream & ws,
 	ws.fixOriginalData(offset - 4, ws.getStreamLen() - offset); 
 	return ws; 
 } 
-zsummer::proto4z::ReadStream & operator >> (zsummer::proto4z::ReadStream & rs, C2S_Pulse & data) 
+inline zsummer::proto4z::ReadStream & operator >> (zsummer::proto4z::ReadStream & rs, C2S_Pulse & data) 
 { 
 	zsummer::proto4z::Integer sttLen = 0; 
 	rs >> sttLen; 
@@ -278,7 +278,7 @@ struct S2C_Pulse
 	inline unsigned short GetProtoID() { return 30002;} 
 	inline std::string GetProtoName() { return "ID_S2C_Pulse";} 
 }; 
-zsummer::proto4z::WriteStream & operator << (zsummer::proto4z::WriteStream & ws, const S2C_Pulse & data) 
+inline zsummer::proto4z::WriteStream & operator << (zsummer::proto4z::WriteStream & ws, const S2C_Pulse & data) 
 { 
 	unsigned long long tag = 0ULL; 
 	ws << (zsummer::proto4z::Integer)0; 
@@ -287,7 +287,7 @@ zsummer::proto4z::WriteStream & operator << (zsummer::proto4z::WriteStream & ws,
 	ws.fixOriginalData(offset - 4, ws.getStreamLen() - offset); 
 	return ws; 
 } 
-zsummer::proto4z::ReadStream & operator >> (zsummer::proto4z::ReadStream & rs, S2C_Pulse & data) 
+inline zsummer::proto4z::ReadStream & operator >> (zsummer::proto4z::ReadStream & rs, S2C_Pulse & data) 
 { 
 	zsummer::proto4z::Integer sttLen = 0; 
 	rs >> sttLen; 

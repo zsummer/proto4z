@@ -6,7 +6,8 @@ add_definitions(-Wall  -O0 -g -ggdb  -DNDEBUG -std=c++11 -D_GLIBCXX_USE_NANOSLEE
 
 set(EXECUTABLE_OUTPUT_PATH ./proto)
 
-add_executable(genProto genProto.cpp  log4z.cpp  main.cpp  md5.cpp  tinyxml2.cpp  utility.cpp)
+aux_source_directory(./ source)
+add_executable(genProto ${source})
 
 if (APPLE)
 	target_link_libraries(genProto pthread)
