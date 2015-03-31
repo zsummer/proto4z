@@ -320,14 +320,12 @@ ParseCode genProto::parseConfig()
 				DataProto dp;
 				if (stype == "proto")
 				{
-					if (!ele->Attribute("name") || !ele->Attribute("from") || !ele->Attribute("to"))
+					if (!ele->Attribute("name"))
 					{
 						LOGE("Attribute Error. ");
 						return PC_ERROR;
 					}
 					std::string name = ele->Attribute("name");
-					std::string from = ele->Attribute("from");
-					std::string to = ele->Attribute("to");
 					std::string desc;
 					if (ele->Attribute("desc"))
 					{
@@ -335,10 +333,10 @@ ParseCode genProto::parseConfig()
 					}
 
 					dp._const._type = ProtoIDType;
-					dp._const._name = "ID_" + from + "2" + to + "_" + name;
+					dp._const._name = "ID_"  + name;
 					dp._const._desc = desc;
 					unsigned int No = _curNo;
-					dp._struct._name = from + "2" + to + "_" + name;
+					dp._struct._name = name;
 					dp._struct._desc = desc;
 
 					auto iterNo = _mapCacheNo.find(dp._const._name);
