@@ -66,7 +66,7 @@ static  std::map<std::string, std::string> xmlTypeToCPPType = {
 		{ "ui8", "unsigned char" },
 		{ "i16", "short" },
 		{ "ui16", "unsigned short" },
-		{ "i32", "unsigned int" },
+		{ "i32", "int" },
 		{ "ui32", "unsigned int" },
 		{ "i64", "long long" },
 		{ "ui64", "unsigned long long" },
