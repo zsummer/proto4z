@@ -35,14 +35,14 @@
   </enum>
 
   <!-- 整形-->
-  <struct name="TestIntegerData" desc="测试">
+  <struct name="TestIntegerData" store="true" desc="测试">
     <member name="_char"  type="i8"  desc=""/>
     <member name="_uchar"  type="ui8"  desc=""/>
     <member name="_short"  type="i16"  desc=""/>
     <member name="_ushort"  type="ui16"   desc=""/>
     <member name="_int"  type="i32"   desc=""/>
     <member name="_uint"  type="ui32"   desc=""/>
-    <member name="_i64"  type="i64"   desc=""/>
+    <member name="_i64"  type="i64" key="true"   desc=""/>
     <member name="_ui128"  type="ui64"  del="true" desc=""/>
     <member name="_ui64"  type="ui64"   desc=""/>
   </struct>
@@ -70,7 +70,7 @@
 
   
   <!-- 协议类型-->
-  <proto from="P" to="P" name="EchoPack" desc= "">
+  <proto  name="EchoPack" desc= "">
   	<member name="_iarray" type="TestIntegerDataArray"   desc=""/>
   	<member name="_farray" type="TestFloatDataArray"   desc=""/>
   	<member name="_sarray" type="TestStringDataArray"   desc=""/>
@@ -80,9 +80,9 @@
   </proto>
 
   <!-- 协议类型-->
-  <proto from="C" to="S" name="Pulse" desc= "">
+  <proto  name="Pulse" desc= "">
   </proto>
    <!-- 协议类型-->
-  <proto from="S" to="C" name="Pulse" desc= "">
+  <proto  name="Pulse" desc= "">
   </proto>
 </Proto>

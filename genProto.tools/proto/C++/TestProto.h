@@ -13,7 +13,7 @@ struct TestIntegerData //测试
 	unsigned char _uchar;  
 	short _short;  
 	unsigned short _ushort;  
-	unsigned int _int;  
+	int _int;  
 	unsigned int _uint;  
 	long long _i64;  
 	unsigned long long _ui128; //[already deleted] 

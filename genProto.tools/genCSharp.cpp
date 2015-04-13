@@ -9,7 +9,7 @@
  * 
  * ===============================================================================
  * 
- * Copyright (C) 2012 YaweiZhang <yawei_zhang@foxmail.com>.
+ * Copyright (C) 2014-2015 YaweiZhang <yawei_zhang@foxmail.com>.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -265,7 +265,7 @@ bool genCSharpFile(std::string path, std::string filename, std::string attr, std
 	os.open(path + filename + attr, std::ios::binary);
 	if (!os.is_open())
 	{
-		LOGE("genCppFile open file Error. : " << path + filename + attr);
+		LOGE("genCSharpFile open file Error. : " << path + filename + attr);
 		return false;
 	}
 	os.write(text.c_str(), text.length());

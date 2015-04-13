@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF - 8"?>
 
-<md5>bdcb1a6a5cd7f0ab2d13d4d470698d8a</md5>
+<md5>260fbfda649b48d376d0d9febcc31ea3</md5>
 
 <CacheNo>
 	<cache key = "ID_C2S_Pulse" No = "30001" /> 
+	<cache key = "ID_EchoPack" No = "30003" /> 
 	<cache key = "ID_P2P_EchoPack" No = "30000" /> 
+	<cache key = "ID_Pulse" No = "30004" /> 
 	<cache key = "ID_S2C_Pulse" No = "30002" /> 
 </CacheNo>

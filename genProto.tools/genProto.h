@@ -9,7 +9,7 @@
  * 
  * ===============================================================================
  * 
- * Copyright (C) 2012 YaweiZhang <yawei_zhang@foxmail.com>.
+ * Copyright (C) 2014-2015 YaweiZhang <yawei_zhang@foxmail.com>.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -163,12 +163,14 @@ struct DataStruct
 	std::string _name;
 	std::string _desc;
 	unsigned long long _tag;
+	bool _isStore = false;
 	struct DataMember
 	{
 		std::string _type;
 		std::string _name;
 		std::string _desc;
-		bool _isDel;
+		bool _isDel = false;
+		bool _isKey = false;
 	};
 	std::vector<DataMember> _members;
 };
@@ -215,6 +217,7 @@ struct StoreInfo
 bool genCppFile(std::string path, std::string filename, std::string attr, std::vector<StoreInfo> & stores);
 bool genLuaFile(std::string path, std::string filename, std::string attr, std::vector<StoreInfo> & stores);
 bool genCSharpFile(std::string path, std::string filename, std::string attr, std::vector<StoreInfo> & stores);
+bool genSQLFile(std::string path, std::string filename, std::string attr, std::vector<StoreInfo> & stores);
 bool genJsFile(std::string path, std::string filename, std::string attr, std::vector<StoreInfo> & stores);
 
 

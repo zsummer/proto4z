@@ -23,6 +23,7 @@
     <ClCompile Include="genCSharp.cpp" />
     <ClCompile Include="genLUA.cpp" />
     <ClCompile Include="genProto.cpp" />
+    <ClCompile Include="genSQL.cpp" />
     <ClCompile Include="log4z.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="md5.cpp" />
@@ -35,10 +36,6 @@
     <ClInclude Include="tinyxml2.h" />
     <ClInclude Include="genProto.h" />
     <ClInclude Include="utility.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <Xml Include="ControlProto.No.xml" />
-    <Xml Include="ControlProto.xml" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{AD368D24-8C2B-4848-822F-0827E725CAD7}</ProjectGuid>

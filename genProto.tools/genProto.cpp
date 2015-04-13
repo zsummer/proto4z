@@ -9,7 +9,7 @@
  * 
  * ===============================================================================
  * 
- * Copyright (C) 2012 YaweiZhang <yawei_zhang@foxmail.com>.
+ * Copyright (C) 2014-2015 YaweiZhang <yawei_zhang@foxmail.com>.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -318,26 +318,27 @@ ParseCode genProto::parseConfig()
 			else if (stype == "struct" || stype == "proto")
 			{
 				DataProto dp;
+				if (!ele->Attribute("name"))
+				{
+					LOGE("Attribute Error. ");
+					return PC_ERROR;
+				}
+				dp._struct._name = ele->Attribute("name");
+				if (ele->Attribute("desc"))
+				{
+					dp._struct._desc = ele->Attribute("desc");
+				}
+				if (ele->Attribute("store"))
+				{
+					dp._struct._isStore = strcmp("true", ele->Attribute("store")) == 0;
+				}
 				if (stype == "proto")
 				{
-					if (!ele->Attribute("name"))
-					{
-						LOGE("Attribute Error. ");
-						return PC_ERROR;
-					}
-					std::string name = ele->Attribute("name");
-					std::string desc;
-					if (ele->Attribute("desc"))
-					{
-						desc = ele->Attribute("desc");
-					}
 
 					dp._const._type = ProtoIDType;
-					dp._const._name = "ID_"  + name;
-					dp._const._desc = desc;
+					dp._const._name = "ID_"  + dp._struct._name;
+					dp._const._desc = dp._struct._desc;
 					unsigned int No = _curNo;
-					dp._struct._name = name;
-					dp._struct._desc = desc;
 
 					auto iterNo = _mapCacheNo.find(dp._const._name);
 					if (iterNo == _mapCacheNo.end())
@@ -359,19 +360,7 @@ ParseCode genProto::parseConfig()
 						return PC_ERROR;
 					}
 				}
-				else
-				{
-					if (!ele->Attribute("name"))
-					{
-						LOGE("Attribute Error. ");
-						return PC_ERROR;
-					}
-					dp._struct._name = ele->Attribute("name");
-					if (ele->Attribute("desc"))
-					{
-						dp._struct._desc = ele->Attribute("desc");
-					}
-				}
+
 				XMLElement * member = ele->FirstChildElement("member");
 				do
 				{
@@ -387,20 +376,13 @@ ParseCode genProto::parseConfig()
 					}
 					dm._type = member->Attribute("type");
 					dm._name = member->Attribute("name");
-					if (member->Attribute("del"))
+					if (member->Attribute("del") && strcmp(member->Attribute("del"), "true") == 0)
 					{
-						if (strcmp(member->Attribute("del"), "true") == 0)
-						{
 							dm._isDel = true;
-						}
-						else
-						{
-							dm._isDel = false;
-						}
 					}
-					else
+					if (member->Attribute("key") && strcmp(member->Attribute("key"), "true") == 0)
 					{
-						dm._isDel = false;
+						dm._isKey = true;
 					}
 					if (member->Attribute("desc"))
 					{
@@ -454,13 +436,18 @@ ParseCode genProto::genCode()
 		std::string cppFileName = "C++/" + _fileName + ".h";
 		std::string luaFileName = "lua/" + _fileName + ".lua";
 		std::string csFileName = "CSharp/" + _fileName + ".CSharp";
-		if (xmlmd5 != _md5 || !zsummer::utility::GetFileStatus(cppFileName, 6))
+		if (xmlmd5 != _md5 || !zsummer::utility::GetFileStatus(cppFileName, 6) || !zsummer::utility::GetFileStatus(std::string()+"C++/" + _fileName + "SQL.h", 6))
 		{
 			if (!genCppFile("C++/", _fileName, ".h", _vctStoreInfo))
 			{
 				return PC_ERROR;
 			}
+			if (!genSQLFile("C++/", _fileName + "SQL", ".h", _vctStoreInfo))
+			{
+				return PC_ERROR;
+			}
 		}
+
 		if (xmlmd5 != _md5 || !zsummer::utility::GetFileStatus(luaFileName, 6))
 		{
 			if (!genLuaFile("lua/", _fileName, ".lua", _vctStoreInfo))
