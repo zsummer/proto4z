@@ -80,6 +80,7 @@ bool genSQLFile(std::string path, std::string filename, std::string attr, std::v
 			text += "inline std::vector<std::string> " + info._proto._struct._name + "_BUILD()" + LFCR;
 			text += "{" + LFCR;
 			text += "\tstd::vector<std::string> ret;" + LFCR;
+			text += "\tret.push_back(\"desc `tb_" + info._proto._struct._name + "`\");" + LFCR;
 			text += "\tret.push_back(\"CREATE TABLE `tb_" + info._proto._struct._name + "` (`" + key._name + "`";
 			if (key._type == "string")
 			{
