@@ -222,7 +222,7 @@ bool genSQLFile(std::string path, std::string filename, std::string attr, std::v
 			text += LFCR;
 			text += "inline std::string " + info._proto._struct._name + "_UPDATE( const " + info._proto._struct._name + " & info) " + LFCR;
 			text += "{" + LFCR;
-			text += "\tzsummer::mysql::DBQuery q(\" insert into tb_" + info._proto._struct._name + "(" + key._name + ") values(?) on duplicate key set ";
+			text += "\tzsummer::mysql::DBQuery q(\" insert into tb_" + info._proto._struct._name + "(" + key._name + ") values(?) on duplicate key update ";
 			for (auto& m : info._proto._struct._members)
 			{
 				if (m._isKey)
@@ -232,7 +232,7 @@ bool genSQLFile(std::string path, std::string filename, std::string attr, std::v
 				text += "`" + m._name + "` = ?,";
 			}
 			text[text.length() - 1] = ' ';
-			text += "from tb_" + info._proto._struct._name + " where `" + key._name + "` = ? \");" + LFCR;
+			text += " \");" + LFCR;
 			text += "\tq << info." + key._name + ";" + LFCR;
 
 			for (auto& m : info._proto._struct._members)
