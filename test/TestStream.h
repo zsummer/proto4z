@@ -119,7 +119,7 @@ inline bool operator==(const std::map<K,V> & data1, const std::map<K,V> &data2)
 template<class K, class V>
 inline bool operator!=(const std::map<K, V> & data1, const std::map<K, V> &data2){ return !(data1 == data2); }
 
-inline bool operator==(const P2P_EchoPack & pack1, const P2P_EchoPack &pack2)
+inline bool operator==(const EchoPack & pack1, const EchoPack &pack2)
 {
 	if (pack1._iarray != pack2._iarray)
 	{
@@ -147,7 +147,7 @@ inline bool operator==(const P2P_EchoPack & pack1, const P2P_EchoPack &pack2)
 	}
 	return true;
 }
-inline bool operator!=(const P2P_EchoPack & pack1, const P2P_EchoPack &pack2){ return !(pack1 == pack2); }
+inline bool operator!=(const EchoPack & pack1, const EchoPack &pack2){ return !(pack1 == pack2); }
 
 class TestBase
 {
@@ -291,7 +291,7 @@ public:
 			WriteStream ws2(120);
 			ws2.appendOriginalData(rs.getStreamUnread(), rs.getStreamUnreadLen());
 			ReadStream rs2(ws2.getStream(), ws2.getStreamLen());
-			P2P_EchoPack testData;
+			EchoPack testData;
 			rs2 >> testData;
 			if (!(testData == _testData))
 			{
@@ -315,7 +315,7 @@ public:
 
 	Integer _packLen;
 	Integer _bodyLen;
-	P2P_EchoPack _testData;
+	EchoPack _testData;
 };
 
 
@@ -401,7 +401,7 @@ bool TestBase::CheckProtocol(WriteStream &ws, const char * desc)
 
 	//check read
 	{
-		P2P_EchoPack readTestData;
+		EchoPack readTestData;
 		ReadStream rs(ws.getStream(), ws.getStreamLen());
 
 		try
@@ -440,7 +440,7 @@ bool TestBase::CheckProtocol(WriteStream &ws, const char * desc)
 
 
 		ReadStream rs2(rs.getStreamBody(), rs.getStreamBodyLen(), false);
-		P2P_EchoPack readTestData2;
+		EchoPack readTestData2;
 		try
 		{
 

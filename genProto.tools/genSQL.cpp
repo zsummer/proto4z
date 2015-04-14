@@ -77,10 +77,10 @@ bool genSQLFile(std::string path, std::string filename, std::string attr, std::v
 			}
 			//build
 			text += LFCR;
-			text += "inline std::pair<std::string, std::vector<std::string>> " + info._proto._struct._name + "_BUILD()" + LFCR;
+			text += "inline std::vector<std::string> " + info._proto._struct._name + "_BUILD()" + LFCR;
 			text += "{" + LFCR;
-			text += "\tstd::pair<std::string, std::vector<std::string>> ret;" + LFCR;
-			text += "\tret.first = \"CREATE TABLE `tb_" + info._proto._struct._name + "` (`" + key._name + "`";
+			text += "\tstd::vector<std::string> ret;" + LFCR;
+			text += "\tret.push_back(\"CREATE TABLE `tb_" + info._proto._struct._name + "` (`" + key._name + "`";
 			if (key._type == "string")
 			{
 				text += " varchar(255) NOT NULL DEFAULT '' , ";
@@ -93,7 +93,7 @@ bool genSQLFile(std::string path, std::string filename, std::string attr, std::v
 			{
 				text += " bigint(20) unsigned NOT NULL DEFAULT '0' , ";
 			}
-			text += " PRIMARY KEY(`" + key._name + "`) ) ENGINE = MyISAM DEFAULT CHARSET = utf8\";" + LFCR;
+			text += " PRIMARY KEY(`" + key._name + "`) ) ENGINE = MyISAM DEFAULT CHARSET = utf8\");" + LFCR;
 
 			for (auto& m : info._proto._struct._members)
 			{
@@ -102,7 +102,7 @@ bool genSQLFile(std::string path, std::string filename, std::string attr, std::v
 					continue;
 				}
 
-				text += "\tret.second.push_back(\"alter table `tb_" + info._proto._struct._name + "` add `" + m._name + "` ";
+				text += "\tret.push_back(\"alter table `tb_" + info._proto._struct._name + "` add `" + m._name + "` ";
 				if (m._type == "string")
 				{
 					text += " varchar(255) NOT NULL DEFAULT '' ";
@@ -146,7 +146,7 @@ bool genSQLFile(std::string path, std::string filename, std::string attr, std::v
 			text += LFCR;
 			text += "inline std::string " + info._proto._struct._name + "_SELECT(" + getCPPType(key._type) + " " + key._name + ")" + LFCR;
 			text += "{" + LFCR;
-			text += "\tzsummer::mysql:: q(\" select ";
+			text += "\tzsummer::mysql::DBQuery q(\" select ";
 			for (auto& m : info._proto._struct._members)
 			{
 				text += "`" + m._name + "`";
@@ -160,21 +160,59 @@ bool genSQLFile(std::string path, std::string filename, std::string attr, std::v
 
 			//fetch
 			text += LFCR;
-			text += "inline std::map<" + getCPPType(key._type) + ", " + info._proto._struct._name + "> " + info._proto._struct._name + "_FETCH(DBResultPtr ptr)" + LFCR;
+			text += "inline std::map<" + getCPPType(key._type) + ", " + info._proto._struct._name + "> " + info._proto._struct._name + "_FETCH(zsummer::mysql::DBResultPtr ptr)" + LFCR;
 			text += "{" + LFCR;
 			text += "\tstd::map<" + getCPPType(key._type) + ", " + info._proto._struct._name + "> ret;" + LFCR;
-			text += "\tif (ptr->getErrorCode() == QEC_SUCCESS)" + LFCR;
+			text += "\tif (ptr->getErrorCode() != zsummer::mysql::QEC_SUCCESS)" + LFCR;
 			text += "\t{" + LFCR;
-			text += "\t\twhile (ptr->haveRow())" + LFCR;
+			text += "\t\t"  "LOGE(\"fetch info from db found error. ErrorCode=\"  <<  ptr->getErrorCode() << \", Error=\" << ptr->getLastError());" + LFCR;
+			text += "\t\t"  "return ret;" + LFCR;
+			text += "\t}" + LFCR;
+			text += "\ttry" + LFCR;
+			text += "\t{" + LFCR;
+
+			text += "\t\t"  "while (ptr->haveRow())" + LFCR;
 			text += "\t\t{" + LFCR;
 			text += "\t\t\t" + info._proto._struct._name + " " + "info;" + LFCR;
 			for (auto& m : info._proto._struct._members)
 			{
-				text += "\t\t\t*ptr >> info." + m._name + ";" + LFCR;
+				if (m._type == "ui8" || m._type == "ui16" || m._type == "ui32" || m._type == "ui64"
+					|| m._type == "i8" || m._type == "i16" || m._type == "i32" || m._type == "i64"
+					|| m._type == "double" || m._type == "float" || m._type == "string")
+				{
+					text += "\t\t\t*ptr >> info." + m._name + ";" + LFCR;
+				}
+				else
+				{
+					text += "\t\t\ttry" + LFCR;
+					text += "\t\t\t{" + LFCR;
+
+					text += "\t\t\t\t"  "std::string blob;" + LFCR;
+					text += "\t\t\t\t"  "*ptr >> blob;" + LFCR;
+					text += "\t\t\t\t"  "if(!blob.empty())" + LFCR;
+					text += "\t\t\t\t"  "{" + LFCR;
+					text += "\t\t\t\t\t"  "zsummer::proto4z::ReadStream rs(blob.c_str(), blob.length(), fase);" + LFCR;
+					text += "\t\t\t\t\t"  "rs >> info." + m._name + ";" + LFCR;
+					text += "\t\t\t\t"  "}" + LFCR;
+
+					text += "\t\t\t}" + LFCR;
+					text += "\t\t\tcatch(std::runtime_error e)" + LFCR;
+					text += "\t\t\t{" + LFCR;
+					text += "\t\t\t\t"  "LOGW(\"fetch blob catch one runtime warning. what=\" << e.what());" + LFCR;
+					text += "\t\t\t}" + LFCR;
+
+				}
 			}
 			text += "\t\t\tret[info." + key._name + "] = info;" + LFCR;
 			text += "\t\t}" + LFCR;
+
 			text += "\t}" + LFCR;
+			text += "\tcatch(std::runtime_error e)" + LFCR;
+			text += "\t{" + LFCR;
+			text += "\t\t"  "LOGE(\"fetch info catch one runtime error. what=\" << e.what());" + LFCR;
+			text += "\t\t"  "return ret;" + LFCR;
+			text += "\t}" + LFCR;
+
 			text += "\treturn std::move(ret);" + LFCR;
 			text += "}" + LFCR;
 			text += LFCR;
@@ -183,7 +221,7 @@ bool genSQLFile(std::string path, std::string filename, std::string attr, std::v
 			text += LFCR;
 			text += "inline std::string " + info._proto._struct._name + "_UPDATE( const " + info._proto._struct._name + " & info) " + LFCR;
 			text += "{" + LFCR;
-			text += "\tzsummer::mysql:: q(\" insert into tb_" + info._proto._struct._name + "(" + key._name + ") values(?) on duplicate key set ";
+			text += "\tzsummer::mysql::DBQuery q(\" insert into tb_" + info._proto._struct._name + "(" + key._name + ") values(?) on duplicate key set ";
 			for (auto& m : info._proto._struct._members)
 			{
 				if (m._isKey)
@@ -202,9 +240,28 @@ bool genSQLFile(std::string path, std::string filename, std::string attr, std::v
 				{
 					continue;
 				}
-				text += "\tq << info." + m._name + ";" + LFCR;
+				else if (m._type == "ui8" || m._type == "ui16" || m._type == "ui32" || m._type == "ui64"
+					|| m._type == "i8" || m._type == "i16" || m._type == "i32" || m._type == "i64"
+					|| m._type == "double" || m._type == "float" || m._type == "string")
+				{
+					text += "\tq << info." + m._name + ";" + LFCR;
+				}
+				else
+				{
+					text += "\t"  "try" + LFCR;
+					text += "\t"  "{" + LFCR;
+					text += "\t\t"  "zsummer::proto4z::WriteStream ws(0);" + LFCR;
+					text += "\t\t"  "ws << info." + m._name + ";" + LFCR;
+					text += "\t\t"  "q << std::string(ws.getStreamBody(), ws.getStreamBodyLen());" + LFCR;
+					text += "\t"  "}" + LFCR;
+					text += "\t"  "catch(std::runtime_error e)" + LFCR;
+					text += "\t"  "{" + LFCR;
+					text += "\t\t"  "LOGW(\"write blob catch one runtime warning. what=\" << e.what());" + LFCR;
+					text += "\t"  "}" + LFCR;
+				}
+				
 			}
-			text += "\treturn std::move(ret);" + LFCR;
+			text += "\treturn q.popSQL();" + LFCR;
 			text += "}" + LFCR;
 			text += LFCR;
 		}

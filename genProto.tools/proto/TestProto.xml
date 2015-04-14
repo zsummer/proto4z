@@ -82,7 +82,5 @@
   <!-- 协议类型-->
   <proto  name="Pulse" desc= "">
   </proto>
-   <!-- 协议类型-->
-  <proto  name="Pulse" desc= "">
-  </proto>
+
 </Proto>

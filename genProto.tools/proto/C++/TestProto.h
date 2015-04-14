@@ -272,31 +272,4 @@ inline zsummer::proto4z::ReadStream & operator >> (zsummer::proto4z::ReadStream 
 	return rs; 
 } 
  
-const unsigned short ID_Pulse = 30004;  
-struct Pulse 
-{ 
-	inline unsigned short GetProtoID() { return 30004;} 
-	inline std::string GetProtoName() { return "ID_Pulse";} 
-}; 
-inline zsummer::proto4z::WriteStream & operator << (zsummer::proto4z::WriteStream & ws, const Pulse & data) 
-{ 
-	unsigned long long tag = 0ULL; 
-	ws << (zsummer::proto4z::Integer)0; 
-	zsummer::proto4z::Integer offset = ws.getStreamLen(); 
-	ws << tag; 
-	ws.fixOriginalData(offset - 4, ws.getStreamLen() - offset); 
-	return ws; 
-} 
-inline zsummer::proto4z::ReadStream & operator >> (zsummer::proto4z::ReadStream & rs, Pulse & data) 
-{ 
-	zsummer::proto4z::Integer sttLen = 0; 
-	rs >> sttLen; 
-	zsummer::proto4z::Integer cursor = rs.getStreamUnreadLen(); 
-	unsigned long long tag = 0; 
-	rs >> tag; 
-	cursor = cursor - rs.getStreamUnreadLen(); 
-	rs.skipOriginalData(sttLen - cursor); 
-	return rs; 
-} 
- 
 #endif 

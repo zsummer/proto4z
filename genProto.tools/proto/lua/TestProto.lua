@@ -82,9 +82,3 @@ Protoz.Pulse = {}
 Protoz.Pulse.__getID = 30004 
 Protoz.Pulse.__getName = "Pulse" 
 Protoz.Pulse.__getTag = "" 
- 
-Protoz.register(30004,"Pulse") 
-Protoz.Pulse = {}  
-Protoz.Pulse.__getID = 30004 
-Protoz.Pulse.__getName = "Pulse" 
-Protoz.Pulse.__getTag = "" 

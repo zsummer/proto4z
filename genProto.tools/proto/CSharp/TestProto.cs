@@ -504,34 +504,6 @@ namespace Proto4z
 		} 
 	} 
  
-	class Pulse: Proto4z.IProtoObject 
-	{	 
-		static public Proto4z.ui16 getProtoID() { return new Proto4z.ui16(30004); } 
-		static public string getProtoName() { return "Pulse"; } 
-		public System.Collections.Generic.List<byte> __encode() 
-		{ 
-			Proto4z.ui32 sttLen = 0; 
-			Proto4z.ui64 tag = 0; 
-			 
-			var data = new System.Collections.Generic.List<byte>(); 
-			sttLen = (System.UInt32)data.Count + 8; 
-			var ret = new System.Collections.Generic.List<byte>(); 
-			ret.AddRange(sttLen.__encode()); 
-			ret.AddRange(tag.__encode()); 
-			ret.AddRange(data); 
-			return ret; 
-		} 
-		public int __decode(byte[] binData, ref int pos) 
-		{ 
-			Proto4z.ui32 offset = 0; 
-			Proto4z.ui64 tag = 0; 
-			offset.__decode(binData, ref pos); 
-			offset.val += (System.UInt32)pos; 
-			tag.__decode(binData, ref pos); 
-			return (int)offset.val; 
-		} 
-	} 
- 
 } 
  
  

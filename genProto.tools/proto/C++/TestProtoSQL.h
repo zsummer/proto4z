@@ -3,10 +3,10 @@
 #define _TESTPROTOSQL_H_ 
  
  
-inline std::pair<std::string, std::vector<std::string>> TestIntegerData_BUILD() 
+inline std::vector<std::string> TestIntegerData_BUILD() 
 { 
-	std::pair<std::string, std::vector<std::string>> ret; 
-	ret.first = "CREATE TABLE `tb_TestIntegerData` (`_i64` bigint(20) NOT NULL DEFAULT '0' ,   PRIMARY KEY(`_i64`) ) ENGINE = MyISAM DEFAULT CHARSET = utf8"; 
+	std::vector<std::string> ret; 
+	ret.second.push_back("CREATE TABLE `tb_TestIntegerData` (`_i64` bigint(20) NOT NULL DEFAULT '0' ,   PRIMARY KEY(`_i64`) ) ENGINE = MyISAM DEFAULT CHARSET = utf8"); 
 	ret.second.push_back("alter table `tb_TestIntegerData` add `_char`  bigint(20) NOT NULL DEFAULT '0' "); 
 	ret.second.push_back("alter table `tb_TestIntegerData` add `_uchar`  bigint(20) unsigned NOT NULL DEFAULT '0' "); 
 	ret.second.push_back("alter table `tb_TestIntegerData` add `_short`  bigint(20) NOT NULL DEFAULT '0' "); 
@@ -27,15 +27,20 @@ inline std::string TestIntegerData_LOAD( unsigned long long curLoaded)
  
 inline std::string TestIntegerData_SELECT(long long _i64) 
 { 
-	zsummer::mysql:: q(" select `_char`,`_uchar`,`_short`,`_ushort`,`_int`,`_uint`,`_i64`,`_ui128`,`_ui64` from `tb_TestIntegerData` where `_i64` = ? "); 
+	zsummer::mysql::q(" select `_char`,`_uchar`,`_short`,`_ushort`,`_int`,`_uint`,`_i64`,`_ui128`,`_ui64` from `tb_TestIntegerData` where `_i64` = ? "); 
 	q << _i64; 
 	return q.popSQL(); 
 } 
  
-inline std::map<long long, TestIntegerData> TestIntegerData_FETCH(DBResultPtr ptr) 
+inline std::map<long long, TestIntegerData> TestIntegerData_FETCH(zsummer::mysql::DBResultPtr ptr) 
 { 
 	std::map<long long, TestIntegerData> ret; 
-	if (ptr->getErrorCode() == QEC_SUCCESS) 
+	if (ptr->getErrorCode() != QEC_SUCCESS) 
+	{ 
+		LOGE("fetch info from db found error. ErrorCode="  <<  ptr->getErrorCode() << ", Error=" << ptr->getLastError()); 
+		return ret; 
+	} 
+	try 
 	{ 
 		while (ptr->haveRow()) 
 		{ 
@@ -51,6 +56,12 @@ inline std::map<long long, TestIntegerData> TestIntegerData_FETCH(DBResultPtr pt
 			*ptr >> info._ui64; 
 			ret[info._i64] = info; 
 		} 
+	} 
+	catch(std::runtime_error e) 
+	{ 
+		LOGE("fetch info catch one runtime error. what=" << e.what()); 
+		return ret; 
+	} 
 	} 
 	return std::move(ret); 
 } 
