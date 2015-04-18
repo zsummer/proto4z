@@ -192,7 +192,7 @@ bool genSQLFile(std::string path, std::string filename, std::string attr, std::v
 					text += "\t\t\t\t"  "*ptr >> blob;" + LFCR;
 					text += "\t\t\t\t"  "if(!blob.empty())" + LFCR;
 					text += "\t\t\t\t"  "{" + LFCR;
-					text += "\t\t\t\t\t"  "zsummer::proto4z::ReadStream rs(blob.c_str(), blob.length(), fase);" + LFCR;
+					text += "\t\t\t\t\t"  "zsummer::proto4z::ReadStream rs(blob.c_str(), blob.length(), false);" + LFCR;
 					text += "\t\t\t\t\t"  "rs >> info." + m._name + ";" + LFCR;
 					text += "\t\t\t\t"  "}" + LFCR;
 
@@ -258,6 +258,7 @@ bool genSQLFile(std::string path, std::string filename, std::string attr, std::v
 					text += "\t"  "catch(std::runtime_error e)" + LFCR;
 					text += "\t"  "{" + LFCR;
 					text += "\t\t"  "LOGW(\"write blob catch one runtime warning. what=\" << e.what());" + LFCR;
+					text += "\t\t"  "return "";" + LFCR;
 					text += "\t"  "}" + LFCR;
 				}
 				
