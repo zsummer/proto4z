@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF - 8"?>
 
-<md5>d540e5b3888e228ad816eb9c4fefb03f</md5>
+<xmlmd5>d540e5b3888e228ad816eb9c4fefb03f</xmlmd5>
+<cppmd5>f9342aca8b93393793e69f71c81259c0</cppmd5>
+<luamd5>9f7502201d34f82d18d5f3890bead411</luamd5>
+<csharpmd5>9f7502201d34f82d18d5f3890bead411</csharpmd5>
+<sqlmd5>0469eeec000210d15491ba5dd379b912</sqlmd5>
 
-<CacheNo>
-	<cache key = "ID_C2S_Pulse" No = "30001" /> 
-	<cache key = "ID_EchoPack" No = "30003" /> 
-	<cache key = "ID_P2P_EchoPack" No = "30000" /> 
-	<cache key = "ID_Pulse" No = "30004" /> 
-	<cache key = "ID_S2C_Pulse" No = "30002" /> 
-</CacheNo>
+<cacheNo>
+	<cache key = "ID_EchoPack" No = "30000" /> 
+	<cache key = "ID_Pulse" No = "30001" /> 
+</cacheNo>

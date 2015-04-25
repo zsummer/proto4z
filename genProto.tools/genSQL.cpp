@@ -42,7 +42,7 @@
 #include <algorithm>
 std::string getCPPType(std::string type);
 
-bool genSQLFile(std::string path, std::string filename, std::string attr, std::vector<StoreInfo> & stores)
+bool genSQLFile(std::string filename, std::vector<StoreInfo> & stores)
 {
 	std::string macroFileName = std::string("_") + filename + "_H_";
 	std::transform(macroFileName.begin(), macroFileName.end(), macroFileName.begin(), [](char ch){ return std::toupper(ch); });
@@ -273,10 +273,10 @@ bool genSQLFile(std::string path, std::string filename, std::string attr, std::v
 	text += LFCR + "#endif" + LFCR;
 
 	std::ofstream os;
-	os.open(path + filename + attr, std::ios::binary);
+	os.open(getSQLFile(filename), std::ios::binary);
 	if (!os.is_open())
 	{
-		LOGE("genSQLFile open file Error. : " << path + filename + attr);
+		LOGE("genSQLFile open file Error. : " << getSQLFile(filename));
 		return false;
 	}
 	os.write(text.c_str(), text.length());

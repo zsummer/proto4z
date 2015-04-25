@@ -51,7 +51,7 @@ std::string getCPPType(std::string type)
 	return type;
 }
 
-bool genCppFile(std::string path, std::string filename, std::string attr, std::vector<StoreInfo> & stores)
+bool genCppFile(std::string filename, std::vector<StoreInfo> & stores)
 {
 	std::string macroFileName = std::string("_") + filename  + "_H_";
 	std::transform(macroFileName.begin(), macroFileName.end(), macroFileName.begin(), [](char ch){ return std::toupper(ch); });
@@ -226,10 +226,10 @@ bool genCppFile(std::string path, std::string filename, std::string attr, std::v
 	text += LFCR + "#endif" + LFCR;
 
 	std::ofstream os;
-	os.open(path + filename + attr, std::ios::binary);
+	os.open(getCPPFile(filename), std::ios::binary);
 	if (!os.is_open())
 	{
-		LOGE("genCppFile open file Error. : " << path + filename + attr);
+		LOGE("genCppFile open file Error. : " << getCPPFile(filename));
 		return false;
 	}
 	os.write(text.c_str(), text.length());

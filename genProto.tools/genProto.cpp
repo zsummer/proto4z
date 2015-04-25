@@ -63,26 +63,41 @@ ParseCode genProto::parseCache()
 	tinyxml2::XMLDocument doc;
 	if (doc.LoadFile(cachename.c_str()) != tinyxml2::XML_SUCCESS)
 	{
-		LOGE(cachename << " parseCache Error. ");
-		doc.PrintError();
+		LOGE(" parseCache Error. cachename=" << cachename << ", err1=" << doc.GetErrorStr1() << ", err2" << doc.GetErrorStr2());
 		return PC_ERROR;
 	}
 
-	XMLElement * md5 = doc.FirstChildElement("md5");
+	XMLElement * md5 = doc.FirstChildElement("xmlmd5");
 	if (md5 && md5->GetText())
 	{
-		_md5 = md5->GetText();
+		_xmlmd5 = md5->GetText();
+	}
+	md5 = doc.FirstChildElement("cppmd5");
+	if (md5 && md5->GetText())
+	{
+		_cppmd5 = md5->GetText();
+	}
+	md5 = doc.FirstChildElement("luamd5");
+	if (md5 && md5->GetText())
+	{
+		_luamd5 = md5->GetText();
+	}
+	md5 = doc.FirstChildElement("csharpmd5");
+	if (md5 && md5->GetText())
+	{
+		_csharpmd5 = md5->GetText();
+	}
+	md5 = doc.FirstChildElement("sqlmd5");
+	if (md5 && md5->GetText())
+	{
+		_sqlmd5 = md5->GetText();
 	}
 
-
-
-
-	XMLElement * cacheEles = doc.FirstChildElement("CacheNo");
+	XMLElement * cacheEles = doc.FirstChildElement("cacheNo");
 	if (cacheEles == NULL)
 	{
-		LOGE("doc.FirstChildElement(\"CacheNo\") Error.");
-		doc.PrintError();
-		return PC_ERROR;
+		LOGW("can not found cacheNo. cachename=" << cachename);
+		return PC_SUCCESS;
 	}
 
 	XMLElement * next = cacheEles->FirstChildElement("cache");
@@ -97,7 +112,6 @@ ParseCode genProto::parseCache()
 		if (key == NULL || No == NULL)
 		{
 			LOGE("cache file is invalid. cachefile=" << cachename);
-			doc.PrintError();
 			return PC_ERROR;
 		}
 		DataCache dc;
@@ -415,56 +429,64 @@ ParseCode genProto::parseConfig()
 }
 
 
+bool autoCreateProtoDir()
+{
+	if (!zsummer::utility::IsDirectory("C++") && !zsummer::utility::CreateDir("C++"))
+	{
+		LOGE("CreateDir C++ Error. ");
+		return false;
+	}
+	if (!zsummer::utility::IsDirectory("lua") && !zsummer::utility::CreateDir("lua"))
+	{
+		LOGE("CreateDir lua Error. ");
+		return false;
+	}
+	if (!zsummer::utility::IsDirectory("CSharp") && !zsummer::utility::CreateDir("CSharp"))
+	{
+		LOGE("CreateDir lua Error. ");
+		return false;
+	}
+	return true;
+}
+
+
 
 ParseCode genProto::genCode()
 {
 	std::string xmlmd5 = genFileMD5(_fileName + _fileConfigAttr);
-
+	std::string cppmd5 = genFileMD5(getCPPFile(_fileName));
+	std::string luamd5 = genFileMD5(getLuaFile(_fileName));
+	std::string csharpmd5 = genFileMD5(getLuaFile(_fileName));
+	std::string sqlmd5 = genFileMD5(getSQLFile(_fileName));
+	if (xmlmd5.empty() || xmlmd5 != _xmlmd5 
+		|| cppmd5.empty() || cppmd5 != _cppmd5 
+		|| luamd5.empty() || luamd5 != _luamd5 
+		|| csharpmd5.empty() || csharpmd5 != _csharpmd5 
+		|| sqlmd5.empty() || sqlmd5 != _sqlmd5)
 	{
-		if (!zsummer::utility::IsDirectory("C++") && !zsummer::utility::CreateDir("C++"))
+		if (!autoCreateProtoDir())
 		{
-			LOGE("CreateDir C++ Error. ");
-		}
-		if (!zsummer::utility::IsDirectory("lua") && !zsummer::utility::CreateDir("lua"))
-		{
-			LOGE("CreateDir lua Error. ");
-		}
-		if (!zsummer::utility::IsDirectory("CSharp") && !zsummer::utility::CreateDir("CSharp"))
-		{
-			LOGE("CreateDir lua Error. ");
-		}
-		std::string cppFileName = "C++/" + _fileName + ".h";
-		std::string luaFileName = "lua/" + _fileName + ".lua";
-		std::string csFileName = "CSharp/" + _fileName + ".CSharp";
-		if (xmlmd5 != _md5 || !zsummer::utility::GetFileStatus(cppFileName, 6) || !zsummer::utility::GetFileStatus(std::string()+"C++/" + _fileName + "SQL.h", 6))
-		{
-			if (!genCppFile("C++/", _fileName, ".h", _vctStoreInfo))
-			{
-				return PC_ERROR;
-			}
-			if (!genSQLFile("C++/", _fileName + "SQL", ".h", _vctStoreInfo))
-			{
-				return PC_ERROR;
-			}
+			return PC_ERROR;
 		}
 
-		if (xmlmd5 != _md5 || !zsummer::utility::GetFileStatus(luaFileName, 6))
+		if (!genCppFile( _fileName,  _vctStoreInfo))
 		{
-			if (!genLuaFile("lua/", _fileName, ".lua", _vctStoreInfo))
-			{
-				return PC_ERROR;
-			}
+			return PC_ERROR;
 		}
-		if (xmlmd5 != _md5 || !zsummer::utility::GetFileStatus(csFileName, 6))
+		if (!genSQLFile( _fileName, _vctStoreInfo))
 		{
-			if (!genCSharpFile("CSharp/", _fileName, ".cs", _vctStoreInfo))
-			{
-				return PC_ERROR;
-			}
+			return PC_ERROR;
+		}
+		if (!genLuaFile(_fileName,  _vctStoreInfo))
+		{
+			return PC_ERROR;
+		}
+		if (!genCSharpFile( _fileName, _vctStoreInfo))
+		{
+			return PC_ERROR;
 		}
 	}
-
-	if (xmlmd5 == _md5)
+	else
 	{
 		return PC_NEEDSKIP;
 	}
@@ -476,8 +498,14 @@ ParseCode genProto::genCode()
 ParseCode genProto::writeCache()
 {
 	std::string filename = _fileName;
-	std::string md5 = genFileMD5(_fileName + _fileConfigAttr);
 	filename += _fileCacheAttr;
+
+	std::string xmlmd5 = genFileMD5(_fileName + _fileConfigAttr);
+	std::string cppmd5 = genFileMD5(getCPPFile(_fileName));
+	std::string luamd5 = genFileMD5(getLuaFile(_fileName));
+	std::string csharpmd5 = genFileMD5(getLuaFile(_fileName));
+	std::string sqlmd5 = genFileMD5(getSQLFile(_fileName));
+
 
 	LOGI("writeCache [" << filename + ".cache" << "] ...");
 	std::ofstream os;
@@ -488,16 +516,35 @@ ParseCode genProto::writeCache()
 		return PC_ERROR;
 	}
 	std::string text = "<?xml version=\"1.0\" encoding=\"UTF - 8\"?>\n\n";
-	text += "<md5>";
-	text += boost::lexical_cast<std::string>(md5);
-	text += "</md5>\n\n";
-	text += "<CacheNo>\n";
+
+	text += "<xmlmd5>";
+	text += boost::lexical_cast<std::string>(xmlmd5);
+	text += "</xmlmd5>\n";
+
+	text += "<cppmd5>";
+	text += boost::lexical_cast<std::string>(cppmd5);
+	text += "</cppmd5>\n";
+
+	text += "<luamd5>";
+	text += boost::lexical_cast<std::string>(luamd5);
+	text += "</luamd5>\n";
+
+	text += "<csharpmd5>";
+	text += boost::lexical_cast<std::string>(csharpmd5);
+	text += "</csharpmd5>\n";
+
+	text += "<sqlmd5>";
+	text += boost::lexical_cast<std::string>(sqlmd5);
+	text += "</sqlmd5>\n\n";
+
+	text += "<cacheNo>\n";
+
 	for (auto &pr : _mapCacheNo)
 	{
 		text += "\t<cache key = \"" + pr.first +
 			"\" No = \"" + boost::lexical_cast<std::string>(pr.second.protoValue) + "\" /> \n";
 	}
-	text += "</CacheNo>\n";
+	text += "</cacheNo>\n";
 	os.write(text.c_str(), text.length());
 	os.close();
 	return PC_SUCCESS;

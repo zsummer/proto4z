@@ -42,7 +42,7 @@
 #include <algorithm>
 
 
-bool genLuaFile(std::string path, std::string filename, std::string attr, std::vector<StoreInfo> & stores)
+bool genLuaFile(std::string filename, std::vector<StoreInfo> & stores)
 {
 	std::string text;
 	for (auto &info : stores)
@@ -153,10 +153,10 @@ bool genLuaFile(std::string path, std::string filename, std::string attr, std::v
 
 
 	std::ofstream os;
-	os.open(path + filename + attr, std::ios::binary);
+	os.open(getLuaFile(filename), std::ios::binary);
 	if (!os.is_open())
 	{
-		LOGE("genLUAFile open file Error. : " << path + filename + attr);
+		LOGE("genLUAFile open file Error. : " << getLuaFile(filename));
 		return false;
 	}
 	os.write(text.c_str(), text.length());

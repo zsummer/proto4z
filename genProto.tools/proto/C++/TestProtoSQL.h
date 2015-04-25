@@ -1,20 +1,21 @@
  
-#ifndef _TESTPROTOSQL_H_ 
-#define _TESTPROTOSQL_H_ 
+#ifndef _TESTPROTO_H_ 
+#define _TESTPROTO_H_ 
  
  
 inline std::vector<std::string> TestIntegerData_BUILD() 
 { 
 	std::vector<std::string> ret; 
-	ret.second.push_back("CREATE TABLE `tb_TestIntegerData` (`_i64` bigint(20) NOT NULL DEFAULT '0' ,   PRIMARY KEY(`_i64`) ) ENGINE = MyISAM DEFAULT CHARSET = utf8"); 
-	ret.second.push_back("alter table `tb_TestIntegerData` add `_char`  bigint(20) NOT NULL DEFAULT '0' "); 
-	ret.second.push_back("alter table `tb_TestIntegerData` add `_uchar`  bigint(20) unsigned NOT NULL DEFAULT '0' "); 
-	ret.second.push_back("alter table `tb_TestIntegerData` add `_short`  bigint(20) NOT NULL DEFAULT '0' "); 
-	ret.second.push_back("alter table `tb_TestIntegerData` add `_ushort`  bigint(20) unsigned NOT NULL DEFAULT '0' "); 
-	ret.second.push_back("alter table `tb_TestIntegerData` add `_int`  bigint(20) NOT NULL DEFAULT '0' "); 
-	ret.second.push_back("alter table `tb_TestIntegerData` add `_uint`  bigint(20) unsigned NOT NULL DEFAULT '0' "); 
-	ret.second.push_back("alter table `tb_TestIntegerData` add `_ui128`  bigint(20) unsigned NOT NULL DEFAULT '0' "); 
-	ret.second.push_back("alter table `tb_TestIntegerData` add `_ui64`  bigint(20) unsigned NOT NULL DEFAULT '0' "); 
+	ret.push_back("desc `tb_TestIntegerData`"); 
+	ret.push_back("CREATE TABLE `tb_TestIntegerData` (`_i64` bigint(20) NOT NULL DEFAULT '0' ,   PRIMARY KEY(`_i64`) ) ENGINE = MyISAM DEFAULT CHARSET = utf8"); 
+	ret.push_back("alter table `tb_TestIntegerData` add `_char`  bigint(20) NOT NULL DEFAULT '0' "); 
+	ret.push_back("alter table `tb_TestIntegerData` add `_uchar`  bigint(20) unsigned NOT NULL DEFAULT '0' "); 
+	ret.push_back("alter table `tb_TestIntegerData` add `_short`  bigint(20) NOT NULL DEFAULT '0' "); 
+	ret.push_back("alter table `tb_TestIntegerData` add `_ushort`  bigint(20) unsigned NOT NULL DEFAULT '0' "); 
+	ret.push_back("alter table `tb_TestIntegerData` add `_int`  bigint(20) NOT NULL DEFAULT '0' "); 
+	ret.push_back("alter table `tb_TestIntegerData` add `_uint`  bigint(20) unsigned NOT NULL DEFAULT '0' "); 
+	ret.push_back("alter table `tb_TestIntegerData` add `_ui128`  bigint(20) unsigned NOT NULL DEFAULT '0' "); 
+	ret.push_back("alter table `tb_TestIntegerData` add `_ui64`  bigint(20) unsigned NOT NULL DEFAULT '0' "); 
 	return std::move(ret); 
 } 
  
@@ -27,7 +28,7 @@ inline std::string TestIntegerData_LOAD( unsigned long long curLoaded)
  
 inline std::string TestIntegerData_SELECT(long long _i64) 
 { 
-	zsummer::mysql::q(" select `_char`,`_uchar`,`_short`,`_ushort`,`_int`,`_uint`,`_i64`,`_ui128`,`_ui64` from `tb_TestIntegerData` where `_i64` = ? "); 
+	zsummer::mysql::DBQuery q(" select `_char`,`_uchar`,`_short`,`_ushort`,`_int`,`_uint`,`_i64`,`_ui128`,`_ui64` from `tb_TestIntegerData` where `_i64` = ? "); 
 	q << _i64; 
 	return q.popSQL(); 
 } 
@@ -35,7 +36,7 @@ inline std::string TestIntegerData_SELECT(long long _i64)
 inline std::map<long long, TestIntegerData> TestIntegerData_FETCH(zsummer::mysql::DBResultPtr ptr) 
 { 
 	std::map<long long, TestIntegerData> ret; 
-	if (ptr->getErrorCode() != QEC_SUCCESS) 
+	if (ptr->getErrorCode() != zsummer::mysql::QEC_SUCCESS) 
 	{ 
 		LOGE("fetch info from db found error. ErrorCode="  <<  ptr->getErrorCode() << ", Error=" << ptr->getLastError()); 
 		return ret; 
@@ -62,14 +63,13 @@ inline std::map<long long, TestIntegerData> TestIntegerData_FETCH(zsummer::mysql
 		LOGE("fetch info catch one runtime error. what=" << e.what()); 
 		return ret; 
 	} 
-	} 
 	return std::move(ret); 
 } 
  
  
 inline std::string TestIntegerData_UPDATE( const TestIntegerData & info)  
 { 
-	zsummer::mysql:: q(" insert into tb_TestIntegerData(_i64) values(?) on duplicate key set `_char` = ?,`_uchar` = ?,`_short` = ?,`_ushort` = ?,`_int` = ?,`_uint` = ?,`_ui128` = ?,`_ui64` = ? from tb_TestIntegerData where `_i64` = ? "); 
+	zsummer::mysql::DBQuery q(" insert into tb_TestIntegerData(_i64) values(?) on duplicate key update `_char` = ?,`_uchar` = ?,`_short` = ?,`_ushort` = ?,`_int` = ?,`_uint` = ?,`_ui128` = ?,`_ui64` = ?  "); 
 	q << info._i64; 
 	q << info._char; 
 	q << info._uchar; 
@@ -79,7 +79,7 @@ inline std::string TestIntegerData_UPDATE( const TestIntegerData & info)
 	q << info._uint; 
 	q << info._ui128; 
 	q << info._ui64; 
-	return std::move(ret); 
+	return q.popSQL(); 
 } 
  
  

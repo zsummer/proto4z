@@ -41,18 +41,6 @@
 #include "tinyxml2.h"
 #include "genProto.h"
 
-
-
-
-
-
-
-
-
-
-
-
-
 using namespace zsummer::utility;
 
 int main(int argc, char *argv[])
@@ -66,11 +54,7 @@ int main(int argc, char *argv[])
 		LOGE("searchFiles error.");
 		return 0;
 	}
-	LOGA("FOUND FILE COUNT = " << files.size());
-	std::cout << "\r\n" << std::endl;
 
-
-	
 	for (auto & file : files)
 	{
 		std::string filename = file.filename;
@@ -89,37 +73,38 @@ int main(int argc, char *argv[])
 		ParseCode pc = gen.parseCache();
 		if (pc == PC_ERROR)
 		{
-			LOGE("LoadCache Error. filename=" << filename);
+			LOGE("LoadCache [" << filename << "] Error.");
 			break;
 		}
 		pc = gen.parseConfig();
 		if (pc == PC_ERROR)
 		{
-			LOGE("LoadConfig Error. filename=" << filename);
+			LOGE("parseConfig [" << filename << "] Error.");
 			break;
 		}
-
 		pc = gen.genCode();
 		if (pc == PC_ERROR)
 		{
-			LOGE("GenCPP Error. filename=" << filename);
+			LOGE("genProto [" << filename << "] Error.");
 			break;
 		}
 		else if (pc == PC_NEEDSKIP)
 		{
-			LOGD("SKIP writeCache. filename=" << filename);
+			LOGI("SKIP [" << filename << "] .");
 			zsummer::utility::SleepMillisecond(120);
+
 			continue;
 		}
-
-		pc = gen.writeCache();
-		if (pc == PC_ERROR)
+		else
 		{
-			LOGE("WriteNoCache Error. filename=" << filename);
-			break;
+			pc = gen.writeCache();
+			if (pc == PC_ERROR)
+			{
+				LOGE("Cached [" << filename << "] Error.");
+				break;
+			}
+			LOGI("Cached [" << filename << "] Success.");
 		}
-		std::cout << "\r\n\r\n" << std::endl;
-
 	}
 	
 	LOGA("All Success..");

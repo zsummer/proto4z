@@ -182,7 +182,7 @@ typedef std::map<std::string, TestFloatData> TestFloatDataMap;
  
 typedef std::map<std::string, TestStringData> TestStringDataMap;  
  
-const unsigned short ID_EchoPack = 30003;  
+const unsigned short ID_EchoPack = 30000;  
 struct EchoPack 
 { 
 	TestIntegerDataArray _iarray;  
@@ -191,7 +191,7 @@ struct EchoPack
 	TestIntegerDataMap _imap;  
 	TestFloatDataMap _fmap;  
 	TestStringDataMap _smap;  
-	inline unsigned short GetProtoID() { return 30003;} 
+	inline unsigned short GetProtoID() { return 30000;} 
 	inline std::string GetProtoName() { return "ID_EchoPack";} 
 }; 
 inline zsummer::proto4z::WriteStream & operator << (zsummer::proto4z::WriteStream & ws, const EchoPack & data) 
@@ -245,10 +245,10 @@ inline zsummer::proto4z::ReadStream & operator >> (zsummer::proto4z::ReadStream 
 	return rs; 
 } 
  
-const unsigned short ID_Pulse = 30004;  
+const unsigned short ID_Pulse = 30001;  
 struct Pulse 
 { 
-	inline unsigned short GetProtoID() { return 30004;} 
+	inline unsigned short GetProtoID() { return 30001;} 
 	inline std::string GetProtoName() { return "ID_Pulse";} 
 }; 
 inline zsummer::proto4z::WriteStream & operator << (zsummer::proto4z::WriteStream & ws, const Pulse & data) 

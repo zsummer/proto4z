@@ -56,7 +56,7 @@ std::string getCSharpType(std::string type)
 	return type;
 }
 
-bool genCSharpFile(std::string path, std::string filename, std::string attr, std::vector<StoreInfo> & stores)
+bool genCSharpFile(std::string filename, std::vector<StoreInfo> & stores)
 {
 
 	std::string text = LFCR;
@@ -262,10 +262,10 @@ bool genCSharpFile(std::string path, std::string filename, std::string attr, std
 	text += LFCR + LFCR;
 
 	std::ofstream os;
-	os.open(path + filename + attr, std::ios::binary);
+	os.open(getCSharpFile(filename), std::ios::binary);
 	if (!os.is_open())
 	{
-		LOGE("genCSharpFile open file Error. : " << path + filename + attr);
+		LOGE("genCSharpFile open file Error. : " << getCSharpFile(filename));
 		return false;
 	}
 	os.write(text.c_str(), text.length());

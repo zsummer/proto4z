@@ -212,13 +212,17 @@ struct StoreInfo
 	DataProto _proto;
 };
 
+inline std::string getCPPFile(std::string fileName){ return std::string("C++/") + fileName + ".h"; }
+inline std::string getLuaFile(std::string fileName){ return std::string("lua/") + fileName + ".lua"; }
+inline std::string getCSharpFile(std::string fileName){ return std::string("CSharp/") + fileName + ".cs"; }
+inline std::string getSQLFile(std::string fileName){ return std::string("C++/") + fileName + "SQL.h"; }
 
 //gen code file
-bool genCppFile(std::string path, std::string filename, std::string attr, std::vector<StoreInfo> & stores);
-bool genLuaFile(std::string path, std::string filename, std::string attr, std::vector<StoreInfo> & stores);
-bool genCSharpFile(std::string path, std::string filename, std::string attr, std::vector<StoreInfo> & stores);
-bool genSQLFile(std::string path, std::string filename, std::string attr, std::vector<StoreInfo> & stores);
-bool genJsFile(std::string path, std::string filename, std::string attr, std::vector<StoreInfo> & stores);
+bool genCppFile(std::string filename, std::vector<StoreInfo> & stores);
+bool genLuaFile(std::string filename, std::vector<StoreInfo> & stores);
+bool genCSharpFile(std::string filename, std::vector<StoreInfo> & stores);
+bool genSQLFile(std::string filename, std::vector<StoreInfo> & stores);
+bool genJsFile(std::string filename, std::vector<StoreInfo> & stores);
 
 
 
@@ -242,7 +246,12 @@ class genProto
 
 	//cache data
 	unsigned short _curNo = 0;
-	std::string _md5;
+	std::string _xmlmd5;
+	std::string _cppmd5;
+	std::string _luamd5;
+	std::string _csharpmd5;
+	std::string _sqlmd5;
+
 	struct DataCache
 	{
 		std::string protoName;
