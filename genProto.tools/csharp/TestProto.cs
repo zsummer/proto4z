@@ -406,10 +406,10 @@ namespace Proto4z
 		} 
 	} 
  
-	class P2P_EchoPack: Proto4z.IProtoObject 
+	class EchoPack: Proto4z.IProtoObject 
 	{	 
 		static public Proto4z.ui16 getProtoID() { return new Proto4z.ui16(30000); } 
-		static public string getProtoName() { return "P2P_EchoPack"; } 
+		static public string getProtoName() { return "EchoPack"; } 
 		public Proto4z.TestIntegerDataArray _iarray;  
 		public Proto4z.TestFloatDataArray _farray;  
 		public Proto4z.TestStringDataArray _sarray;  
@@ -476,38 +476,10 @@ namespace Proto4z
 		} 
 	} 
  
-	class C2S_Pulse: Proto4z.IProtoObject 
+	class Pulse: Proto4z.IProtoObject 
 	{	 
 		static public Proto4z.ui16 getProtoID() { return new Proto4z.ui16(30001); } 
-		static public string getProtoName() { return "C2S_Pulse"; } 
-		public System.Collections.Generic.List<byte> __encode() 
-		{ 
-			Proto4z.ui32 sttLen = 0; 
-			Proto4z.ui64 tag = 0; 
-			 
-			var data = new System.Collections.Generic.List<byte>(); 
-			sttLen = (System.UInt32)data.Count + 8; 
-			var ret = new System.Collections.Generic.List<byte>(); 
-			ret.AddRange(sttLen.__encode()); 
-			ret.AddRange(tag.__encode()); 
-			ret.AddRange(data); 
-			return ret; 
-		} 
-		public int __decode(byte[] binData, ref int pos) 
-		{ 
-			Proto4z.ui32 offset = 0; 
-			Proto4z.ui64 tag = 0; 
-			offset.__decode(binData, ref pos); 
-			offset.val += (System.UInt32)pos; 
-			tag.__decode(binData, ref pos); 
-			return (int)offset.val; 
-		} 
-	} 
- 
-	class S2C_Pulse: Proto4z.IProtoObject 
-	{	 
-		static public Proto4z.ui16 getProtoID() { return new Proto4z.ui16(30002); } 
-		static public string getProtoName() { return "S2C_Pulse"; } 
+		static public string getProtoName() { return "Pulse"; } 
 		public System.Collections.Generic.List<byte> __encode() 
 		{ 
 			Proto4z.ui32 sttLen = 0; 

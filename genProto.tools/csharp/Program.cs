@@ -95,7 +95,7 @@ namespace ConsoleApplication2
 
                 NetHeader head = new NetHeader();
                 head.packLen = (UInt32)(4 + 2 + binData.Length);
-                head.protoID = Proto4z.P2P_EchoPack.getProtoID();
+                head.protoID = Proto4z.EchoPack.getProtoID();
 
                 sendData.AddRange(head.__encode());
                 sendData.AddRange(binData);
@@ -126,9 +126,9 @@ namespace ConsoleApplication2
                     }
                     else if (needLen == 0)
                     {
-                        if (recvHead.protoID == Proto4z.P2P_EchoPack.getProtoID())
+                        if (recvHead.protoID == Proto4z.EchoPack.getProtoID())
                         {
-                            Proto4z.P2P_EchoPack result = new Proto4z.P2P_EchoPack();
+                            Proto4z.EchoPack result = new Proto4z.EchoPack();
                             int pos = 4+2;
                             result.__decode(recvBytes, ref pos);
                             //System.Console.WriteLine("echo =" + result.text.val);
@@ -168,7 +168,7 @@ namespace ConsoleApplication2
             TestStringData sdata = new TestStringData();
             sdata._string = "love";
 
-            P2P_EchoPack pack = new P2P_EchoPack();
+            EchoPack pack = new EchoPack();
             pack._iarray = new Proto4z.TestIntegerDataArray();
             pack._iarray.Add(idata);
             pack._iarray.Add(idata);
@@ -206,7 +206,7 @@ namespace ConsoleApplication2
                 System.Console.WriteLine((int)binData[i]);
             }
 
-            var v = new P2P_EchoPack();
+            var v = new EchoPack();
 
             int pos = 0;
             v.__decode(binData, ref pos);
