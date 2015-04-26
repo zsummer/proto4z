@@ -84,7 +84,8 @@ int main()
 	StressTest t4;
 	unsigned int now = GetTimeMillisecond();
 	int len = 0;
-	for( int i=0; i<100*10000; i++)
+	const int StressCount = 100*10000;
+	for( int i=0; i<StressCount; i++)
 	{
 		WriteStream ws(100, buf, 1000);
 		{
@@ -105,7 +106,7 @@ int main()
 			rs >> t3.name >> t3.id >> t3.mail >>t3.number >> t3.type  >> t4.name >> t4.id >> t4.mail >> t4.number >> t4.type;
 		}
 	}	
-	std::cout << "all:" << GetTimeMillisecond() - now << std::endl;
+	std::cout << "encode and decode " << StressCount <<" used time:" << GetTimeMillisecond() - now << std::endl;
 
 	now = GetTimeMillisecond();
 	for (int i = 0; i < 100 * 10000; i++)
@@ -124,7 +125,7 @@ int main()
 			ws << t1.name << t1.id << t1.mail << t1.number << t1.type << t2.name << t2.id << t2.mail << t2.number << t2.type;
 		}
 	}
-	std::cout << "encode:" << GetTimeMillisecond() - now << std::endl;
+	std::cout << "encode " << StressCount  << "used time: " << GetTimeMillisecond() - now << std::endl;
 	
 	now = GetTimeMillisecond();
 	WriteStream ws(100);
@@ -147,7 +148,7 @@ int main()
 			rs >> t3.name >> t3.id >> t3.mail >> t3.number >> t3.type >> t4.name >> t4.id >> t4.mail >> t4.number >> t4.type;
 		}
 	}
-	std::cout << "decode:" << GetTimeMillisecond() - now << std::endl;
+	std::cout << "decode " << StressCount  << "used time: " << GetTimeMillisecond() - now << std::endl;
 
 
 	std::cout << len << std::endl;

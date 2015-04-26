@@ -265,7 +265,7 @@ public:
 
 
 			//analog recv msg
-			std::pair<INTEGRITY_RET_TYPE, Integer> ret = checkBuffIntegrity(ws.getStream(), ws.getStreamLen(), MaxPackLen);
+			std::pair<INTEGRITY_RET_TYPE, Integer> ret = checkBuffIntegrity(ws.getStream(), ws.getStreamLen(), MaxPackLen, MaxPackLen);
 			if (ret.first == IRT_CORRUPTION || ret.first == IRT_SHORTAGE)
 			{
 				cout << "CheckRouteProtocol -> " << className << "  checkBuffIntegrity error" << endl;
@@ -376,7 +376,7 @@ bool TestBase::CheckProtocol(WriteStream &ws, const char * desc)
 	//check checkBuffIntegrity
 	{
 		size_t headLen = sizeof(Integer) + sizeof(ProtoInteger);
-		std::pair<INTEGRITY_RET_TYPE, Integer> ret = checkBuffIntegrity(ws.getStream(), 1, _packLen);
+		std::pair<INTEGRITY_RET_TYPE, Integer> ret = checkBuffIntegrity(ws.getStream(), 1, _packLen, _packLen);
 		if (ret.first == IRT_SHORTAGE && ret.second == headLen - 1)
 		{
 			cout << desc << " checkBuffIntegrity check header len OK" << endl;
@@ -386,7 +386,7 @@ bool TestBase::CheckProtocol(WriteStream &ws, const char * desc)
 			cout << desc << " checkBuffIntegrity check header len failed" << endl;
 			return false;
 		}
-		ret = checkBuffIntegrity(ws.getStream(), ws.getStreamLen(), ws.getStreamLen());
+		ret = checkBuffIntegrity(ws.getStream(), ws.getStreamLen(), ws.getStreamLen(), ws.getStreamLen());
 		if (ret.first == IRT_SUCCESS && ret.second == _packLen)
 		{
 			cout << desc << " checkBuffIntegrity check integrity  OK" << endl;
