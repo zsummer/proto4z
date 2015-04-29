@@ -171,6 +171,7 @@ struct DataStruct
 		std::string _desc;
 		bool _isDel = false;
 		bool _isKey = false;
+		bool _isIgnore = false;
 	};
 	std::vector<DataMember> _members;
 };

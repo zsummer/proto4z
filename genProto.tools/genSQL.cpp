@@ -44,7 +44,7 @@ std::string getCPPType(std::string type);
 
 bool genSQLFile(std::string filename, std::vector<StoreInfo> & stores)
 {
-	std::string macroFileName = std::string("_") + filename + "_H_";
+	std::string macroFileName = std::string("_") + filename + "SQL_H_";
 	std::transform(macroFileName.begin(), macroFileName.end(), macroFileName.begin(), [](char ch){ return std::toupper(ch); });
 
 
@@ -102,6 +102,10 @@ bool genSQLFile(std::string filename, std::vector<StoreInfo> & stores)
 				{
 					continue;
 				}
+				if (m._isIgnore)
+				{
+					continue;
+				}
 
 				text += "\tret.push_back(\"alter table `tb_" + info._proto._struct._name + "` add `" + m._name + "` ";
 				if (m._type == "string")
@@ -134,6 +138,10 @@ bool genSQLFile(std::string filename, std::vector<StoreInfo> & stores)
 			text += "\tzsummer::mysql::DBQuery q(\" select ";
 			for (auto& m: info._proto._struct._members)
 			{
+				if (m._isIgnore || m._isDel)
+				{
+					continue;
+				}
 				text += "`" + m._name + "`";
 				text += ",";
 			}
@@ -150,6 +158,10 @@ bool genSQLFile(std::string filename, std::vector<StoreInfo> & stores)
 			text += "\tzsummer::mysql::DBQuery q(\" select ";
 			for (auto& m : info._proto._struct._members)
 			{
+				if (m._isIgnore || m._isDel)
+				{
+					continue;
+				}
 				text += "`" + m._name + "`";
 				text += ",";
 			}
@@ -177,6 +189,10 @@ bool genSQLFile(std::string filename, std::vector<StoreInfo> & stores)
 			text += "\t\t\t" + info._proto._struct._name + " " + "info;" + LFCR;
 			for (auto& m : info._proto._struct._members)
 			{
+				if (m._isIgnore || m._isDel)
+				{
+					continue;
+				}
 				if (m._type == "ui8" || m._type == "ui16" || m._type == "ui32" || m._type == "ui64"
 					|| m._type == "i8" || m._type == "i16" || m._type == "i32" || m._type == "i64"
 					|| m._type == "double" || m._type == "float" || m._type == "string")
@@ -192,7 +208,7 @@ bool genSQLFile(std::string filename, std::vector<StoreInfo> & stores)
 					text += "\t\t\t\t"  "*ptr >> blob;" + LFCR;
 					text += "\t\t\t\t"  "if(!blob.empty())" + LFCR;
 					text += "\t\t\t\t"  "{" + LFCR;
-					text += "\t\t\t\t\t"  "zsummer::proto4z::ReadStream rs(blob.c_str(), blob.length(), false);" + LFCR;
+					text += "\t\t\t\t\t"  "zsummer::proto4z::ReadStream rs(blob.c_str(), (zsummer::proto4z::Integer)blob.length(), false);" + LFCR;
 					text += "\t\t\t\t\t"  "rs >> info." + m._name + ";" + LFCR;
 					text += "\t\t\t\t"  "}" + LFCR;
 
@@ -218,30 +234,38 @@ bool genSQLFile(std::string filename, std::vector<StoreInfo> & stores)
 			text += "}" + LFCR;
 			text += LFCR;
 
-			//update
+			//insert
 			text += LFCR;
-			text += "inline std::string " + info._proto._struct._name + "_UPDATE( const " + info._proto._struct._name + " & info) " + LFCR;
+			text += "inline std::string " + info._proto._struct._name + "_INSERT( const " + info._proto._struct._name + " & info) " + LFCR;
 			text += "{" + LFCR;
-			text += "\tzsummer::mysql::DBQuery q(\" insert into tb_" + info._proto._struct._name + "(" + key._name + ") values(?) on duplicate key update ";
+			text += "\tzsummer::mysql::DBQuery q(\" insert into tb_" + info._proto._struct._name + "( ";
 			for (auto& m : info._proto._struct._members)
 			{
-				if (m._isKey)
+				if (m._isIgnore || m._isDel)
 				{
 					continue;
 				}
-				text += "`" + m._name + "` = ?,";
+				text += "`" + m._name + "`,";
 			}
 			text[text.length() - 1] = ' ';
-			text += " \");" + LFCR;
-			text += "\tq << info." + key._name + ";" + LFCR;
-
+			text += ") values(";
 			for (auto& m : info._proto._struct._members)
 			{
-				if (m._isKey)
+				if (m._isIgnore || m._isDel)
 				{
 					continue;
 				}
-				else if (m._type == "ui8" || m._type == "ui16" || m._type == "ui32" || m._type == "ui64"
+				text += "?,";
+			}
+			text[text.length() - 1] = ' ';
+			text += " )\");" + LFCR;
+			for (auto& m : info._proto._struct._members)
+			{
+				if (m._isIgnore || m._isDel)
+				{
+					continue;
+				}
+				if (m._type == "ui8" || m._type == "ui16" || m._type == "ui32" || m._type == "ui64"
 					|| m._type == "i8" || m._type == "i16" || m._type == "i32" || m._type == "i64"
 					|| m._type == "double" || m._type == "float" || m._type == "string")
 				{
@@ -258,7 +282,65 @@ bool genSQLFile(std::string filename, std::vector<StoreInfo> & stores)
 					text += "\t"  "catch(std::runtime_error e)" + LFCR;
 					text += "\t"  "{" + LFCR;
 					text += "\t\t"  "LOGW(\"write blob catch one runtime warning. what=\" << e.what());" + LFCR;
-					text += "\t\t"  "return "";" + LFCR;
+					text += "\t\t"  "return \"\";" + LFCR;
+					text += "\t"  "}" + LFCR;
+				}
+
+			}
+			text += "\treturn q.popSQL();" + LFCR;
+			text += "}" + LFCR;
+			text += LFCR;
+
+
+			//update
+			text += LFCR;
+			text += "inline std::string " + info._proto._struct._name + "_UPDATE( const " + info._proto._struct._name + " & info) " + LFCR;
+			text += "{" + LFCR;
+			text += "\tzsummer::mysql::DBQuery q(\" insert into tb_" + info._proto._struct._name + "(" + key._name + ") values(?) on duplicate key update ";
+			for (auto& m : info._proto._struct._members)
+			{
+				if (m._isKey)
+				{
+					continue;
+				}
+				if (m._isIgnore || m._isDel)
+				{
+					continue;
+				}
+				text += "`" + m._name + "` = ?,";
+			}
+			text[text.length() - 1] = ' ';
+			text += " \");" + LFCR;
+			text += "\tq << info." + key._name + ";" + LFCR;
+
+			for (auto& m : info._proto._struct._members)
+			{
+				if (m._isKey)
+				{
+					continue;
+				}
+				if (m._isIgnore || m._isDel)
+				{
+					continue;
+				}
+				if (m._type == "ui8" || m._type == "ui16" || m._type == "ui32" || m._type == "ui64"
+					|| m._type == "i8" || m._type == "i16" || m._type == "i32" || m._type == "i64"
+					|| m._type == "double" || m._type == "float" || m._type == "string")
+				{
+					text += "\tq << info." + m._name + ";" + LFCR;
+				}
+				else
+				{
+					text += "\t"  "try" + LFCR;
+					text += "\t"  "{" + LFCR;
+					text += "\t\t"  "zsummer::proto4z::WriteStream ws(0);" + LFCR;
+					text += "\t\t"  "ws << info." + m._name + ";" + LFCR;
+					text += "\t\t"  "q << std::string(ws.getStreamBody(), ws.getStreamBodyLen());" + LFCR;
+					text += "\t"  "}" + LFCR;
+					text += "\t"  "catch(std::runtime_error e)" + LFCR;
+					text += "\t"  "{" + LFCR;
+					text += "\t\t"  "LOGW(\"write blob catch one runtime warning. what=\" << e.what());" + LFCR;
+					text += "\t\t"  "return \"\";" + LFCR;
 					text += "\t"  "}" + LFCR;
 				}
 				

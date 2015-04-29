@@ -21,14 +21,14 @@ inline std::vector<std::string> TestIntegerData_BUILD()
  
 inline std::string TestIntegerData_LOAD( unsigned long long curLoaded) 
 { 
-	zsummer::mysql::DBQuery q(" select `_char`,`_uchar`,`_short`,`_ushort`,`_int`,`_uint`,`_i64`,`_ui128`,`_ui64` from `tb_TestIntegerData` order by `_i64` desc limit ?, 1000 "); 
+	zsummer::mysql::DBQuery q(" select `_char`,`_uchar`,`_short`,`_ushort`,`_int`,`_uint`,`_i64`,`_ui64` from `tb_TestIntegerData` order by `_i64` desc limit ?, 1000 "); 
 	q << curLoaded; 
 	return q.popSQL(); 
 } 
  
 inline std::string TestIntegerData_SELECT(long long _i64) 
 { 
-	zsummer::mysql::DBQuery q(" select `_char`,`_uchar`,`_short`,`_ushort`,`_int`,`_uint`,`_i64`,`_ui128`,`_ui64` from `tb_TestIntegerData` where `_i64` = ? "); 
+	zsummer::mysql::DBQuery q(" select `_char`,`_uchar`,`_short`,`_ushort`,`_int`,`_uint`,`_i64`,`_ui64` from `tb_TestIntegerData` where `_i64` = ? "); 
 	q << _i64; 
 	return q.popSQL(); 
 } 
@@ -53,7 +53,6 @@ inline std::map<long long, TestIntegerData> TestIntegerData_FETCH(zsummer::mysql
 			*ptr >> info._int; 
 			*ptr >> info._uint; 
 			*ptr >> info._i64; 
-			*ptr >> info._ui128; 
 			*ptr >> info._ui64; 
 			ret[info._i64] = info; 
 		} 
@@ -69,7 +68,7 @@ inline std::map<long long, TestIntegerData> TestIntegerData_FETCH(zsummer::mysql
  
 inline std::string TestIntegerData_UPDATE( const TestIntegerData & info)  
 { 
-	zsummer::mysql::DBQuery q(" insert into tb_TestIntegerData(_i64) values(?) on duplicate key update `_char` = ?,`_uchar` = ?,`_short` = ?,`_ushort` = ?,`_int` = ?,`_uint` = ?,`_ui128` = ?,`_ui64` = ?  "); 
+	zsummer::mysql::DBQuery q(" insert into tb_TestIntegerData(_i64) values(?) on duplicate key update `_char` = ?,`_uchar` = ?,`_short` = ?,`_ushort` = ?,`_int` = ?,`_uint` = ?,`_ui64` = ?  "); 
 	q << info._i64; 
 	q << info._char; 
 	q << info._uchar; 
@@ -77,7 +76,6 @@ inline std::string TestIntegerData_UPDATE( const TestIntegerData & info)
 	q << info._ushort; 
 	q << info._int; 
 	q << info._uint; 
-	q << info._ui128; 
 	q << info._ui64; 
 	return q.popSQL(); 
 } 

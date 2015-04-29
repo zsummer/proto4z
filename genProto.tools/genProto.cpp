@@ -394,6 +394,10 @@ ParseCode genProto::parseConfig()
 					{
 							dm._isDel = true;
 					}
+					if (member->Attribute("ignore") && strcmp(member->Attribute("ignore"), "true") == 0)
+					{
+						dm._isIgnore = true;
+					}
 					if (member->Attribute("key") && strcmp(member->Attribute("key"), "true") == 0)
 					{
 						dm._isKey = true;
@@ -456,7 +460,7 @@ ParseCode genProto::genCode()
 	std::string xmlmd5 = genFileMD5(_fileName + _fileConfigAttr);
 	std::string cppmd5 = genFileMD5(getCPPFile(_fileName));
 	std::string luamd5 = genFileMD5(getLuaFile(_fileName));
-	std::string csharpmd5 = genFileMD5(getLuaFile(_fileName));
+	std::string csharpmd5 = genFileMD5(getCSharpFile(_fileName));
 	std::string sqlmd5 = genFileMD5(getSQLFile(_fileName));
 	if (xmlmd5.empty() || xmlmd5 != _xmlmd5 
 		|| cppmd5.empty() || cppmd5 != _cppmd5 
@@ -503,7 +507,7 @@ ParseCode genProto::writeCache()
 	std::string xmlmd5 = genFileMD5(_fileName + _fileConfigAttr);
 	std::string cppmd5 = genFileMD5(getCPPFile(_fileName));
 	std::string luamd5 = genFileMD5(getLuaFile(_fileName));
-	std::string csharpmd5 = genFileMD5(getLuaFile(_fileName));
+	std::string csharpmd5 = genFileMD5(getCSharpFile(_fileName));
 	std::string sqlmd5 = genFileMD5(getSQLFile(_fileName));
 
 
