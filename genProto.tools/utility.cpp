@@ -9,7 +9,7 @@
  * 
  * ===============================================================================
  * 
- * Copyright (C) 2012 YaweiZhang <yawei_zhang@foxmail.com>.
+ * Copyright (C) 2012 YaweiZhang <yawei.zhang@foxmail.com>.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -75,7 +75,7 @@ static const char * gsc_strVersion	=""
 "\n***********************************\n"
 "zsummer current version: 1.0.0 \n"
 "build by: zhangyawei\n"
-"e-mail: yawei_zhang@foxmail.com\n"
+"e-mail: yawei.zhang@foxmail.com\n"
 "build time: 2010.08.29\n"
 "update time: 2012.05.06\n"
 "***********************************\n";
@@ -113,7 +113,7 @@ static const char * gsc_strUtilityVersion = ""
 "\n***********************************\n"
 "module name: utility\n"
 "builder: zhangyawei\n"
-"e-mail: yawei_zhang@foxmail.com\n"
+"e-mail: yawei.zhang@foxmail.com\n"
 "build time: 2011.3.19\n"
 "update time: 2012.12.13\n"
 "***********************************\n";

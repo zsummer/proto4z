@@ -9,7 +9,7 @@
  * 
  * ===============================================================================
  * 
- * Copyright (C) 2012 YaweiZhang <yawei_zhang@foxmail.com>.
+ * Copyright (C) 2012 YaweiZhang <yawei.zhang@foxmail.com>.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -36,7 +36,7 @@
 
 
 /*
- * AUTHORS:  YaweiZhang <yawei_zhang@foxmail.com>
+ * AUTHORS:  YaweiZhang <yawei.zhang@foxmail.com>
  * VERSION:  1.0.0
  * PURPOSE:  A lightweight C++ library for network.
  * CREATION: 2010.8.29
@@ -49,13 +49,13 @@
  *
  * QQ Group: 19811947
  * Web Site: www.zsummer.net
- * mail: yawei_zhang@foxmail.com
+ * mail: yawei.zhang@foxmail.com
  */
 
 /*
 module:	public tools	公共小零件
 builder:	zhangyawei	张亚伟
-e-mail:	yawei_zhang@foxmail.com
+e-mail:	yawei.zhang@foxmail.com
 version:	-
 build time:	2011.3.19
 

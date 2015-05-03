@@ -1,6 +1,6 @@
  
-#ifndef _TESTPROTO_H_ 
-#define _TESTPROTO_H_ 
+#ifndef _TESTPROTOSQL_H_ 
+#define _TESTPROTOSQL_H_ 
  
  
 inline std::vector<std::string> TestIntegerData_BUILD() 
@@ -63,6 +63,21 @@ inline std::map<long long, TestIntegerData> TestIntegerData_FETCH(zsummer::mysql
 		return ret; 
 	} 
 	return std::move(ret); 
+} 
+ 
+ 
+inline std::string TestIntegerData_INSERT( const TestIntegerData & info)  
+{ 
+	zsummer::mysql::DBQuery q(" insert into tb_TestIntegerData( `_char`,`_uchar`,`_short`,`_ushort`,`_int`,`_uint`,`_i64`,`_ui64` ) values(?,?,?,?,?,?,?,?  )"); 
+	q << info._char; 
+	q << info._uchar; 
+	q << info._short; 
+	q << info._ushort; 
+	q << info._int; 
+	q << info._uint; 
+	q << info._i64; 
+	q << info._ui64; 
+	return q.popSQL(); 
 } 
  
  
