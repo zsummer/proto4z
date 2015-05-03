@@ -219,7 +219,7 @@ inline std::string getCSharpFile(std::string fileName){ return std::string("CSha
 inline std::string getSQLFile(std::string fileName){ return std::string("C++/") + fileName + "SQL.h"; }
 
 //gen code file
-bool genCppFile(std::string filename, std::vector<StoreInfo> & stores);
+bool genCppFile(std::string filename, std::vector<StoreInfo> & stores, bool genLog4z);
 bool genLuaFile(std::string filename, std::vector<StoreInfo> & stores);
 bool genCSharpFile(std::string filename, std::vector<StoreInfo> & stores);
 bool genSQLFile(std::string filename, std::vector<StoreInfo> & stores);
@@ -236,6 +236,11 @@ enum ParseCode
 	PC_ERROR,
 };
 
+struct DataCache
+{
+	std::string protoName;
+	unsigned int protoValue;
+};
 
 //manager
 class genProto
@@ -253,16 +258,13 @@ class genProto
 	std::string _csharpmd5;
 	std::string _sqlmd5;
 
-	struct DataCache
-	{
-		std::string protoName;
-		unsigned int protoValue;
-	};
+
 	std::map<std::string, DataCache> _mapCacheNo;
 
 	//xml data
 	unsigned short _minNo = 0;
 	unsigned short _maxNo = 0;
+	unsigned short _log4z = false;
 	std::vector<StoreInfo> _vctStoreInfo;
 
 public:

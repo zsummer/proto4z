@@ -51,7 +51,7 @@ std::string getCPPType(std::string type)
 	return type;
 }
 
-bool genCppFile(std::string filename, std::vector<StoreInfo> & stores)
+bool genCppFile(std::string filename, std::vector<StoreInfo> & stores, bool genLog4z)
 {
 	std::string macroFileName = std::string("_") + filename  + "_H_";
 	std::transform(macroFileName.begin(), macroFileName.end(), macroFileName.begin(), [](char ch){ return std::toupper(ch); });
@@ -220,6 +220,29 @@ bool genCppFile(std::string filename, std::vector<StoreInfo> & stores)
 			text += "\trs.skipOriginalData(sttLen - cursor);" + LFCR;
 			text += "\treturn rs;" + LFCR;
 			text += "}" + LFCR;
+
+			//input log4z operator
+			if (genLog4z)
+			{
+				text += "inline zsummer::log4z::Log4zStream & operator << (zsummer::log4z::Log4zStream & stm, const " + info._proto._struct._name + " & info)" + LFCR;
+				text += "{" + LFCR;
+				bool bFirst = true;
+				for (const auto &m : info._proto._struct._members)
+				{
+					if (bFirst)
+					{
+						bFirst = false;
+						text += "\tstm << \"" + m._name + "=\"" + " << info." + m._name;
+					}
+					else
+					{
+						text += " << \", " + m._name + "=\"" + " << info." + m._name;
+					}
+				}
+				text += ";" + LFCR;
+				text += "\treturn stm;" + LFCR;
+				text += "}" + LFCR;
+			}
 		}
 
 	}

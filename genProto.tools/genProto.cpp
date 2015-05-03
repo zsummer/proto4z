@@ -159,7 +159,6 @@ ParseCode genProto::parseConfig()
 			}
 			auto MinNo = ele->FirstChildElement("MinNo");
 			auto MaxNo = ele->FirstChildElement("MaxNo");
-
 			if (!MinNo || !MinNo->GetText() || !MaxNo || !MaxNo->GetText())
 			{
 				LOGE("FirstChildElement(\"MinNo\") || FirstChildElement(\"MaxNo\")  Error");
@@ -176,6 +175,12 @@ ParseCode genProto::parseConfig()
 			{
 				LOGE("Current cache Proto No Error. CurNo=" << _curNo << ", minNo=" << _minNo << ", maxNo=" << _maxNo);
 				return PC_ERROR;
+			}
+
+			auto UseLog4z = ele->FirstChildElement("UseLog4z");
+			if (UseLog4z && UseLog4z->GetText() && strcmp(UseLog4z->GetText(), "0") != 0 && strcmp(UseLog4z->GetText(), "false") != 0)
+			{
+				_log4z = true;
 			}
 		}
 	LOGI("parseConfig [" << filename << "] CurProtoNo=" << _curNo << ", minProtoNo=" << _minNo << ", maxProtoNo=" << _maxNo);
@@ -473,7 +478,7 @@ ParseCode genProto::genCode()
 			return PC_ERROR;
 		}
 
-		if (!genCppFile( _fileName,  _vctStoreInfo))
+		if (!genCppFile( _fileName,  _vctStoreInfo, _log4z))
 		{
 			return PC_ERROR;
 		}
