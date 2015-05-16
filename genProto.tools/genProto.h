@@ -264,7 +264,7 @@ class genProto
 	//xml data
 	unsigned short _minNo = 0;
 	unsigned short _maxNo = 0;
-	unsigned short _log4z = false;
+	bool _log4z = false;
 	std::vector<StoreInfo> _vctStoreInfo;
 
 public:
