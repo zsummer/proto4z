@@ -10,7 +10,7 @@
  * 
  * ===============================================================================
  * 
- * Copyright (C) 2013-2015 YaweiZhang <yawei_zhang@foxmail.com>.
+ * Copyright (C) 2013-2015 YaweiZhang <yawei.zhang@foxmail.com>.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -59,9 +59,9 @@ Protoz.dump(echo)
 
 local now = os.time()
 for i=1, 100000 do
-	local data = Protoz.encode(echo, "P2P_EchoPack")
+	local data = Protoz.encode(echo, "EchoPack")
 	--Protoz.putbin(data)
-	local dr = Protoz.decode(data, Protoz.getName(Protoz.P2P_EchoPack.__getID)) -- "P2P_EchoPack"
+	local dr = Protoz.decode(data, Protoz.getName(Protoz.EchoPack.__getID)) -- "EchoPack"
 	--Protoz.dump(dr)
 
 end
