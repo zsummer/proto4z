@@ -58,7 +58,7 @@ bool genLuaFile(std::string filename, std::vector<StoreInfo> & stores)
 		}
 		else if (info._type == GT_DataConstValue)
 		{
-			text += "Protoz." + info._const._name + " = " + info._const._value;
+			text += "Proto4z." + info._const._name + " = " + info._const._value;
 			if (!info._const._desc.empty())
 			{
 				text += "--" + info._const._desc;
@@ -68,31 +68,31 @@ bool genLuaFile(std::string filename, std::vector<StoreInfo> & stores)
 		else if (info._type == GT_DataArray)
 		{
 			text += LFCR;
-			text += "Protoz." + info._array._arrayName + " = {} ";
+			text += "Proto4z." + info._array._arrayName + " = {} ";
 			if (!info._array._desc.empty())
 			{
 				text += "--" + info._array._desc;
 			}
 			text += LFCR;
 
-			text += "Protoz." + info._array._arrayName + ".__getName = \"" + info._array._arrayName + "\"" + LFCR;
-			text += "Protoz." + info._array._arrayName + ".__getDesc = \"array\"" + LFCR;
-			text += "Protoz." + info._array._arrayName + ".__getTypeV = \"" + info._array._type + "\"" + LFCR;
+			text += "Proto4z." + info._array._arrayName + ".__getName = \"" + info._array._arrayName + "\"" + LFCR;
+			text += "Proto4z." + info._array._arrayName + ".__getDesc = \"array\"" + LFCR;
+			text += "Proto4z." + info._array._arrayName + ".__getTypeV = \"" + info._array._type + "\"" + LFCR;
 		}
 		else if (info._type == GT_DataMap)
 		{
 			text += LFCR;
-			text += "Protoz." + info._map._mapName + " = {} ";
+			text += "Proto4z." + info._map._mapName + " = {} ";
 			if (!info._map._desc.empty())
 			{
 				text += "--" + info._map._desc;
 			}
 			text += LFCR;
 
-			text += "Protoz." + info._map._mapName + ".__getName = \"" + info._map._mapName + "\"" + LFCR;
-			text += "Protoz." + info._map._mapName + ".__getDesc = \"map\"" + LFCR;
-			text += "Protoz." + info._map._mapName + ".__getTypeK = \"" + info._map._typeKey + "\"" + LFCR;
-			text += "Protoz." + info._map._mapName + ".__getTypeV = \"" + info._map._typeValue + "\"" + LFCR;
+			text += "Proto4z." + info._map._mapName + ".__getName = \"" + info._map._mapName + "\"" + LFCR;
+			text += "Proto4z." + info._map._mapName + ".__getDesc = \"map\"" + LFCR;
+			text += "Proto4z." + info._map._mapName + ".__getTypeK = \"" + info._map._typeKey + "\"" + LFCR;
+			text += "Proto4z." + info._map._mapName + ".__getTypeV = \"" + info._map._typeValue + "\"" + LFCR;
 		}
 		else if (info._type == GT_DataStruct || info._type == GT_DataProto)
 		{
@@ -100,10 +100,10 @@ bool genLuaFile(std::string filename, std::vector<StoreInfo> & stores)
 
 			if (info._type == GT_DataProto)
 			{
-				text += "Protoz.register(" + info._proto._const._value + ",\"" + info._proto._struct._name + "\")" + LFCR;
+				text += "Proto4z.register(" + info._proto._const._value + ",\"" + info._proto._struct._name + "\")" + LFCR;
 			}
 
-			text += "Protoz." + info._proto._struct._name + " = {} ";
+			text += "Proto4z." + info._proto._struct._name + " = {} ";
 			if (!info._proto._struct._desc.empty())
 			{
 				text += "--" + info._proto._struct._desc;
@@ -111,9 +111,9 @@ bool genLuaFile(std::string filename, std::vector<StoreInfo> & stores)
 			text += LFCR;
 			if (info._type == GT_DataProto)
 			{
-				text += "Protoz." + info._proto._struct._name + ".__getID = " + info._proto._const._value + "" + LFCR;
+				text += "Proto4z." + info._proto._struct._name + ".__getID = " + info._proto._const._value + "" + LFCR;
 			}
-			text += "Protoz." + info._proto._struct._name + ".__getName = \"" + info._proto._struct._name + "\"" + LFCR;
+			text += "Proto4z." + info._proto._struct._name + ".__getName = \"" + info._proto._struct._name + "\"" + LFCR;
 
 	
 			info._proto._struct._tag = 0;
@@ -129,10 +129,10 @@ bool genLuaFile(std::string filename, std::vector<StoreInfo> & stores)
 					tag.append("1");
 				}
 			}
-			text += "Protoz." + info._proto._struct._name + ".__getTag = \"" + tag + "\"" + LFCR;
+			text += "Proto4z." + info._proto._struct._name + ".__getTag = \"" + tag + "\"" + LFCR;
 			for (size_t i = 0; i < info._proto._struct._members.size(); ++i)
 			{
-				text += "Protoz." + info._proto._struct._name + "[" + boost::lexical_cast<std::string>(i + 1)
+				text += "Proto4z." + info._proto._struct._name + "[" + boost::lexical_cast<std::string>(i + 1)
 					+ "] = {name=\"" + info._proto._struct._members[i]._name + "\", type=\"" + info._proto._struct._members[i]._type + "\"";
 				if (info._proto._struct._members[i]._isDel)
 				{
