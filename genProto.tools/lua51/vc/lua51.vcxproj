@@ -19,6 +19,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\luasrc\lpack.c" />
+    <ClCompile Include="..\..\..\luasrc\lproto4z.c" />
     <ClCompile Include="..\lapi.c" />
     <ClCompile Include="..\lauxlib.c" />
     <ClCompile Include="..\lbaselib.c" />
@@ -38,7 +40,6 @@
     <ClCompile Include="..\lobject.c" />
     <ClCompile Include="..\lopcodes.c" />
     <ClCompile Include="..\loslib.c" />
-    <ClCompile Include="..\lpack.c" />
     <ClCompile Include="..\lparser.c" />
     <ClCompile Include="..\lstate.c" />
     <ClCompile Include="..\lstring.c" />
@@ -51,9 +52,9 @@
     <ClCompile Include="..\lvm.c" />
     <ClCompile Include="..\lzio.c" />
     <ClCompile Include="..\print.c" />
-    <ClCompile Include="..\protoz_bit.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\luasrc\lpack.h" />
     <ClInclude Include="..\lapi.h" />
     <ClInclude Include="..\lauxlib.h" />
     <ClInclude Include="..\lcode.h" />
@@ -66,7 +67,6 @@
     <ClInclude Include="..\lmem.h" />
     <ClInclude Include="..\lobject.h" />
     <ClInclude Include="..\lopcodes.h" />
-    <ClInclude Include="..\lpack.h" />
     <ClInclude Include="..\lparser.h" />
     <ClInclude Include="..\lstate.h" />
     <ClInclude Include="..\lstring.h" />
@@ -157,6 +157,7 @@
       <ProgramDataBaseFileName>$(OutDir)$(ProjectName)_win32d.pdb</ProgramDataBaseFileName>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <AdditionalIncludeDirectories>../;../../../luasrc</AdditionalIncludeDirectories>
     </ClCompile>
     <Lib>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
@@ -182,6 +183,7 @@
       <ProgramDataBaseFileName>$(OutDir)$(ProjectName)_win64d.pdb</ProgramDataBaseFileName>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <AdditionalIncludeDirectories>../;../../../luasrc</AdditionalIncludeDirectories>
     </ClCompile>
     <Lib>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
@@ -201,6 +203,7 @@
       <ProgramDataBaseFileName>$(OutDir)$(ProjectName)_win32.pdb</ProgramDataBaseFileName>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <AdditionalIncludeDirectories>../;../../../luasrc</AdditionalIncludeDirectories>
     </ClCompile>
     <Lib>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
@@ -220,6 +223,7 @@
       <ProgramDataBaseFileName>$(OutDir)$(ProjectName)_win64.pdb</ProgramDataBaseFileName>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <AdditionalIncludeDirectories>../;../../../luasrc</AdditionalIncludeDirectories>
     </ClCompile>
     <Lib>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
