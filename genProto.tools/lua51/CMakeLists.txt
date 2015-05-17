@@ -7,5 +7,13 @@ aux_source_directory(./ source)
 aux_source_directory(../../luasrc/ luasrc) 
 set(EXECUTABLE_OUTPUT_PATH ../proto)
 
+
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+        add_definitions(-Wall -g -ggdb -O0  -D_GLIBCXX_USE_NANOSLEEP)
+else()
+        add_definitions(-Wall  -O2 -DNDEBUG  -D_GLIBCXX_USE_NANOSLEEP)
+endif()
+set(CMAKE_CXX_FLAGS -std=c++11)
+
 add_executable(lua51 ${source} ${luasrc})
 target_link_libraries(lua51 m)
