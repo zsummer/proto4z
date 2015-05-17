@@ -37,8 +37,8 @@
  ]]--
 
 -- proto4z test file
--- Auther: zhangyawei
--- mail:yawei_zhang@foxmail.com
+-- Author: zhangyawei
+-- mail:yawei.zhang@foxmail.com
 -- date: 2015-01-12
 
 package.path =  "../../?.lua;" .. package.path
