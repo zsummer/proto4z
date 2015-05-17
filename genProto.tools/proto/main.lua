@@ -46,6 +46,7 @@ package.path =  "../../?.lua;" .. package.path
 require("proto4z")
 require("lua.TestProto")
 
+local proto = Proto4z
 
 local echo = {  _iarray = {{_char=1,_uchar=2,_short=3,_ushort=4,_int=5,_uint=6,_i64="12345678",_ui64="12345678"},{_char=1,_uchar=2,_short=3,_ushort=4,_int=5,_uint=6,_i64="12345678",_ui64="12345678"}},
 				_farray = {{_float=2.235,_double=235.111},{_float=2.235,_double=235.111},},
@@ -55,14 +56,14 @@ local echo = {  _iarray = {{_char=1,_uchar=2,_short=3,_ushort=4,_int=5,_uint=6,_
 				_smap = {{k="523", v={_string="abcdefg"}},{k="523", v={_string="abcdefg"}}},
 				}
 
-Protoz.dump(echo)
+proto.dump(echo)
 
 local now = os.time()
 for i=1, 100000 do
-	local data = Protoz.encode(echo, "EchoPack")
-	--Protoz.putbin(data)
-	local dr = Protoz.decode(data, Protoz.getName(Protoz.EchoPack.__getID)) -- "EchoPack"
-	--Protoz.dump(dr)
+	local data = proto.encode(echo, "EchoPack")
+	--proto.putbin(data)
+	local dr = proto.decode(data, proto.getName(proto.EchoPack.__getID)) -- "EchoPack"
+	--proto.dump(dr)
 
 end
 now = os.time() - now
