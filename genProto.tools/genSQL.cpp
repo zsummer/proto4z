@@ -62,7 +62,7 @@ bool genSQLFile(std::string filename, std::vector<AnyData> & stores)
 			text += "{" + LFCR;
 			text += "\tstd::vector<std::string> ret;" + LFCR;
 			text += "\tret.push_back(\"desc `tb_" + info._proto._struct._name + "`\");" + LFCR;
-			text += "\tret.push_back(\"CREATE TABLE `tb_" + info._proto._struct._name + "` (" + LFCR; 
+			text += "\tret.push_back(\"CREATE TABLE `tb_" + info._proto._struct._name + "` (" ; 
 			for (auto& m : info._proto._struct._members)
 			{
 				if (m._tag != MT_DB_KEY)
@@ -82,7 +82,6 @@ bool genSQLFile(std::string filename, std::vector<AnyData> & stores)
 				{
 					text += " bigint(20) unsigned NOT NULL DEFAULT '0' , ";
 				}
-				text += LFCR;
 			}
 			text += "\t\tPRIMARY KEY("; 
 			for (auto& m : info._proto._struct._members)
