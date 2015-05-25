@@ -42,7 +42,7 @@
 #include <algorithm>
 std::string getCPPType(std::string type);
 
-bool genSQLFile(std::string filename, std::vector<StoreInfo> & stores)
+bool genSQLFile(std::string filename, std::vector<AnyData> & stores)
 {
 	std::string macroFileName = std::string("_") + filename + "SQL_H_";
 	std::transform(macroFileName.begin(), macroFileName.end(), macroFileName.begin(), [](char ch){ return std::toupper(ch); });
@@ -55,57 +55,56 @@ bool genSQLFile(std::string filename, std::vector<StoreInfo> & stores)
 	{
 		if ((info._type == GT_DataStruct || info._type == GT_DataProto) && info._proto._struct._isStore)
 		{
-			DataStruct::DataMember key;
-			for (auto m : info._proto._struct._members)
-			{
-				if (m._isKey)
-				{
-					if (key._isKey)
-					{
-						LOGE("struct have multi key. struct name=" << info._proto._struct._name << ", key1=" << key._name << ", key2=" << m._name);
-					}
-					else
-					{
-						key = m;
-					}
-				}
-			}
-			if (!key._isKey)
-			{
-				LOGE("struct have no key. struct name=" << info._proto._struct._name);
-				continue;
-			}
+
 			//build
 			text += LFCR;
 			text += "inline std::vector<std::string> " + info._proto._struct._name + "_BUILD()" + LFCR;
 			text += "{" + LFCR;
 			text += "\tstd::vector<std::string> ret;" + LFCR;
 			text += "\tret.push_back(\"desc `tb_" + info._proto._struct._name + "`\");" + LFCR;
-			text += "\tret.push_back(\"CREATE TABLE `tb_" + info._proto._struct._name + "` (`" + key._name + "`";
-			if (key._type == "string")
+			text += "\tret.push_back(\"CREATE TABLE `tb_" + info._proto._struct._name + "` (" + LFCR; 
+			for (auto& m : info._proto._struct._members)
 			{
-				text += " varchar(255) NOT NULL DEFAULT '' , ";
+				if (m._tag != MT_DB_KEY)
+				{
+					continue;
+				}
+				text +="\t\t`" + m._name + "`";
+				if (m._type == "string")
+				{
+					text += " varchar(255) NOT NULL DEFAULT '' , ";
+				}
+				else if (m._type == "i8" || m._type == "i16" || m._type == "i32" || m._type == "i64")
+				{
+					text += " bigint(20) NOT NULL DEFAULT '0' ,  ";
+				}
+				else if (m._type == "ui8" || m._type == "ui16" || m._type == "ui32" || m._type == "ui64")
+				{
+					text += " bigint(20) unsigned NOT NULL DEFAULT '0' , ";
+				}
+				text += LFCR;
 			}
-			else if (key._type == "i8" || key._type == "i16" || key._type == "i32" || key._type == "i64")
+			text += "\t\tPRIMARY KEY("; 
+			for (auto& m : info._proto._struct._members)
 			{
-				text += " bigint(20) NOT NULL DEFAULT '0' ,  ";
+				if (m._tag != MT_DB_KEY)
+				{
+					continue;
+				}
+				text += "`" + m._name + "`,";
 			}
-			else if (key._type == "ui8" || key._type == "ui16" || key._type == "ui32" || key._type == "ui64")
-			{
-				text += " bigint(20) unsigned NOT NULL DEFAULT '0' , ";
-			}
-			text += " PRIMARY KEY(`" + key._name + "`) ) ENGINE = MyISAM DEFAULT CHARSET = utf8\");" + LFCR;
+			text.pop_back();
+			text +=") ) ENGINE = MyISAM DEFAULT CHARSET = utf8\");" + LFCR;
+
+
 
 			for (auto& m : info._proto._struct._members)
 			{
-				if (m._isKey)
+				if (m._tag == MT_DB_KEY || m._tag == MT_DB_IGNORE || m._tag == MT_DELETE)
 				{
 					continue;
 				}
-				if (m._isIgnore)
-				{
-					continue;
-				}
+
 
 				text += "\tret.push_back(\"alter table `tb_" + info._proto._struct._name + "` add `" + m._name + "` ";
 				if (m._type == "string")
@@ -138,44 +137,108 @@ bool genSQLFile(std::string filename, std::vector<StoreInfo> & stores)
 			text += "\tzsummer::mysql::DBQuery q(\" select ";
 			for (auto& m: info._proto._struct._members)
 			{
-				if (m._isIgnore || m._isDel)
+				if (m._tag == MT_DB_IGNORE || m._tag == MT_DELETE)
 				{
 					continue;
 				}
 				text += "`" + m._name + "`";
 				text += ",";
 			}
-			text[text.length() - 1] = ' ';
-			text += "from `tb_" + info._proto._struct._name + "` order by `" + key._name + "` desc limit ?, 1000 \");" + LFCR;
+			text.pop_back();
+
+			text += "from `tb_" + info._proto._struct._name + "` order by ";
+			for (auto& m : info._proto._struct._members)
+			{
+				if (m._tag != MT_DB_KEY)
+				{
+					continue;
+				}
+				text += "`" + m._name + "`,";
+			}
+			text.pop_back();
+			text += " desc limit ?, 1000 \");" + LFCR;
 			text += "\tq << curLoaded;" + LFCR;
 			text += "\treturn q.popSQL();" + LFCR;
 			text += "}" + LFCR;
 
 			//select
 			text += LFCR;
-			text += "inline std::string " + info._proto._struct._name + "_SELECT(" + getCPPType(key._type) + " " + key._name + ")" + LFCR;
+			text += "inline std::string " + info._proto._struct._name + "_SELECT(";
+			for (auto& m : info._proto._struct._members)
+			{
+				if (m._tag != MT_DB_KEY)
+				{
+					continue;
+				}
+				text += getCPPType(m._type) + " " + m._name + ", ";
+			}
+			text.pop_back();
+			text.pop_back();
+			text += ")" + LFCR;
 			text += "{" + LFCR;
 			text += "\tzsummer::mysql::DBQuery q(\" select ";
 			for (auto& m : info._proto._struct._members)
 			{
-				if (m._isIgnore || m._isDel)
+				if (m._tag == MT_DB_IGNORE || m._tag == MT_DELETE)
 				{
 					continue;
 				}
 				text += "`" + m._name + "`";
 				text += ",";
 			}
-			text[text.length() - 1] = ' ';
-			text += "from `tb_" + info._proto._struct._name + "` where `" + key._name + "` = ? \");" + LFCR;
-			text += "\tq << " + key._name + ";" + LFCR;
+			text.pop_back();
+
+			text += "from `tb_" + info._proto._struct._name + "` where ";
+			for (auto& m : info._proto._struct._members)
+			{
+				if (m._tag != MT_DB_KEY)
+				{
+					continue;
+				}
+				text += "`" + m._name + "` = ? and ";
+			}
+			text.pop_back();
+			text.pop_back();
+			text.pop_back();
+			text.pop_back();
+			text += "\");" + LFCR;
+			for (auto& m : info._proto._struct._members)
+			{
+				if (m._tag != MT_DB_KEY)
+				{
+					continue;
+				}
+				text += "\tq << " + m._name + ";" + LFCR;
+			}
+			
 			text += "\treturn q.popSQL();" + LFCR;
 			text += "}" + LFCR;
 
 			//fetch
 			text += LFCR;
-			text += "inline std::map<" + getCPPType(key._type) + ", " + info._proto._struct._name + "> " + info._proto._struct._name + "_FETCH(zsummer::mysql::DBResultPtr ptr)" + LFCR;
+			text += "inline ";
+			std::string fetchType;
+			for (auto& m : info._proto._struct._members)
+			{
+				if (m._tag != MT_DB_KEY)
+				{
+					continue;
+				}
+				fetchType += "std::map<" + getCPPType(m._type) + ", ";
+			}
+			fetchType += info._proto._struct._name;
+			for (auto& m : info._proto._struct._members)
+			{
+				if (m._tag != MT_DB_KEY)
+				{
+					continue;
+				}
+				fetchType += "> ";
+			}
+			text += fetchType + " ";
+			text += info._proto._struct._name + "_FETCH(zsummer::mysql::DBResultPtr ptr)" + LFCR;
 			text += "{" + LFCR;
-			text += "\tstd::map<" + getCPPType(key._type) + ", " + info._proto._struct._name + "> ret;" + LFCR;
+			text += "\t" + fetchType + " ret;" + LFCR;
 			text += "\tif (ptr->getErrorCode() != zsummer::mysql::QEC_SUCCESS)" + LFCR;
 			text += "\t{" + LFCR;
 			text += "\t\t"  "LOGE(\"fetch info from db found error. ErrorCode=\"  <<  ptr->getErrorCode() << \", Error=\" << ptr->getLastError());" + LFCR;
@@ -189,7 +252,7 @@ bool genSQLFile(std::string filename, std::vector<StoreInfo> & stores)
 			text += "\t\t\t" + info._proto._struct._name + " " + "info;" + LFCR;
 			for (auto& m : info._proto._struct._members)
 			{
-				if (m._isIgnore || m._isDel)
+				if (m._tag == MT_DB_IGNORE || m._tag == MT_DELETE)
 				{
 					continue;
 				}
@@ -220,7 +283,17 @@ bool genSQLFile(std::string filename, std::vector<StoreInfo> & stores)
 
 				}
 			}
-			text += "\t\t\tret[info." + key._name + "] = info;" + LFCR;
+
+			text += "\t\t\tret";
+			for (auto& m : info._proto._struct._members)
+			{
+				if (m._tag != MT_DB_KEY)
+				{
+					continue;
+				}
+				text += "[info." + m._name + "]";
+			}
+			text += " = info; " + LFCR;
 			text += "\t\t}" + LFCR;
 
 			text += "\t}" + LFCR;
@@ -241,27 +314,28 @@ bool genSQLFile(std::string filename, std::vector<StoreInfo> & stores)
 			text += "\tzsummer::mysql::DBQuery q(\" insert into tb_" + info._proto._struct._name + "( ";
 			for (auto& m : info._proto._struct._members)
 			{
-				if (m._isIgnore || m._isDel)
+				if (m._tag == MT_DB_IGNORE || m._tag == MT_DELETE)
 				{
 					continue;
 				}
 				text += "`" + m._name + "`,";
 			}
-			text[text.length() - 1] = ' ';
+			text.pop_back();
+
 			text += ") values(";
 			for (auto& m : info._proto._struct._members)
 			{
-				if (m._isIgnore || m._isDel)
+				if (m._tag == MT_DB_IGNORE || m._tag == MT_DELETE)
 				{
 					continue;
 				}
 				text += "?,";
 			}
-			text[text.length() - 1] = ' ';
-			text += " )\");" + LFCR;
+			text.pop_back();
+			text += ")\");" + LFCR;
 			for (auto& m : info._proto._struct._members)
 			{
-				if (m._isIgnore || m._isDel)
+				if (m._tag == MT_DB_IGNORE || m._tag == MT_DELETE)
 				{
 					continue;
 				}
@@ -296,30 +370,60 @@ bool genSQLFile(std::string filename, std::vector<StoreInfo> & stores)
 			text += LFCR;
 			text += "inline std::string " + info._proto._struct._name + "_UPDATE( const " + info._proto._struct._name + " & info) " + LFCR;
 			text += "{" + LFCR;
-			text += "\tzsummer::mysql::DBQuery q(\" insert into tb_" + info._proto._struct._name + "(" + key._name + ") values(?) on duplicate key update ";
+			text += "\tzsummer::mysql::DBQuery q(\" insert into tb_" + info._proto._struct._name + "(";
 			for (auto& m : info._proto._struct._members)
 			{
-				if (m._isKey)
+				if (m._tag != MT_DB_KEY)
 				{
 					continue;
 				}
-				if (m._isIgnore || m._isDel)
+				text += m._name;
+				text += ",";
+			}
+			text.pop_back();
+			text += ") values(";
+			for (auto& m : info._proto._struct._members)
+			{
+				if (m._tag != MT_DB_KEY)
+				{
+					continue;
+				}
+				text += "?,";
+			}
+			text.pop_back();
+			text += " ) on duplicate key update ";
+			for (auto& m : info._proto._struct._members)
+			{
+				if (m._tag == MT_DB_KEY)
+				{
+					continue;
+				}
+				if (m._tag == MT_DB_IGNORE || m._tag == MT_DELETE)
 				{
 					continue;
 				}
 				text += "`" + m._name + "` = ?,";
 			}
-			text[text.length() - 1] = ' ';
-			text += " \");" + LFCR;
-			text += "\tq << info." + key._name + ";" + LFCR;
+			text.pop_back();
 
+			text += " \");" + LFCR;
 			for (auto& m : info._proto._struct._members)
 			{
-				if (m._isKey)
+				if (m._tag != MT_DB_KEY)
 				{
 					continue;
 				}
-				if (m._isIgnore || m._isDel)
+				text += "\tq << info." + m._name + ";" + LFCR;
+			}
+			
+
+			for (auto& m : info._proto._struct._members)
+			{
+				if (m._tag == MT_DB_KEY)
+				{
+					continue;
+				}
+				if (m._tag == MT_DB_IGNORE || m._tag == MT_DELETE)
 				{
 					continue;
 				}

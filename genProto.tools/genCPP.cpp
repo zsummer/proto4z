@@ -51,7 +51,7 @@ std::string getCPPType(std::string type)
 	return type;
 }
 
-bool genCppFile(std::string filename, std::vector<StoreInfo> & stores, bool genLog4z)
+bool genCppFile(std::string filename, std::vector<AnyData> & stores, bool genLog4z)
 {
 	std::string macroFileName = std::string("_") + filename  + "_H_";
 	std::transform(macroFileName.begin(), macroFileName.end(), macroFileName.begin(), [](char ch){ return std::toupper(ch); });
@@ -128,16 +128,15 @@ bool genCppFile(std::string filename, std::vector<StoreInfo> & stores, bool genL
 			int curTagIndex = 0;
 			for (const auto & m : info._proto._struct._members)
 			{
+				if (m._tag != MT_DELETE)
 				{
-					if (!m._isDel)
-					{
-						info._proto._struct._tag |= (1ULL << curTagIndex);
-					}
-					curTagIndex++;
+					info._proto._struct._tag |= (1ULL << curTagIndex);
 				}
+				curTagIndex++;
+
 				
 				text += "\t" + getCPPType(m._type) + " " + m._name + "; ";
-				if (m._isDel)
+				if (m._tag == MT_DELETE)
 				{
 					text += "//[already deleted]";
 				}
@@ -185,7 +184,7 @@ bool genCppFile(std::string filename, std::vector<StoreInfo> & stores, bool genL
 			text += "\tws << tag;" + LFCR;
 			for (const auto &m : info._proto._struct._members)
 			{
-				if (m._isDel)
+				if (m._tag == MT_DELETE)
 				{
 					text += "//\tws << data." + m._name + "; //[already deleted]" + LFCR;
 				}

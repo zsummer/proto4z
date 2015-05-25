@@ -56,7 +56,7 @@ std::string getCSharpType(std::string type)
 	return type;
 }
 
-bool genCSharpFile(std::string filename, std::vector<StoreInfo> & stores)
+bool genCSharpFile(std::string filename, std::vector<AnyData> & stores)
 {
 
 	std::string text = LFCR;
@@ -191,7 +191,7 @@ bool genCSharpFile(std::string filename, std::vector<StoreInfo> & stores)
 			for (const auto & m : info._proto._struct._members)
 			{
 				{
-					if (!m._isDel)
+					if (m._tag != MT_DELETE)
 					{
 						info._proto._struct._tag |= (1ULL << curTagIndex);
 					}
@@ -216,7 +216,7 @@ bool genCSharpFile(std::string filename, std::vector<StoreInfo> & stores)
 			text += "\t\t\t"   "var data = new System.Collections.Generic.List<byte>();" + LFCR;
 			for (const auto &m : info._proto._struct._members)
 			{
-				if (m._isDel)
+				if (m._tag == MT_DELETE)
 				{
 					text += "//\t\t\t"  "data.AddRange(" + m._name + ".__encode());//[already deleted]" + LFCR;
 				}

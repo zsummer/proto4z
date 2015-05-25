@@ -216,7 +216,7 @@ ParseCode genProto::parseConfig()
 				{
 					dc._desc = ele->Attribute("desc");
 				}
-				StoreInfo info;
+				AnyData info;
 				info._include = dc;
 				info._type = GT_DataInclude;
 				_vctStoreInfo.push_back(info);
@@ -237,7 +237,7 @@ ParseCode genProto::parseConfig()
 				{
 					dc._desc = ele->Attribute("desc");
 				}
-				StoreInfo info;
+				AnyData info;
 				info._const = dc;
 				info._type = GT_DataConstValue;
 				_vctStoreInfo.push_back(info);
@@ -284,7 +284,7 @@ ParseCode genProto::parseConfig()
 					{
 						dc._desc = member->Attribute("desc");
 					}
-					StoreInfo info;
+					AnyData info;
 					info._const = dc;
 					info._type = GT_DataConstValue;
 					_vctStoreInfo.push_back(info);
@@ -307,7 +307,7 @@ ParseCode genProto::parseConfig()
 				{
 					ar._desc = ele->Attribute("desc");
 				}
-				StoreInfo info;
+				AnyData info;
 				info._type = GT_DataArray;
 				info._array = ar;
 				_vctStoreInfo.push_back(info);
@@ -328,7 +328,7 @@ ParseCode genProto::parseConfig()
 				{
 					dm._desc = ele->Attribute("desc");
 				}
-				StoreInfo info;
+				AnyData info;
 				info._type = GT_DataMap;
 				info._map = dm;
 				_vctStoreInfo.push_back(info);
@@ -395,18 +395,24 @@ ParseCode genProto::parseConfig()
 					}
 					dm._type = member->Attribute("type");
 					dm._name = member->Attribute("name");
-					if (member->Attribute("del") && strcmp(member->Attribute("del"), "true") == 0)
+					dm._tag = MT_NORMAL;
+					if (member->Attribute("tag"))
 					{
-							dm._isDel = true;
+						if (strcmp(member->Attribute("tag"), "del") == 0)
+						{
+							dm._tag = MT_DELETE;
+						}
+						else if (strcmp(member->Attribute("tag"), "key") == 0)
+						{
+							dm._tag = MT_DB_KEY;
+						}
+						else if (strcmp(member->Attribute("tag"), "ignore") == 0)
+						{
+							dm._tag = MT_DB_IGNORE;
+						}
+
 					}
-					if (member->Attribute("ignore") && strcmp(member->Attribute("ignore"), "true") == 0)
-					{
-						dm._isIgnore = true;
-					}
-					if (member->Attribute("key") && strcmp(member->Attribute("key"), "true") == 0)
-					{
-						dm._isKey = true;
-					}
+
 					if (member->Attribute("desc"))
 					{
 						dm._desc = member->Attribute("desc");
@@ -416,7 +422,7 @@ ParseCode genProto::parseConfig()
 
 				} while (true);
 
-				StoreInfo info;
+				AnyData info;
 				info._type = GT_DataStruct;
 				info._proto = dp;
 				if (stype == "proto")

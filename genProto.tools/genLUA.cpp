@@ -42,7 +42,7 @@
 #include <algorithm>
 
 
-bool genLuaFile(std::string filename, std::vector<StoreInfo> & stores)
+bool genLuaFile(std::string filename, std::vector<AnyData> & stores)
 {
 	std::string text;
 	for (auto &info : stores)
@@ -120,7 +120,7 @@ bool genLuaFile(std::string filename, std::vector<StoreInfo> & stores)
 			std::string tag = "";
 			for (auto &m : info._proto._struct._members)
 			{
-				if (m._isDel)
+				if (m._tag == MT_DELETE)
 				{
 					tag.append("0");
 				}
@@ -134,7 +134,7 @@ bool genLuaFile(std::string filename, std::vector<StoreInfo> & stores)
 			{
 				text += "Proto4z." + info._proto._struct._name + "[" + boost::lexical_cast<std::string>(i + 1)
 					+ "] = {name=\"" + info._proto._struct._members[i]._name + "\", type=\"" + info._proto._struct._members[i]._type + "\"";
-				if (info._proto._struct._members[i]._isDel)
+				if (info._proto._struct._members[i]._tag == MT_DELETE)
 				{
 					text += ", del = true";
 				}

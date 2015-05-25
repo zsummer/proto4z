@@ -122,7 +122,26 @@ static  std::map<std::string, std::string> xmlTypeToCSharpDefaultValue = {
 
 
 
+//store type enum
+enum DataType : short
+{
+	GT_DataInclude,
+	GT_DataArray,
+	GT_DataMap,
+	GT_DataConstValue,
+	GT_DataStruct,
+	GT_DataProto,
+};
 
+//tag
+enum MemberTag : short
+{
+	MT_NORMAL,
+	MT_DB_KEY,
+	MT_DB_IGNORE,
+	MT_DELETE,
+	//MT_OPTION,
+};
 
 //include file name, without suffix
 struct DataInclude
@@ -169,9 +188,7 @@ struct DataStruct
 		std::string _type;
 		std::string _name;
 		std::string _desc;
-		bool _isDel = false;
-		bool _isKey = false;
-		bool _isIgnore = false;
+		MemberTag _tag;
 	};
 	std::vector<DataMember> _members;
 };
@@ -191,21 +208,12 @@ const std::string ProtoIDType = "ui16";
 const std::string LFCR = " \r\n";
 
 
-//store type enum
-enum StoreType
-{
-	GT_DataInclude,
-	GT_DataArray,
-	GT_DataMap,
-	GT_DataConstValue,
-	GT_DataStruct,
-	GT_DataProto,
-};
+
 
 //general store type
-struct StoreInfo
+struct AnyData
 {
-	StoreType _type;
+	DataType _type;
 	DataInclude _include;
 	DataArray _array;
 	DataMap _map;
@@ -213,17 +221,18 @@ struct StoreInfo
 	DataProto _proto;
 };
 
+
 inline std::string getCPPFile(std::string fileName){ return std::string("C++/") + fileName + ".h"; }
 inline std::string getLuaFile(std::string fileName){ return std::string("lua/") + fileName + ".lua"; }
 inline std::string getCSharpFile(std::string fileName){ return std::string("CSharp/") + fileName + ".cs"; }
 inline std::string getSQLFile(std::string fileName){ return std::string("C++/") + fileName + "SQL.h"; }
 
 //gen code file
-bool genCppFile(std::string filename, std::vector<StoreInfo> & stores, bool genLog4z);
-bool genLuaFile(std::string filename, std::vector<StoreInfo> & stores);
-bool genCSharpFile(std::string filename, std::vector<StoreInfo> & stores);
-bool genSQLFile(std::string filename, std::vector<StoreInfo> & stores);
-bool genJsFile(std::string filename, std::vector<StoreInfo> & stores);
+bool genCppFile(std::string filename, std::vector<AnyData> & stores, bool genLog4z);
+bool genLuaFile(std::string filename, std::vector<AnyData> & stores);
+bool genCSharpFile(std::string filename, std::vector<AnyData> & stores);
+bool genSQLFile(std::string filename, std::vector<AnyData> & stores);
+bool genJsFile(std::string filename, std::vector<AnyData> & stores);
 
 
 
@@ -265,7 +274,7 @@ class genProto
 	unsigned short _minNo = 0;
 	unsigned short _maxNo = 0;
 	bool _log4z = false;
-	std::vector<StoreInfo> _vctStoreInfo;
+	std::vector<AnyData> _vctStoreInfo;
 
 public:
 	//filename without suffix
