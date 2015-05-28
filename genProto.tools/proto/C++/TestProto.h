@@ -34,6 +34,7 @@ struct TestIntegerData //测试
 inline zsummer::proto4z::WriteStream & operator << (zsummer::proto4z::WriteStream & ws, const TestIntegerData & data) 
 { 
 	unsigned long long tag = 383ULL; 
+	if (zsummer::proto4z::__localEndianType() != zsummer::proto4z::LittleEndian) tag = zsummer::proto4z::reversalInteger(tag); 
 	ws << (zsummer::proto4z::Integer)0; 
 	zsummer::proto4z::Integer offset = ws.getStreamLen(); 
 	ws << tag; 
@@ -56,6 +57,7 @@ inline zsummer::proto4z::ReadStream & operator >> (zsummer::proto4z::ReadStream 
 	zsummer::proto4z::Integer cursor = rs.getStreamUnreadLen(); 
 	unsigned long long tag = 0; 
 	rs >> tag; 
+	if (zsummer::proto4z::__localEndianType() != zsummer::proto4z::LittleEndian) tag = zsummer::proto4z::reversalInteger(tag); 
 	if ( (1ULL << 0) & tag) 
 	{ 
 		rs >> data._char;  
@@ -110,6 +112,7 @@ struct TestFloatData //测试
 inline zsummer::proto4z::WriteStream & operator << (zsummer::proto4z::WriteStream & ws, const TestFloatData & data) 
 { 
 	unsigned long long tag = 3ULL; 
+	if (zsummer::proto4z::__localEndianType() != zsummer::proto4z::LittleEndian) tag = zsummer::proto4z::reversalInteger(tag); 
 	ws << (zsummer::proto4z::Integer)0; 
 	zsummer::proto4z::Integer offset = ws.getStreamLen(); 
 	ws << tag; 
@@ -125,6 +128,7 @@ inline zsummer::proto4z::ReadStream & operator >> (zsummer::proto4z::ReadStream 
 	zsummer::proto4z::Integer cursor = rs.getStreamUnreadLen(); 
 	unsigned long long tag = 0; 
 	rs >> tag; 
+	if (zsummer::proto4z::__localEndianType() != zsummer::proto4z::LittleEndian) tag = zsummer::proto4z::reversalInteger(tag); 
 	if ( (1ULL << 0) & tag) 
 	{ 
 		rs >> data._float;  
@@ -145,6 +149,7 @@ struct TestStringData //测试
 inline zsummer::proto4z::WriteStream & operator << (zsummer::proto4z::WriteStream & ws, const TestStringData & data) 
 { 
 	unsigned long long tag = 1ULL; 
+	if (zsummer::proto4z::__localEndianType() != zsummer::proto4z::LittleEndian) tag = zsummer::proto4z::reversalInteger(tag); 
 	ws << (zsummer::proto4z::Integer)0; 
 	zsummer::proto4z::Integer offset = ws.getStreamLen(); 
 	ws << tag; 
@@ -159,6 +164,7 @@ inline zsummer::proto4z::ReadStream & operator >> (zsummer::proto4z::ReadStream 
 	zsummer::proto4z::Integer cursor = rs.getStreamUnreadLen(); 
 	unsigned long long tag = 0; 
 	rs >> tag; 
+	if (zsummer::proto4z::__localEndianType() != zsummer::proto4z::LittleEndian) tag = zsummer::proto4z::reversalInteger(tag); 
 	if ( (1ULL << 0) & tag) 
 	{ 
 		rs >> data._string;  
@@ -197,6 +203,7 @@ struct EchoPack
 inline zsummer::proto4z::WriteStream & operator << (zsummer::proto4z::WriteStream & ws, const EchoPack & data) 
 { 
 	unsigned long long tag = 63ULL; 
+	if (zsummer::proto4z::__localEndianType() != zsummer::proto4z::LittleEndian) tag = zsummer::proto4z::reversalInteger(tag); 
 	ws << (zsummer::proto4z::Integer)0; 
 	zsummer::proto4z::Integer offset = ws.getStreamLen(); 
 	ws << tag; 
@@ -216,6 +223,7 @@ inline zsummer::proto4z::ReadStream & operator >> (zsummer::proto4z::ReadStream 
 	zsummer::proto4z::Integer cursor = rs.getStreamUnreadLen(); 
 	unsigned long long tag = 0; 
 	rs >> tag; 
+	if (zsummer::proto4z::__localEndianType() != zsummer::proto4z::LittleEndian) tag = zsummer::proto4z::reversalInteger(tag); 
 	if ( (1ULL << 0) & tag) 
 	{ 
 		rs >> data._iarray;  
@@ -254,6 +262,7 @@ struct Pulse
 inline zsummer::proto4z::WriteStream & operator << (zsummer::proto4z::WriteStream & ws, const Pulse & data) 
 { 
 	unsigned long long tag = 0ULL; 
+	if (zsummer::proto4z::__localEndianType() != zsummer::proto4z::LittleEndian) tag = zsummer::proto4z::reversalInteger(tag); 
 	ws << (zsummer::proto4z::Integer)0; 
 	zsummer::proto4z::Integer offset = ws.getStreamLen(); 
 	ws << tag; 
@@ -267,6 +276,7 @@ inline zsummer::proto4z::ReadStream & operator >> (zsummer::proto4z::ReadStream 
 	zsummer::proto4z::Integer cursor = rs.getStreamUnreadLen(); 
 	unsigned long long tag = 0; 
 	rs >> tag; 
+	if (zsummer::proto4z::__localEndianType() != zsummer::proto4z::LittleEndian) tag = zsummer::proto4z::reversalInteger(tag); 
 	cursor = cursor - rs.getStreamUnreadLen(); 
 	rs.skipOriginalData(sttLen - cursor); 
 	return rs; 

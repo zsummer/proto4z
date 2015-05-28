@@ -57,52 +57,90 @@ static bool islocalLittleEndian()
 	return false;
 }
 
-
-
-static unsigned long long streamToInteger(const char stream[])
+static unsigned long long reversalInteger(unsigned long long org)
 {
-	unsigned long long integer = 0;
+	unsigned long long ret = 0;
 	size_t len = sizeof(unsigned long long);
+
+	unsigned char *dst = (unsigned char*)&ret;
+	unsigned char *src = (unsigned char*)org + sizeof(unsigned long long);
+	while (len > 0)
+	{
+		*dst++ = *--src;
+		len--;
+	}
+	return ret;
+}
+
+
+static int checkIntegerBitTrue(lua_State *L)
+{
+	size_t len = 0;
+	const char * stream;
+	size_t pos;
+	unsigned long long val;
+	stream = luaL_checklstring(L, 1, &len);
+	if (len != 8)
+	{
+		return 0;
+	}
+	val = *(unsigned long long *)stream;
 	if (!islocalLittleEndian())
 	{
-		unsigned char *dst = (unsigned char*)&integer;
-		unsigned char *src = (unsigned char*)stream + sizeof(unsigned long long);
-		while (len > 0)
-		{
-			*dst++ = *--src;
-			len--;
-		}
+		val = reversalInteger(val);
+	}
+	pos = luaL_checkinteger(L, 2);
+
+	lua_settop(L, 0);
+	
+	if (val & (1ULL << pos))
+	{
+		lua_pushboolean(L, 1);
 	}
 	else
 	{
-		memcpy(&integer, stream, len);
+		lua_pushnil(L);
 	}
-	return integer;
+	return 1;
+}
+
+static int  sequenceToInteger(lua_State *L)
+{
+	size_t i, len = 0;
+	const char * sequence = luaL_checklstring(L, 1, &len);
+	unsigned long long num = 0;
+	if (len > 64)
+	{
+		return 0;
+	}
+	
+	for (i = 0; i < len; i++)
+	{
+		if (sequence[i] == '1')
+		{
+			num |= (1ULL << i);
+		}
+		else
+		{
+			num &= ~(unsigned long long)(1ULL << i);
+		}
+	}
+	if (!islocalLittleEndian())
+	{
+		num = reversalInteger(num);
+	}
+	
+	lua_pushlstring(L, (const char*)&num, 8);
+	return 1;
 }
 
 
 static int streamToString(lua_State *L)
 {
 	const char * stream = luaL_checkstring(L, -1);
-	unsigned long long integer = 0;
-	size_t len = sizeof(unsigned long long);
+	unsigned long long integer = *(unsigned long long*) stream;
 	char buf[50];
-	if (!islocalLittleEndian())
-	{
-		unsigned char *dst = (unsigned char*)&integer;
-		unsigned char *src = (unsigned char*)stream + sizeof(unsigned long long);
-		while (len > 0)
-		{
-			*dst++ = *--src;
-			len--;
-		}
-	}
-	else
-	{
-		memcpy(&integer, stream, len);
-	}
 	lua_settop(L, 0);
-	
 #ifdef WIN32  
 	sprintf(buf, "%I64u", integer);
 #else
@@ -116,92 +154,22 @@ static int stringToStream(lua_State *L)
 {
 	const char * stream = luaL_checkstring(L, -1);
 	unsigned long long integer = 0;
-	unsigned long long org = 0;
-	size_t len = sizeof(unsigned long long);
 #ifdef WIN32  
-	sscanf(stream, "%I64u", &org);
+	sscanf(stream, "%I64u", &integer);
 #else
-	sscanf(stream, "%llu", &org);
+	sscanf(stream, "%llu", &integer);
 #endif
-	stream = (const char *)&org;
-	if (!islocalLittleEndian())
-	{
-		unsigned char *dst = (unsigned char*)&integer;
-		unsigned char *src = (unsigned char*)stream + len;
-		while (len > 0)
-		{
-			*dst++ = *--src;
-			len--;
-		}
-	}
-	else
-	{
-		integer = org;
-	}
-	
 	lua_settop(L, 0);
 	lua_pushlstring(L, (const char *)&integer, 8);
 	return 1;
 }
 
 
-//检测第一个参数的二进制位是否为1
-//param1 ui64
-//param2 0~63
-static int checkBitTrue(lua_State *L)
-{
-	size_t len = 0;
-	const char * log = luaL_checklstring(L, 1, &len);
-	size_t pos = luaL_checkinteger(L, 2);
-	if (len != 8)
-	{
-		return 0;
-	}
-	lua_settop(L, 0);
-	unsigned long long val = streamToInteger(log);
-	if (val & (1ULL << pos))
-	{
-		lua_pushboolean(L, 1);
-	}
-	else
-	{
-		lua_pushnil(L);
-	}
-	return 1;
-}
-
-static int checkStringToBit(lua_State *L)
-{
-	size_t i, len = 0;
-	const char * log = luaL_checklstring(L, 1, &len);
-	unsigned long long pos = 0;
-	if (len > 64)
-	{
-		return 0;
-	}
-	
-	for (i = 0; i < len; i++)
-	{
-		if (log[i] == '1')
-		{
-			pos |= (1ULL << i);
-		}
-		else
-		{
-			pos &= ~(unsigned long long)(1ULL << i);
-		}
-	}
-
-	lua_pushlstring(L, (const char*)&pos, 8);
-	return 1;
-}
-
-
 static luaL_Reg checkBit[] = {
-	{ "__checkBitTrue", checkBitTrue },
-	{ "__checkStringToBit", checkStringToBit },
-	{ "stringToStream", stringToStream },
+	{ "checkIntegerBitTrue", checkIntegerBitTrue },
+	{ "sequenceToInteger", sequenceToInteger },
 	{ "streamToString", streamToString },
+	{ "stringToStream", stringToStream },
 
 	{ NULL, NULL }
 };

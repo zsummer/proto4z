@@ -7,10 +7,7 @@ inline std::vector<std::string> TestIntegerData_BUILD()
 { 
 	std::vector<std::string> ret; 
 	ret.push_back("desc `tb_TestIntegerData`"); 
-	ret.push_back("CREATE TABLE `tb_TestIntegerData` ( 
-		`_uint` bigint(20) unsigned NOT NULL DEFAULT '0' ,  
-		`_i64` bigint(20) NOT NULL DEFAULT '0' ,   
-		PRIMARY KEY(`_uint`,`_i64`) ) ENGINE = MyISAM DEFAULT CHARSET = utf8"); 
+	ret.push_back("CREATE TABLE `tb_TestIntegerData` (		`_uint` bigint(20) unsigned NOT NULL DEFAULT '0' , 		`_i64` bigint(20) NOT NULL DEFAULT '0' ,  		PRIMARY KEY(`_uint`,`_i64`) ) ENGINE = MyISAM DEFAULT CHARSET = utf8"); 
 	ret.push_back("alter table `tb_TestIntegerData` add `_char`  bigint(20) NOT NULL DEFAULT '0' "); 
 	ret.push_back("alter table `tb_TestIntegerData` add `_uchar`  bigint(20) unsigned NOT NULL DEFAULT '0' "); 
 	ret.push_back("alter table `tb_TestIntegerData` add `_short`  bigint(20) NOT NULL DEFAULT '0' "); 
@@ -21,14 +18,14 @@ inline std::vector<std::string> TestIntegerData_BUILD()
  
 inline std::string TestIntegerData_LOAD( unsigned long long curLoaded) 
 { 
-	zsummer::mysql::DBQuery q(" select `_char`,`_uchar`,`_short`,`_ushort`,`_int`,`_uint`,`_i64` from `tb_TestIntegerData` order by `_uint`,`_i64` desc limit ?, 1000 "); 
+	zsummer::mysql::DBQuery q(" select `_char`,`_uchar`,`_short`,`_ushort`,`_int`,`_uint`,`_i64`from `tb_TestIntegerData` order by `_uint`,`_i64` desc limit ?, 1000 "); 
 	q << curLoaded; 
 	return q.popSQL(); 
 } 
  
 inline std::string TestIntegerData_SELECT(unsigned int _uint, long long _i64) 
 { 
-	zsummer::mysql::DBQuery q(" select `_char`,`_uchar`,`_short`,`_ushort`,`_int`,`_uint`,`_i64` from `tb_TestIntegerData` where `_uint` = ? and `_i64` = ? "); 
+	zsummer::mysql::DBQuery q(" select `_char`,`_uchar`,`_short`,`_ushort`,`_int`,`_uint`,`_i64`from `tb_TestIntegerData` where `_uint` = ? and `_i64` = ? "); 
 	q << _uint; 
 	q << _i64; 
 	return q.popSQL(); 
@@ -68,7 +65,7 @@ inline std::map<unsigned int, std::map<long long, TestIntegerData> >  TestIntege
  
 inline std::string TestIntegerData_INSERT( const TestIntegerData & info)  
 { 
-	zsummer::mysql::DBQuery q(" insert into tb_TestIntegerData( `_char`,`_uchar`,`_short`,`_ushort`,`_int`,`_uint`,`_i64` ) values(?,?,?,?,?,?,?  )"); 
+	zsummer::mysql::DBQuery q(" insert into tb_TestIntegerData( `_char`,`_uchar`,`_short`,`_ushort`,`_int`,`_uint`,`_i64`) values(?,?,?,?,?,?,?)"); 
 	q << info._char; 
 	q << info._uchar; 
 	q << info._short; 
@@ -82,7 +79,7 @@ inline std::string TestIntegerData_INSERT( const TestIntegerData & info)
  
 inline std::string TestIntegerData_UPDATE( const TestIntegerData & info)  
 { 
-	zsummer::mysql::DBQuery q(" insert into tb_TestIntegerData(_uint,_i64) values(?,? ) on duplicate key update `_char` = ?,`_uchar` = ?,`_short` = ?,`_ushort` = ?,`_int` = ?  "); 
+	zsummer::mysql::DBQuery q(" insert into tb_TestIntegerData(_uint,_i64) values(?,? ) on duplicate key update `_char` = ?,`_uchar` = ?,`_short` = ?,`_ushort` = ?,`_int` = ? "); 
 	q << info._uint; 
 	q << info._i64; 
 	q << info._char; 

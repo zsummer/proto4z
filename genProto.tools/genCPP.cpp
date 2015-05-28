@@ -179,6 +179,7 @@ bool genCppFile(std::string filename, std::vector<AnyData> & stores, bool genLog
 			text += "inline zsummer::proto4z::WriteStream & operator << (zsummer::proto4z::WriteStream & ws, const " + info._proto._struct._name + " & data)" + LFCR;
 			text += "{" + LFCR;
 			text += "\tunsigned long long tag = " + boost::lexical_cast<std::string, unsigned long long>(info._proto._struct._tag) + "ULL;" + LFCR;
+			text += "\tif (zsummer::proto4z::__localEndianType() != zsummer::proto4z::LittleEndian) tag = zsummer::proto4z::reversalInteger(tag);" + LFCR;
 			text += "\tws << (zsummer::proto4z::Integer)0;" + LFCR;
 			text += "\tzsummer::proto4z::Integer offset = ws.getStreamLen();" + LFCR;
 			text += "\tws << tag;" + LFCR;
@@ -206,6 +207,7 @@ bool genCppFile(std::string filename, std::vector<AnyData> & stores, bool genLog
 			text += "\tzsummer::proto4z::Integer cursor = rs.getStreamUnreadLen();" + LFCR;
 			text += "\tunsigned long long tag = 0;" + LFCR;
 			text += "\trs >> tag;" + LFCR;
+			text += "\tif (zsummer::proto4z::__localEndianType() != zsummer::proto4z::LittleEndian) tag = zsummer::proto4z::reversalInteger(tag);" + LFCR;
 			curTagIndex = 0;
 			for (const auto &m : info._proto._struct._members)
 			{
