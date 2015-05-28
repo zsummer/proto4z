@@ -81,6 +81,73 @@ static unsigned long long streamToInteger(const char stream[])
 }
 
 
+static int streamToString(lua_State *L)
+{
+	const char * stream = luaL_checkstring(L, -1);
+	unsigned long long integer = 0;
+	size_t len = sizeof(unsigned long long);
+	char buf[50];
+	if (!islocalLittleEndian())
+	{
+		unsigned char *dst = (unsigned char*)&integer;
+		unsigned char *src = (unsigned char*)stream + sizeof(unsigned long long);
+		while (len > 0)
+		{
+			*dst++ = *--src;
+			len--;
+		}
+	}
+	else
+	{
+		memcpy(&integer, stream, len);
+	}
+	lua_settop(L, 0);
+	
+#ifdef WIN32  
+	sprintf(buf, "%I64u", integer);
+#else
+	sprintf(buf, "%llu", integer);
+#endif
+	lua_pushstring(L, buf);
+	return 1;
+}
+
+static int stringToStream(lua_State *L)
+{
+	const char * stream = luaL_checkstring(L, -1);
+	unsigned long long integer = 0;
+	unsigned long long org = 0;
+	size_t len = sizeof(unsigned long long);
+#ifdef WIN32  
+	sscanf(stream, "%I64u", &org);
+#else
+	sscanf(stream, "%llu", &org);
+#endif
+	stream = (const char *)&org;
+	if (!islocalLittleEndian())
+	{
+		unsigned char *dst = (unsigned char*)&integer;
+		unsigned char *src = (unsigned char*)stream + len;
+		while (len > 0)
+		{
+			*dst++ = *--src;
+			len--;
+		}
+	}
+	else
+	{
+		integer = org;
+	}
+	
+	lua_settop(L, 0);
+	lua_pushlstring(L, (const char *)&integer, 8);
+	return 1;
+}
+
+
+//检测第一个参数的二进制位是否为1
+//param1 ui64
+//param2 0~63
 static int checkBitTrue(lua_State *L)
 {
 	size_t len = 0;
@@ -133,6 +200,8 @@ static int checkStringToBit(lua_State *L)
 static luaL_Reg checkBit[] = {
 	{ "__checkBitTrue", checkBitTrue },
 	{ "__checkStringToBit", checkStringToBit },
+	{ "stringToStream", stringToStream },
+	{ "streamToString", streamToString },
 
 	{ NULL, NULL }
 };
