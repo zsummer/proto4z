@@ -4,7 +4,6 @@
     <ClCompile Include="genCPP.cpp" />
     <ClCompile Include="genCSharp.cpp" />
     <ClCompile Include="genLUA.cpp" />
-    <ClCompile Include="genProto.cpp" />
     <ClCompile Include="genSQL.cpp" />
     <ClCompile Include="log4z.cpp">
       <Filter>depends</Filter>
@@ -19,9 +18,11 @@
       <Filter>depends</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="parseProto.cpp" />
+    <ClCompile Include="parseCache.cpp" />
+    <ClCompile Include="genBase.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="genProto.h" />
     <ClInclude Include="utility.h">
       <Filter>depends</Filter>
     </ClInclude>
@@ -34,6 +35,15 @@
     <ClInclude Include="tinyxml2.h">
       <Filter>depends</Filter>
     </ClInclude>
+    <ClInclude Include="any.h" />
+    <ClInclude Include="parseProto.h" />
+    <ClInclude Include="genBase.h" />
+    <ClInclude Include="parseCache.h" />
+    <ClInclude Include="common.h" />
+    <ClInclude Include="genCPP.h" />
+    <ClInclude Include="genCSharp.h" />
+    <ClInclude Include="genLUA.h" />
+    <ClInclude Include="genSQL.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="depends">

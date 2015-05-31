@@ -39,8 +39,9 @@
 #include "utility.h"
 #include "log4z.h"
 #include "tinyxml2.h"
-#include "genProto.h"
-
+#include "genBase.h"
+#include "parseCache.h"
+#include "parseProto.h"
 using namespace zsummer::utility;
 
 int main(int argc, char *argv[])
@@ -54,58 +55,50 @@ int main(int argc, char *argv[])
 		LOGE("searchFiles error.");
 		return 0;
 	}
-
-	for (auto & file : files)
+	try
 	{
-		std::string filename = file.filename;
-		if (filename.size() <= 4)
+		for (auto & file : files)
 		{
-			continue;
-		}
-		std::string xmlattr = filename.substr(filename.length() - 4, 4);
-		if (xmlattr != ".xml")
-		{
-			continue;
-		}
-		filename = filename.substr(0, filename.size() - 4);
-		
-		genProto gen(filename);
-		ParseCode pc = gen.parseCache();
-		if (pc == PC_ERROR)
-		{
-			LOGE("LoadCache [" << filename << "] Error.");
-			break;
-		}
-		pc = gen.parseConfig();
-		if (pc == PC_ERROR)
-		{
-			LOGE("parseConfig [" << filename << "] Error.");
-			break;
-		}
-		pc = gen.genCode();
-		if (pc == PC_ERROR)
-		{
-			LOGE("genProto [" << filename << "] Error.");
-			break;
-		}
-		else if (pc == PC_NEEDSKIP)
-		{
-			LOGI("SKIP [" << filename << "] .");
-			zsummer::utility::SleepMillisecond(120);
-
-			continue;
-		}
-		else
-		{
-			pc = gen.writeCache();
-			if (pc == PC_ERROR)
+			std::string filename = file.filename;
+			if (filename.size() <= 4)
 			{
-				LOGE("Cached [" << filename << "] Error.");
-				break;
+				continue;
 			}
-			LOGI("Cached [" << filename << "] Success.");
+			std::string xmlattr = filename.substr(filename.length() - 4, 4);
+			if (xmlattr != ".xml")
+			{
+				continue;
+			}
+			filename = filename.substr(0, filename.size() - 4);
+
+			ParseCache cache;
+			cache.parse(filename);
+			if (!cache.isNeedUpdate())
+			{
+				continue;
+			}
+			auto stores = parseProto(filename, cache);
+			for (int i = SL_NORMAL + 1; i < SL_END; i++)
+			{
+				auto gen = createGenerate((SupportLanguageType)i);
+				if (!gen)
+				{
+					continue;
+				}
+				gen->init(filename, (SupportLanguageType)i);
+				auto content = gen->genRealContent(stores);
+				gen->write(content);
+				destroyGenerate(gen);
+			}
+			cache.write();
 		}
 	}
+	catch (std::runtime_error e)
+	{
+		LOGE("catch error: " << e.what());
+		return -1;
+	}
+
 	
 	LOGA("All Success..");
 	getchar();

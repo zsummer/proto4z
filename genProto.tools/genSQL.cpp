@@ -34,17 +34,27 @@
  * (end of COPYRIGHT)
  */
 
-#ifndef _CRT_SECURE_NO_WARNINGS
-#define  _CRT_SECURE_NO_WARNINGS
-#endif
-#include "genProto.h"
-#include <time.h>
-#include <algorithm>
-std::string getCPPType(std::string type);
-
-bool genSQLFile(std::string filename, std::vector<AnyData> & stores)
+#include "genSQL.h"
+std::string GenSQL::getRealType(const std::string & xmltype)
 {
-	std::string macroFileName = std::string("_") + filename + "SQL_H_";
+	if (xmltype == "i8") return "char";
+	else if (xmltype == "ui8") return "unsigned char";
+	else if (xmltype == "i16") return "short";
+	else if (xmltype == "ui16") return "unsigned short";
+	else if (xmltype == "i32") return "int";
+	else if (xmltype == "ui32") return "unsigned int";
+	else if (xmltype == "i64") return "long long";
+	else if (xmltype == "ui64") return "unsigned long long";
+	else if (xmltype == "float") return "float";
+	else if (xmltype == "double") return "double";
+	else if (xmltype == "string") return "std::string";
+	return xmltype;
+}
+
+
+std::string GenSQL::genRealContent(const std::list<AnyData> & stores)
+{
+	std::string macroFileName = std::string("_") + _filename + "SQL_H_";
 	std::transform(macroFileName.begin(), macroFileName.end(), macroFileName.begin(), [](char ch){ return std::toupper(ch); });
 
 
@@ -169,7 +179,7 @@ bool genSQLFile(std::string filename, std::vector<AnyData> & stores)
 				{
 					continue;
 				}
-				text += getCPPType(m._type) + " " + m._name + ", ";
+				text += getRealType(m._type) + " " + m._name + ", ";
 			}
 			text.pop_back();
 			text.pop_back();
@@ -223,7 +233,7 @@ bool genSQLFile(std::string filename, std::vector<AnyData> & stores)
 				{
 					continue;
 				}
-				fetchType += "std::map<" + getCPPType(m._type) + ", ";
+				fetchType += "std::map<" + getRealType(m._type) + ", ";
 			}
 			fetchType += info._proto._struct._name;
 			for (auto& m : info._proto._struct._members)
@@ -457,16 +467,7 @@ bool genSQLFile(std::string filename, std::vector<AnyData> & stores)
 
 	text += LFCR + "#endif" + LFCR;
 
-	std::ofstream os;
-	os.open(getSQLFile(filename), std::ios::binary);
-	if (!os.is_open())
-	{
-		LOGE("genSQLFile open file Error. : " << getSQLFile(filename));
-		return false;
-	}
-	os.write(text.c_str(), text.length());
-	os.close();
-	return true;
+	return std::move(text);
 }
 
 
