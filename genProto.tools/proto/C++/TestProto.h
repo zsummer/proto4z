@@ -20,13 +20,12 @@ struct TestIntegerData //测试
 	unsigned long long _ui64;  
 	TestIntegerData() 
 	{ 
-		_char = '\0'; 
+		_char = 0; 
 		_uchar = 0; 
 		_short = 0; 
 		_ushort = 0; 
 		_int = 0; 
 		_uint = 0; 
-		_i64 = 0; 
 		_ui128 = 0; 
 		_ui64 = 0; 
 	} 
@@ -98,6 +97,11 @@ inline zsummer::proto4z::ReadStream & operator >> (zsummer::proto4z::ReadStream 
 	rs.skipOriginalData(sttLen - cursor); 
 	return rs; 
 } 
+inline zsummer::log4z::Log4zStream & operator << (zsummer::log4z::Log4zStream & stm, const TestIntegerData & info) 
+{ 
+	stm << "_char=" << info._char << ", _uchar=" << info._uchar << ", _short=" << info._short << ", _ushort=" << info._ushort << ", _int=" << info._int << ", _uint=" << info._uint << ", _i64=" << info._i64 << ", _ui128=" << info._ui128 << ", _ui64=" << info._ui64; 
+	return stm; 
+} 
  
 struct TestFloatData //测试 
 { 
@@ -141,6 +145,11 @@ inline zsummer::proto4z::ReadStream & operator >> (zsummer::proto4z::ReadStream 
 	rs.skipOriginalData(sttLen - cursor); 
 	return rs; 
 } 
+inline zsummer::log4z::Log4zStream & operator << (zsummer::log4z::Log4zStream & stm, const TestFloatData & info) 
+{ 
+	stm << "_float=" << info._float << ", _double=" << info._double; 
+	return stm; 
+} 
  
 struct TestStringData //测试 
 { 
@@ -173,6 +182,11 @@ inline zsummer::proto4z::ReadStream & operator >> (zsummer::proto4z::ReadStream 
 	rs.skipOriginalData(sttLen - cursor); 
 	return rs; 
 } 
+inline zsummer::log4z::Log4zStream & operator << (zsummer::log4z::Log4zStream & stm, const TestStringData & info) 
+{ 
+	stm << "_string=" << info._string; 
+	return stm; 
+} 
  
 typedef std::vector<unsigned int> IntArray;  
  
@@ -188,7 +202,7 @@ typedef std::map<std::string, TestFloatData> TestFloatDataMap;
  
 typedef std::map<std::string, TestStringData> TestStringDataMap;  
  
-const unsigned short ID_EchoPack = 30000;  
+const unsigned short ID_EchoPack = 65535;  
 struct EchoPack 
 { 
 	TestIntegerDataArray _iarray;  
@@ -197,7 +211,7 @@ struct EchoPack
 	TestIntegerDataMap _imap;  
 	TestFloatDataMap _fmap;  
 	TestStringDataMap _smap;  
-	inline unsigned short GetProtoID() { return 30000;} 
+	inline unsigned short GetProtoID() { return 65535;} 
 	inline std::string GetProtoName() { return "ID_EchoPack";} 
 }; 
 inline zsummer::proto4z::WriteStream & operator << (zsummer::proto4z::WriteStream & ws, const EchoPack & data) 
@@ -252,11 +266,16 @@ inline zsummer::proto4z::ReadStream & operator >> (zsummer::proto4z::ReadStream 
 	rs.skipOriginalData(sttLen - cursor); 
 	return rs; 
 } 
+inline zsummer::log4z::Log4zStream & operator << (zsummer::log4z::Log4zStream & stm, const EchoPack & info) 
+{ 
+	stm << "_iarray=" << info._iarray << ", _farray=" << info._farray << ", _sarray=" << info._sarray << ", _imap=" << info._imap << ", _fmap=" << info._fmap << ", _smap=" << info._smap; 
+	return stm; 
+} 
  
-const unsigned short ID_Pulse = 30001;  
+const unsigned short ID_Pulse = 65535;  
 struct Pulse 
 { 
-	inline unsigned short GetProtoID() { return 30001;} 
+	inline unsigned short GetProtoID() { return 65535;} 
 	inline std::string GetProtoName() { return "ID_Pulse";} 
 }; 
 inline zsummer::proto4z::WriteStream & operator << (zsummer::proto4z::WriteStream & ws, const Pulse & data) 
@@ -280,6 +299,11 @@ inline zsummer::proto4z::ReadStream & operator >> (zsummer::proto4z::ReadStream 
 	cursor = cursor - rs.getStreamUnreadLen(); 
 	rs.skipOriginalData(sttLen - cursor); 
 	return rs; 
+} 
+inline zsummer::log4z::Log4zStream & operator << (zsummer::log4z::Log4zStream & stm, const Pulse & info) 
+{ 
+; 
+	return stm; 
 } 
  
 #endif 

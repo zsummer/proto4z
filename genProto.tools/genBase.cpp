@@ -107,7 +107,7 @@ void GenBase::write(const std::string & content)
 {
 	std::string filename = SupportLanguageFilePath[_type];
 	filename += "/";
-	filename += filename;
+	filename += _filename;
 	filename += SupportLanguageFileSuffix[_type];
 	std::ofstream os;
 	os.open(filename, std::ios::binary);

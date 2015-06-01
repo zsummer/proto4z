@@ -65,9 +65,9 @@ Proto4z.TestStringDataMap.__getDesc = "map"
 Proto4z.TestStringDataMap.__getTypeK = "string" 
 Proto4z.TestStringDataMap.__getTypeV = "TestStringData" 
  
-Proto4z.register(30000,"EchoPack") 
+Proto4z.register(65535,"EchoPack") 
 Proto4z.EchoPack = {}  
-Proto4z.EchoPack.__getID = 30000 
+Proto4z.EchoPack.__getID = 65535 
 Proto4z.EchoPack.__getName = "EchoPack" 
 Proto4z.EchoPack.__getTag = "111111" 
 Proto4z.EchoPack[1] = {name="_iarray", type="TestIntegerDataArray" }  
@@ -77,8 +77,8 @@ Proto4z.EchoPack[4] = {name="_imap", type="TestIntegerDataMap" }
 Proto4z.EchoPack[5] = {name="_fmap", type="TestFloatDataMap" }  
 Proto4z.EchoPack[6] = {name="_smap", type="TestStringDataMap" }  
  
-Proto4z.register(30001,"Pulse") 
+Proto4z.register(65535,"Pulse") 
 Proto4z.Pulse = {}  
-Proto4z.Pulse.__getID = 30001 
+Proto4z.Pulse.__getID = 65535 
 Proto4z.Pulse.__getName = "Pulse" 
 Proto4z.Pulse.__getTag = "" 
