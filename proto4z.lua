@@ -86,7 +86,7 @@ function Proto4z.register(id, name)
 		Proto4z.__protos = {}
 	end
 	if Proto4z.__protos[id] ~= nil then
-		error("id already register. id=" .. id .. " registrered name=" .. Proto4z.__protos[id]  .. ", new name=" .. protoName .. ": " .. debug.traceback())
+		error("id already register. id=" .. id .. " registrered name=" .. Proto4z.__protos[id]  .. ", new name=" .. name .. ": " .. debug.traceback())
 	end
 	if type(name) ~= "string" then
 		error("name ~= string " .. debug.traceback())
