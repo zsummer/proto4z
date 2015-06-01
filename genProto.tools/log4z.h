@@ -172,6 +172,12 @@
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 #endif
+#include <vector>
+#include <map>
+#include <list>
+#include <queue>
+#include <deque>
+
 
 //! logger ID type. DO NOT TOUCH
 typedef int LoggerId;
@@ -337,7 +343,7 @@ _ZSUMMER_END
 
 //! base micro.
 #define LOG_STREAM(id, level, log)\
-{\
+do{\
 	if (zsummer::log4z::ILog4zManager::getPtr()->prePushLog(id,level)) \
 	{\
 		char logBuf[LOG4Z_LOG_BUF_SIZE];\
@@ -345,7 +351,7 @@ _ZSUMMER_END
 		ss << log;\
 		zsummer::log4z::ILog4zManager::getPtr()->pushLog(id, level, logBuf, __FILE__, __LINE__);\
 	}\
-}
+} while (0)
 
 
 //! fast micro
@@ -371,24 +377,24 @@ _ZSUMMER_END
 #ifdef LOG4Z_FORMAT_INPUT_ENABLE
 #ifdef WIN32
 #define LOG_FORMAT(id, level, logformat, ...) \
-{ \
+do{ \
 	if (zsummer::log4z::ILog4zManager::getPtr()->prePushLog(id,level)) \
 	{\
 		char logbuf[LOG4Z_LOG_BUF_SIZE]; \
 		_snprintf_s(logbuf, LOG4Z_LOG_BUF_SIZE, _TRUNCATE, logformat, ##__VA_ARGS__); \
 		zsummer::log4z::ILog4zManager::getPtr()->pushLog(id, level, logbuf, __FILE__, __LINE__); \
 	}\
- }
+} while (0)
 #else
 #define LOG_FORMAT(id, level, logformat, ...) \
-{ \
+do{ \
 	if (zsummer::log4z::ILog4zManager::getPtr()->prePushLog(id,level)) \
 	{\
 		char logbuf[LOG4Z_LOG_BUF_SIZE]; \
 		snprintf(logbuf, LOG4Z_LOG_BUF_SIZE,logformat, ##__VA_ARGS__); \
 		zsummer::log4z::ILog4zManager::getPtr()->pushLog(id, level, logbuf, __FILE__, __LINE__); \
 	} \
-}
+}while(0)
 #endif
 //!format string
 #define LOGFMT_TRACE(id, fmt, ...)  LOG_FORMAT(id, LOG_LEVEL_TRACE, fmt, ##__VA_ARGS__)
@@ -495,6 +501,17 @@ public:
 	inline Log4zStream & operator <<(const std::basic_string<_Elem, _Traits, _Alloc> & t){ return *this << t.c_str(); }
 
 	inline Log4zStream & operator << (const zsummer::log4z::Log4zBinary & binary){ return writeBinary(binary); }
+
+	template<class _Elem, class _Alloc>
+	inline Log4zStream & operator <<(const std::vector<_Elem, _Alloc> & t){ *this << "vector[size="; *this << t.size(); return *this << "]"; }
+	template<class _Elem, class _Alloc>
+	inline Log4zStream & operator <<(const std::list<_Elem, _Alloc> & t){ *this << "list[size="; *this << t.size(); return *this << "]"; }
+	template<class _Elem, class _Alloc>
+	inline Log4zStream & operator <<(const std::deque<_Elem, _Alloc> & t){ *this << "deque[size="; *this << t.size(); return *this << "]"; }
+	template<class _Elem, class _Alloc>
+	inline Log4zStream & operator <<(const std::queue<_Elem, _Alloc> & t){ *this << "queue[size="; *this << t.size(); return *this << "]"; }
+	template<class _K, class _V, class _Pr, class _Alloc>
+	inline Log4zStream & operator <<(const std::map<_K, _V, _Pr, _Alloc> & t){ *this << "map[size="; *this << t.size(); return *this << "]"; }
 
 private:
 	Log4zStream(){}
