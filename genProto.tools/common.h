@@ -89,7 +89,7 @@ enum SupportLanguageType
 	SL_END,
 };
 
-static const char * SupportLanguageString[] = 
+const char * const SupportLanguageString[] =
 {
 	"",
 	"cppmd5",
@@ -100,7 +100,7 @@ static const char * SupportLanguageString[] =
 	""
 };
 
-static const char * SupportLanguageFileSuffix[] =
+const char * const SupportLanguageFileSuffix[] =
 {
 	"",
 	".h",
@@ -112,7 +112,7 @@ static const char * SupportLanguageFileSuffix[] =
 };
 
 
-static const char * SupportLanguageFilePath[] =
+const char * const SupportLanguageFilePath[] =
 {
 	"",
 	"C++",
