@@ -61,17 +61,17 @@ class ParseCache
 	std::string _fileName;
 	std::string _md5Cache[SL_END];
 	//cache data
-	unsigned short _nextNumber = 0;
+	unsigned short _currentProtoID = 0;
 
 	std::map<std::string, unsigned short> _cacheNumber;
 public:
 	void parse(std::string filename);
 	bool  write();
 	bool isNeedUpdate();
-	inline void setNextNumber(unsigned short n){ _nextNumber = n; }
-	inline unsigned short getNextNumber(){ return _nextNumber; }
-	unsigned short genNextNumber(std::string key, unsigned short _minNumber, unsigned short _maxNumber);
-
+	inline void setCurrentProtoID(unsigned short n){ _currentProtoID = n; }
+	inline unsigned short getCurrentProtoID(){ return _currentProtoID; }
+	unsigned short genProtoID(std::string key, unsigned short minProtoID, unsigned short maxProtoID);
+protected:
 	unsigned short getCacheNumber(std::string key);
 	bool setCacheNumber(std::string key, unsigned short number);
 };

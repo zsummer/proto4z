@@ -63,15 +63,11 @@ void processTag(std::list<AnyData> & data)
 
 std::list<AnyData> parseProto(std::string fileName, ParseCache & cache)
 {
-	unsigned short _minNumber = 0;
-	unsigned short _maxNumber = 0;
+	unsigned short minProtoID = 0;
+	unsigned short maxProtoID = 0;
 	std::list<AnyData> anydata;
-	cache.parse(fileName);
-	if (!cache.isNeedUpdate())
-	{
-		return anydata;
-	}
-	cache.parse(fileName);
+
+
 	std::string filename = fileName + ".xml";
 
 	if (!zsummer::utility::GetFileStatus(filename, 6))
@@ -94,24 +90,24 @@ std::list<AnyData> parseProto(std::string fileName, ParseCache & cache)
 		{
 			E("doc.FirstChildElement(\"ProtoTraits\") Error.");
 		}
-		auto minNumber = ele->FirstChildElement("MinNo");
-		auto maxNumber = ele->FirstChildElement("MaxNo");
-		if (!minNumber || !minNumber->GetText() || !maxNumber || !maxNumber->GetText())
+		auto minNo = ele->FirstChildElement("MinNo");
+		auto maxNo = ele->FirstChildElement("MaxNo");
+		if (!minNo || !minNo->GetText() || !maxNo || !maxNo->GetText())
 		{
 			E("FirstChildElement(\"MinNo\") || FirstChildElement(\"MaxNo\")  Error");
 		}
-		_minNumber = atoi(minNumber->GetText());
-		_maxNumber = atoi(maxNumber->GetText());
-		if (cache.getNextNumber() < _minNumber)
+		minProtoID = atoi(minNo->GetText());
+		maxProtoID = atoi(maxNo->GetText());
+		if (cache.getCurrentProtoID() < minProtoID)
 		{
-			cache.setNextNumber(_minNumber);
+			cache.setCurrentProtoID(minProtoID);
 		}
-		if (cache.getNextNumber() > _minNumber)
+		if (cache.getCurrentProtoID() > maxProtoID)
 		{
-			E("Current cache Proto No Error. NextNumber=" << cache.getNextNumber() << ", minNo=" << _minNumber << ", maxNo=" << _maxNumber);
+			E("Current cache Proto No Error. NextNumber=" << cache.getCurrentProtoID() << ", minNo=" << minProtoID << ", maxNo=" << maxProtoID);
 		}
 	} while (0);
-	LOGI("parseConfig [" << filename << "] NextNumber=" << cache.getNextNumber() << ", minProtoNo=" << _minNumber << ", maxProtoNo=" << _maxNumber);
+	LOGI("parseConfig [" << filename << "] NextNumber=" << cache.getCurrentProtoID() << ", minProtoNo=" << minProtoID << ", maxProtoNo=" << maxProtoID);
 
 
 	{
@@ -275,7 +271,7 @@ std::list<AnyData> parseProto(std::string fileName, ParseCache & cache)
 					dp._const._type = ProtoIDType;
 					dp._const._name = "ID_"  + dp._struct._name;
 					dp._const._desc = dp._struct._desc;
-					dp._const._value = boost::lexical_cast<std::string>(cache.genNextNumber(dp._const._name, _minNumber, _maxNumber));
+					dp._const._value = boost::lexical_cast<std::string>(cache.genProtoID(dp._const._name, minProtoID, maxProtoID));
 				}
 
 				XMLElement * member = ele->FirstChildElement("member");

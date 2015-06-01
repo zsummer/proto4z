@@ -6,4 +6,6 @@
 <sqlmd5></sqlmd5> 
 <xmlmd5>171e0ce000df7cd3cb07422ba3561e99</xmlmd5> 
 <cacheNumber>
+	<cache key = "ID_EchoPack" Number = "30000" /> 
+	<cache key = "ID_Pulse" Number = "30001" /> 
 </cacheNumber>

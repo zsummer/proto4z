@@ -49,7 +49,8 @@ void ParseCache::parse(std::string filename)
 	std::string configFile = filename + ".xml.cache";
 	if (!zsummer::utility::GetFileStatus(configFile, 6))
 	{
-		E("ParseCache::parse [" << configFile << " not found.");
+		LOGW("ParseCache::parse [" << configFile << " not found.");
+		return;
 	}
 	tinyxml2::XMLDocument doc;
 	if (doc.LoadFile(configFile.c_str()) != tinyxml2::XML_SUCCESS)
@@ -95,9 +96,9 @@ void ParseCache::parse(std::string filename)
 		}
 		_cacheNumber[key] = atoi(number);
 
-		if (_nextNumber <= atoi(number))
+		if (_currentProtoID <= atoi(number))
 		{
-			_nextNumber = atoi(number) + 1;
+			_currentProtoID = atoi(number) + 1;
 		}
 
 		next = next->NextSiblingElement("cache");
@@ -171,14 +172,14 @@ bool ParseCache::setCacheNumber(std::string key, unsigned short number)
 	return true;
 }
 
-unsigned short ParseCache::genNextNumber(std::string key, unsigned short _minNumber, unsigned short _maxNumber)
+unsigned short ParseCache::genProtoID(std::string key, unsigned short minProtoID, unsigned short maxProtoID)
 {
 	unsigned short ret = getCacheNumber(key);
-	if (ret == -1)
+	if (ret == (unsigned short)-1)
 	{
-		ret = _nextNumber++;
+		ret = _currentProtoID++;
 		setCacheNumber(key, ret);
-		if (ret < _minNumber || ret >= _maxNumber)
+		if (ret < minProtoID || ret >= maxProtoID)
 		{
 			E("proto number override. key=" << key << ", next number=" << ret);
 		}

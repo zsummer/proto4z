@@ -408,7 +408,7 @@ namespace Proto4z
  
 	class EchoPack: Proto4z.IProtoObject 
 	{	 
-		static public Proto4z.ui16 getProtoID() { return new Proto4z.ui16(65535); } 
+		static public Proto4z.ui16 getProtoID() { return new Proto4z.ui16(30000); } 
 		static public string getProtoName() { return "EchoPack"; } 
 		public TestIntegerDataArray _iarray;  
 		public TestFloatDataArray _farray;  
@@ -478,7 +478,7 @@ namespace Proto4z
  
 	class Pulse: Proto4z.IProtoObject 
 	{	 
-		static public Proto4z.ui16 getProtoID() { return new Proto4z.ui16(65535); } 
+		static public Proto4z.ui16 getProtoID() { return new Proto4z.ui16(30001); } 
 		static public string getProtoName() { return "Pulse"; } 
 		public System.Collections.Generic.List<byte> __encode() 
 		{ 
