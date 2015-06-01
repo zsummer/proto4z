@@ -34,15 +34,10 @@
  * (end of COPYRIGHT)
  */
 
-#ifndef _CRT_SECURE_NO_WARNINGS
-#define  _CRT_SECURE_NO_WARNINGS
-#endif
-#include "genProto.h"
-#include <time.h>
-#include <algorithm>
 
+#include "genLUA.h"
 
-bool genLuaFile(std::string filename, std::vector<AnyData> & stores)
+std::string GenLUA::genRealContent(const std::list<AnyData> & stores)
 {
 	std::string text;
 	for (auto &info : stores)
@@ -116,7 +111,6 @@ bool genLuaFile(std::string filename, std::vector<AnyData> & stores)
 			text += "Proto4z." + info._proto._struct._name + ".__getName = \"" + info._proto._struct._name + "\"" + LFCR;
 
 	
-			info._proto._struct._tag = 0;
 			std::string tag = "";
 			for (auto &m : info._proto._struct._members)
 			{
@@ -152,16 +146,7 @@ bool genLuaFile(std::string filename, std::vector<AnyData> & stores)
 	}
 
 
-	std::ofstream os;
-	os.open(getLuaFile(filename), std::ios::binary);
-	if (!os.is_open())
-	{
-		LOGE("genLUAFile open file Error. : " << getLuaFile(filename));
-		return false;
-	}
-	os.write(text.c_str(), text.length());
-	os.close();
-	return true;
+	return std::move(text);
 }
 
 

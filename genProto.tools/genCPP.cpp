@@ -34,26 +34,31 @@
  * (end of COPYRIGHT)
  */
 
-#ifndef _CRT_SECURE_NO_WARNINGS
-#define  _CRT_SECURE_NO_WARNINGS
-#endif
-#include "genProto.h"
-#include <time.h>
-#include <algorithm>
 
-std::string getCPPType(std::string type)
+#include "genCPP.h"
+
+
+
+std::string GenCPP::getRealType(const std::string & xmltype)
 {
-	auto founder = xmlTypeToCPPType.find(type);
-	if (founder != xmlTypeToCPPType.end() && !founder->second.empty())
-	{
-		type = founder->second;
-	}
-	return type;
+	if ( xmltype == "i8") return "char";
+	else if ( xmltype == "ui8") return "unsigned char";
+	else if ( xmltype == "i16") return "short";
+	else if ( xmltype == "ui16") return "unsigned short";
+	else if ( xmltype == "i32") return "int";
+	else if ( xmltype == "ui32") return "unsigned int";
+	else if ( xmltype == "i64") return "long long";
+	else if ( xmltype == "ui64") return "unsigned long long";
+	else if ( xmltype == "float") return "float";
+	else if ( xmltype == "double") return "double";
+	else if ( xmltype == "string") return "std::string";
+	return xmltype;
 }
 
-bool genCppFile(std::string filename, std::vector<AnyData> & stores, bool genLog4z)
+
+std::string GenCPP::genRealContent(const std::list<AnyData> & stores)
 {
-	std::string macroFileName = std::string("_") + filename  + "_H_";
+	std::string macroFileName = std::string("_") + _filename  + "_H_";
 	std::transform(macroFileName.begin(), macroFileName.end(), macroFileName.begin(), [](char ch){ return std::toupper(ch); });
 
 
@@ -73,7 +78,7 @@ bool genCppFile(std::string filename, std::vector<AnyData> & stores, bool genLog
 		}
 		else if (info._type == GT_DataConstValue)
 		{
-			text += "const " + getCPPType(info._const._type) + " " + info._const._name + " = " + info._const._value + "; ";
+			text += "const " + getRealType(info._const._type) + " " + info._const._name + " = " + info._const._value + "; ";
 			if (!info._const._desc.empty())
 			{
 				text += "//" + info._const._desc;
@@ -82,7 +87,7 @@ bool genCppFile(std::string filename, std::vector<AnyData> & stores, bool genLog
 		}
 		else if (info._type == GT_DataArray)
 		{
-			text += LFCR + "typedef std::vector<" + getCPPType(info._array._type) + "> " + info._array._arrayName + "; ";
+			text += LFCR + "typedef std::vector<" + getRealType(info._array._type) + "> " + info._array._arrayName + "; ";
 			if (!info._array._desc.empty())
 			{
 				text += "//" + info._array._desc;
@@ -92,7 +97,7 @@ bool genCppFile(std::string filename, std::vector<AnyData> & stores, bool genLog
 		else if (info._type == GT_DataMap)
 		{
 			text += LFCR + "typedef std::map<"
-				+ getCPPType(info._map._typeKey) + ", " + getCPPType(info._map._typeValue) 
+				+ getRealType(info._map._typeKey) + ", " + getRealType(info._map._typeValue)
 				+ "> " + info._map._mapName + "; ";
 			if (!info._map._desc.empty())
 			{
@@ -106,7 +111,7 @@ bool genCppFile(std::string filename, std::vector<AnyData> & stores, bool genLog
 			//write ProtoID
 			if (info._type == GT_DataProto)
 			{
-				text += "const " + getCPPType(info._proto._const._type) + " " 
+				text += "const " + getRealType(info._proto._const._type) + " " 
 					+ info._proto._const._name + " = " + info._proto._const._value + "; ";
 				if (!info._proto._const._desc.empty())
 				{
@@ -124,18 +129,10 @@ bool genCppFile(std::string filename, std::vector<AnyData> & stores, bool genLog
 			text += LFCR;
 			text += "{" + LFCR;
 
-			info._proto._struct._tag = 0;
-			int curTagIndex = 0;
+
 			for (const auto & m : info._proto._struct._members)
 			{
-				if (m._tag != MT_DELETE)
-				{
-					info._proto._struct._tag |= (1ULL << curTagIndex);
-				}
-				curTagIndex++;
-
-				
-				text += "\t" + getCPPType(m._type) + " " + m._name + "; ";
+				text += "\t" + getRealType(m._type) + " " + m._name + "; ";
 				if (m._tag == MT_DELETE)
 				{
 					text += "//[already deleted]";
@@ -153,10 +150,10 @@ bool genCppFile(std::string filename, std::vector<AnyData> & stores, bool genLog
 				std::string memberText;
 				for (const auto &m : info._proto._struct._members)
 				{
-					auto founder = xmlTypeToCPPDefaultValue.find(m._type);
-					if (founder != xmlTypeToCPPDefaultValue.end() && !founder->second.empty())
+					std::string def = getTypeDefault(m._type);
+					if (!def.empty())
 					{
-						memberText += "\t\t" + m._name + " = " + founder->second + ";" + LFCR;
+						memberText += "\t\t" + m._name + " = " + def + ";" + LFCR;
 					}
 				}
 				if (!memberText.empty())
@@ -168,8 +165,8 @@ bool genCppFile(std::string filename, std::vector<AnyData> & stores, bool genLog
 			}
 			if (info._type == GT_DataProto)
 			{
-				text += std::string("\tinline ") + getCPPType(ProtoIDType) + " GetProtoID() { return " + info._proto._const._value + ";}" + LFCR;
-				text += std::string("\tinline ") + getCPPType("string") + " GetProtoName() { return \""
+				text += std::string("\tinline ") + getRealType(ProtoIDType) + " GetProtoID() { return " + info._proto._const._value + ";}" + LFCR;
+				text += std::string("\tinline ") + getRealType("string") + " GetProtoName() { return \""
 					+ info._proto._const._name + "\";}" + LFCR;
 			}
 			text += "};" + LFCR;
@@ -208,7 +205,7 @@ bool genCppFile(std::string filename, std::vector<AnyData> & stores, bool genLog
 			text += "\tunsigned long long tag = 0;" + LFCR;
 			text += "\trs >> tag;" + LFCR;
 			text += "\tif (zsummer::proto4z::__localEndianType() != zsummer::proto4z::LittleEndian) tag = zsummer::proto4z::reversalInteger(tag);" + LFCR;
-			curTagIndex = 0;
+			int curTagIndex = 0;
 			for (const auto &m : info._proto._struct._members)
 			{
 				text += "\tif ( (1ULL << " + boost::lexical_cast<std::string, int>(curTagIndex)+") & tag)" + LFCR;
@@ -223,7 +220,7 @@ bool genCppFile(std::string filename, std::vector<AnyData> & stores, bool genLog
 			text += "}" + LFCR;
 
 			//input log4z operator
-			if (genLog4z)
+			if (true)
 			{
 				text += "inline zsummer::log4z::Log4zStream & operator << (zsummer::log4z::Log4zStream & stm, const " + info._proto._struct._name + " & info)" + LFCR;
 				text += "{" + LFCR;
@@ -249,14 +246,5 @@ bool genCppFile(std::string filename, std::vector<AnyData> & stores, bool genLog
 	}
 	text += LFCR + "#endif" + LFCR;
 
-	std::ofstream os;
-	os.open(getCPPFile(filename), std::ios::binary);
-	if (!os.is_open())
-	{
-		LOGE("genCppFile open file Error. : " << getCPPFile(filename));
-		return false;
-	}
-	os.write(text.c_str(), text.length());
-	os.close();
-	return true;
+	return std::move(text);
 }

@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF - 8"?>
 
-<xmlmd5>171e0ce000df7cd3cb07422ba3561e99</xmlmd5>
-<cppmd5>c0d74a550c9b47f01d162203440e6dfc</cppmd5>
-<luamd5>a5c8bd93e2329c7e90b19557e8e68985</luamd5>
-<csharpmd5>b78974a9df1c304d40534fd03c6f2e19</csharpmd5>
-<sqlmd5>f655aea9f2b68484e37775c9d39af47b</sqlmd5>
-
-<cacheNo>
-	<cache key = "ID_EchoPack" No = "30000" /> 
-	<cache key = "ID_Pulse" No = "30001" /> 
-</cacheNo>
+<cppmd5></cppmd5> 
+<luamd5></luamd5> 
+<csharpmd5></csharpmd5> 
+<sqlmd5></sqlmd5> 
+<xmlmd5>171e0ce000df7cd3cb07422ba3561e99</xmlmd5> 
+<cacheNumber>
+	<cache key = "ID_EchoPack" Number = "30000" /> 
+	<cache key = "ID_Pulse" Number = "30001" /> 
+</cacheNumber>

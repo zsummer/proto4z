@@ -37,28 +37,28 @@
 #ifndef _CRT_SECURE_NO_WARNINGS
 #define  _CRT_SECURE_NO_WARNINGS
 #endif
-#include "genProto.h"
+#include "genCSharp.h"
 #include <time.h>
 #include <algorithm>
 
-
-std::string getCSharpType(std::string type)
+std::string GenCSharp::getRealType(const std::string & xmltype)
 {
-	auto founder = xmlTypeToCSharpType.find(type);
-	if (founder != xmlTypeToCSharpType.end() && !founder->second.empty())
-	{
-		type = founder->second;
-	}
-	else
-	{
-		type = std::string("Proto4z.") + type;
-	}
-	return type;
+	if ( xmltype == "i8") return "Proto4z.i8";
+	else if ( xmltype == "ui8") return "Proto4z.ui8";
+	else if ( xmltype == "i16") return "Proto4z.i16";
+	else if ( xmltype == "ui16") return "Proto4z.ui16";
+	else if ( xmltype == "i32") return "Proto4z.i32";
+	else if ( xmltype == "ui32") return "Proto4z.ui32";
+	else if ( xmltype == "i64") return "Proto4z.i64";
+	else if ( xmltype == "ui64") return "Proto4z.ui64";
+	else if ( xmltype == "float") return "Proto4z.Float";
+	else if ( xmltype == "double") return "Proto4z.Double";
+	else if ( xmltype == "string") return "Proto4z.String";
+	return xmltype;
 }
 
-bool genCSharpFile(std::string filename, std::vector<AnyData> & stores)
+std::string GenCSharp::genRealContent(const std::list<AnyData> & stores)
 {
-
 	std::string text = LFCR;
 
 	{
@@ -83,12 +83,12 @@ bool genCSharpFile(std::string filename, std::vector<AnyData> & stores)
 			}
 			text += LFCR;
 			text += "\t{" + LFCR;
-			text += "\t\tpublic static " + getCSharpType(info._const._type) + " value = " + info._const._value + "; " + LFCR;
+			text += "\t\tpublic static " + getRealType(info._const._type) + " value = " + info._const._value + "; " + LFCR;
 			text += "\t}" + LFCR;
 		}
 		else if (info._type == GT_DataArray)
 		{
-			text += LFCR + "\tclass " + info._array._arrayName + " : System.Collections.Generic.List<" + getCSharpType(info._array._type) + ">, Proto4z.IProtoObject ";
+			text += LFCR + "\tclass " + info._array._arrayName + " : System.Collections.Generic.List<" + getRealType(info._array._type) + ">, Proto4z.IProtoObject ";
 			if (!info._array._desc.empty())
 			{
 				text += "//" + info._array._desc;
@@ -116,7 +116,7 @@ bool genCSharpFile(std::string filename, std::vector<AnyData> & stores)
 			text += "\t\t\t"   "{" + LFCR;
 			text += "\t\t\t\t"  "for (int i=0; i<len.val; i++)" + LFCR;
 			text += "\t\t\t\t"   "{" + LFCR;
-			text += "\t\t\t\t\t" "var data = new " + getCSharpType(info._array._type) + "();" + LFCR;
+			text += "\t\t\t\t\t" "var data = new " + getRealType(info._array._type) + "();" + LFCR;
 			text += "\t\t\t\t\t"  " data.__decode(binData, ref pos);" + LFCR;
 			text += "\t\t\t\t\t"  "this.Add(data);" + LFCR;
 			text += "\t\t\t\t"   "}" + LFCR;
@@ -127,7 +127,7 @@ bool genCSharpFile(std::string filename, std::vector<AnyData> & stores)
 		}
 		else if (info._type == GT_DataMap)
 		{
-			text += LFCR + "\tclass " + info._map._mapName + " : System.Collections.Generic.Dictionary<" + getCSharpType(info._map._typeKey) + ", " + getCSharpType(info._map._typeValue)  + ">, Proto4z.IProtoObject ";
+			text += LFCR + "\tclass " + info._map._mapName + " : System.Collections.Generic.Dictionary<" + getRealType(info._map._typeKey) + ", " + getRealType(info._map._typeValue) + ">, Proto4z.IProtoObject ";
 			if (!info._array._desc.empty())
 			{
 				text += "//" + info._array._desc;
@@ -156,8 +156,8 @@ bool genCSharpFile(std::string filename, std::vector<AnyData> & stores)
 			text += "\t\t\t"   "{" + LFCR;
 			text += "\t\t\t\t"   "for (int i=0; i<len.val; i++)" + LFCR;
 			text += "\t\t\t\t"   "{" + LFCR;
-			text += "\t\t\t\t\t"   "var key = new " + getCSharpType(info._map._typeKey) + "();" + LFCR;
-			text += "\t\t\t\t\t"   "var val = new " + getCSharpType(info._map._typeValue) + "();" + LFCR;
+			text += "\t\t\t\t\t"   "var key = new " + getRealType(info._map._typeKey) + "();" + LFCR;
+			text += "\t\t\t\t\t"   "var val = new " + getRealType(info._map._typeValue) + "();" + LFCR;
 			text += "\t\t\t\t\t"    "key.__decode(binData, ref pos);" + LFCR;
 			text += "\t\t\t\t\t"   "val.__decode(binData, ref pos);" + LFCR;
 			text += "\t\t\t\t\t"   "this.Add(key, val);" + LFCR;
@@ -186,26 +186,15 @@ bool genCSharpFile(std::string filename, std::vector<AnyData> & stores)
 				text += "\t\t" "static public string getProtoName() { return \"" + info._proto._struct._name + "\"; }" + LFCR;
 			}
 
-			info._proto._struct._tag = 0;
-			int curTagIndex = 0;
 			for (const auto & m : info._proto._struct._members)
 			{
-				{
-					if (m._tag != MT_DELETE)
-					{
-						info._proto._struct._tag |= (1ULL << curTagIndex);
-					}
-					curTagIndex++;
-				}
-				text += "\t\tpublic " + getCSharpType(m._type) + " " + m._name + "; ";
+				text += "\t\tpublic " + getRealType(m._type) + " " + m._name + "; ";
 				if (!m._desc.empty())
 				{
 					text += "//" + m._desc;
 				}
 				text += LFCR;
 			}
-
-
 
 			//encode
 			text += "\t\tpublic System.Collections.Generic.List<byte> __encode()" + LFCR;
@@ -244,7 +233,7 @@ bool genCSharpFile(std::string filename, std::vector<AnyData> & stores)
 			int i = 0;
 			for (const auto &m : info._proto._struct._members)
 			{
-				text += "\t\t\t" + m._name + " = new " + getCSharpType(m._type) + "();" + LFCR;
+				text += "\t\t\t" + m._name + " = new " + getRealType(m._type) + "();" + LFCR;
 				text += "\t\t\t" "if ((tag.val & ((System.UInt64)1 << " + boost::lexical_cast<std::string, int>(i) + ")) != 0)" + LFCR;
 				text += "\t\t\t" "{" + LFCR;
 				text += "\t\t\t\t" + m._name + ".__decode(binData, ref pos);" + LFCR;
@@ -261,16 +250,7 @@ bool genCSharpFile(std::string filename, std::vector<AnyData> & stores)
 	text += "}" + LFCR;
 	text += LFCR + LFCR;
 
-	std::ofstream os;
-	os.open(getCSharpFile(filename), std::ios::binary);
-	if (!os.is_open())
-	{
-		LOGE("genCSharpFile open file Error. : " << getCSharpFile(filename));
-		return false;
-	}
-	os.write(text.c_str(), text.length());
-	os.close();
-	return true;
+	return text;
 }
 
 

@@ -191,6 +191,7 @@ int luaopen_protoz_bit(lua_State *L)
 		lua_pushcclosure(L, l->func, 0);  /* closure with those upvalues */
 		lua_setfield(L, -2, l->name);
 	}
+	lua_pop(L, 1);
 	return 0;
 }
 

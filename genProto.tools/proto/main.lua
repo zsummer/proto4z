@@ -59,7 +59,7 @@ local echo = {  _iarray = {{_char=1,_uchar=2,_short=3,_ushort=4,_int=5,_uint=6,_
 proto.dump(echo)
 
 local now = os.time()
-for i=1, 100000 do
+for i=1, 10000 do
 	local data = proto.encode(echo, "EchoPack")
 	--proto.putbin(data)
 	local dr = proto.decode(data, proto.getName(proto.EchoPack.__getID)) -- "EchoPack"
@@ -68,6 +68,11 @@ for i=1, 100000 do
 end
 now = os.time() - now
 print(now)
+
+local num = "101200010000"
+local bin = proto.stringToStream(num)
+num = proto.streamToString(bin)
+print(num)
 
 
 

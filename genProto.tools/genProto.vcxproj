@@ -19,22 +19,32 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="genBase.cpp" />
     <ClCompile Include="genCPP.cpp" />
     <ClCompile Include="genCSharp.cpp" />
     <ClCompile Include="genLUA.cpp" />
-    <ClCompile Include="genProto.cpp" />
     <ClCompile Include="genSQL.cpp" />
     <ClCompile Include="log4z.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="md5.cpp" />
+    <ClCompile Include="parseCache.cpp" />
+    <ClCompile Include="parseProto.cpp" />
     <ClCompile Include="tinyxml2.cpp" />
     <ClCompile Include="utility.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="any.h" />
+    <ClInclude Include="common.h" />
+    <ClInclude Include="genBase.h" />
+    <ClInclude Include="genCPP.h" />
+    <ClInclude Include="genCSharp.h" />
+    <ClInclude Include="genLUA.h" />
+    <ClInclude Include="genSQL.h" />
     <ClInclude Include="log4z.h" />
     <ClInclude Include="md5.h" />
+    <ClInclude Include="parseCache.h" />
+    <ClInclude Include="parseProto.h" />
     <ClInclude Include="tinyxml2.h" />
-    <ClInclude Include="genProto.h" />
     <ClInclude Include="utility.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

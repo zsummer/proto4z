@@ -211,7 +211,7 @@ namespace Proto4z
 		} 
 	} 
  
-	class TestIntegerDataArray : System.Collections.Generic.List<Proto4z.TestIntegerData>, Proto4z.IProtoObject  
+	class TestIntegerDataArray : System.Collections.Generic.List<TestIntegerData>, Proto4z.IProtoObject  
 	{ 
 		public System.Collections.Generic.List<byte> __encode() 
 		{ 
@@ -233,7 +233,7 @@ namespace Proto4z
 			{ 
 				for (int i=0; i<len.val; i++) 
 				{ 
-					var data = new Proto4z.TestIntegerData(); 
+					var data = new TestIntegerData(); 
 					 data.__decode(binData, ref pos); 
 					this.Add(data); 
 				} 
@@ -242,7 +242,7 @@ namespace Proto4z
 		} 
 	} 
  
-	class TestFloatDataArray : System.Collections.Generic.List<Proto4z.TestFloatData>, Proto4z.IProtoObject  
+	class TestFloatDataArray : System.Collections.Generic.List<TestFloatData>, Proto4z.IProtoObject  
 	{ 
 		public System.Collections.Generic.List<byte> __encode() 
 		{ 
@@ -264,7 +264,7 @@ namespace Proto4z
 			{ 
 				for (int i=0; i<len.val; i++) 
 				{ 
-					var data = new Proto4z.TestFloatData(); 
+					var data = new TestFloatData(); 
 					 data.__decode(binData, ref pos); 
 					this.Add(data); 
 				} 
@@ -273,7 +273,7 @@ namespace Proto4z
 		} 
 	} 
  
-	class TestStringDataArray : System.Collections.Generic.List<Proto4z.TestStringData>, Proto4z.IProtoObject  
+	class TestStringDataArray : System.Collections.Generic.List<TestStringData>, Proto4z.IProtoObject  
 	{ 
 		public System.Collections.Generic.List<byte> __encode() 
 		{ 
@@ -295,7 +295,7 @@ namespace Proto4z
 			{ 
 				for (int i=0; i<len.val; i++) 
 				{ 
-					var data = new Proto4z.TestStringData(); 
+					var data = new TestStringData(); 
 					 data.__decode(binData, ref pos); 
 					this.Add(data); 
 				} 
@@ -304,7 +304,7 @@ namespace Proto4z
 		} 
 	} 
  
-	class TestIntegerDataMap : System.Collections.Generic.Dictionary<Proto4z.String, Proto4z.TestIntegerData>, Proto4z.IProtoObject  
+	class TestIntegerDataMap : System.Collections.Generic.Dictionary<Proto4z.String, TestIntegerData>, Proto4z.IProtoObject  
 	{ 
 		public System.Collections.Generic.List<byte> __encode() 
 		{ 
@@ -328,7 +328,7 @@ namespace Proto4z
 				for (int i=0; i<len.val; i++) 
 				{ 
 					var key = new Proto4z.String(); 
-					var val = new Proto4z.TestIntegerData(); 
+					var val = new TestIntegerData(); 
 					key.__decode(binData, ref pos); 
 					val.__decode(binData, ref pos); 
 					this.Add(key, val); 
@@ -338,7 +338,7 @@ namespace Proto4z
 		} 
 	} 
  
-	class TestFloatDataMap : System.Collections.Generic.Dictionary<Proto4z.String, Proto4z.TestFloatData>, Proto4z.IProtoObject  
+	class TestFloatDataMap : System.Collections.Generic.Dictionary<Proto4z.String, TestFloatData>, Proto4z.IProtoObject  
 	{ 
 		public System.Collections.Generic.List<byte> __encode() 
 		{ 
@@ -362,7 +362,7 @@ namespace Proto4z
 				for (int i=0; i<len.val; i++) 
 				{ 
 					var key = new Proto4z.String(); 
-					var val = new Proto4z.TestFloatData(); 
+					var val = new TestFloatData(); 
 					key.__decode(binData, ref pos); 
 					val.__decode(binData, ref pos); 
 					this.Add(key, val); 
@@ -372,7 +372,7 @@ namespace Proto4z
 		} 
 	} 
  
-	class TestStringDataMap : System.Collections.Generic.Dictionary<Proto4z.String, Proto4z.TestStringData>, Proto4z.IProtoObject  
+	class TestStringDataMap : System.Collections.Generic.Dictionary<Proto4z.String, TestStringData>, Proto4z.IProtoObject  
 	{ 
 		public System.Collections.Generic.List<byte> __encode() 
 		{ 
@@ -396,7 +396,7 @@ namespace Proto4z
 				for (int i=0; i<len.val; i++) 
 				{ 
 					var key = new Proto4z.String(); 
-					var val = new Proto4z.TestStringData(); 
+					var val = new TestStringData(); 
 					key.__decode(binData, ref pos); 
 					val.__decode(binData, ref pos); 
 					this.Add(key, val); 
@@ -410,12 +410,12 @@ namespace Proto4z
 	{	 
 		static public Proto4z.ui16 getProtoID() { return new Proto4z.ui16(30000); } 
 		static public string getProtoName() { return "EchoPack"; } 
-		public Proto4z.TestIntegerDataArray _iarray;  
-		public Proto4z.TestFloatDataArray _farray;  
-		public Proto4z.TestStringDataArray _sarray;  
-		public Proto4z.TestIntegerDataMap _imap;  
-		public Proto4z.TestFloatDataMap _fmap;  
-		public Proto4z.TestStringDataMap _smap;  
+		public TestIntegerDataArray _iarray;  
+		public TestFloatDataArray _farray;  
+		public TestStringDataArray _sarray;  
+		public TestIntegerDataMap _imap;  
+		public TestFloatDataMap _fmap;  
+		public TestStringDataMap _smap;  
 		public System.Collections.Generic.List<byte> __encode() 
 		{ 
 			Proto4z.ui32 sttLen = 0; 
@@ -442,32 +442,32 @@ namespace Proto4z
 			offset.__decode(binData, ref pos); 
 			offset.val += (System.UInt32)pos; 
 			tag.__decode(binData, ref pos); 
-			_iarray = new Proto4z.TestIntegerDataArray(); 
+			_iarray = new TestIntegerDataArray(); 
 			if ((tag.val & ((System.UInt64)1 << 0)) != 0) 
 			{ 
 				_iarray.__decode(binData, ref pos); 
 			} 
-			_farray = new Proto4z.TestFloatDataArray(); 
+			_farray = new TestFloatDataArray(); 
 			if ((tag.val & ((System.UInt64)1 << 1)) != 0) 
 			{ 
 				_farray.__decode(binData, ref pos); 
 			} 
-			_sarray = new Proto4z.TestStringDataArray(); 
+			_sarray = new TestStringDataArray(); 
 			if ((tag.val & ((System.UInt64)1 << 2)) != 0) 
 			{ 
 				_sarray.__decode(binData, ref pos); 
 			} 
-			_imap = new Proto4z.TestIntegerDataMap(); 
+			_imap = new TestIntegerDataMap(); 
 			if ((tag.val & ((System.UInt64)1 << 3)) != 0) 
 			{ 
 				_imap.__decode(binData, ref pos); 
 			} 
-			_fmap = new Proto4z.TestFloatDataMap(); 
+			_fmap = new TestFloatDataMap(); 
 			if ((tag.val & ((System.UInt64)1 << 4)) != 0) 
 			{ 
 				_fmap.__decode(binData, ref pos); 
 			} 
-			_smap = new Proto4z.TestStringDataMap(); 
+			_smap = new TestStringDataMap(); 
 			if ((tag.val & ((System.UInt64)1 << 5)) != 0) 
 			{ 
 				_smap.__decode(binData, ref pos); 
