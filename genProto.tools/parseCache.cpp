@@ -117,7 +117,7 @@ bool   ParseCache::write()
 	std::string text = "<?xml version=\"1.0\" encoding=\"UTF - 8\"?>\n\n";
 	for (int i = SL_NORMAL + 1; i < SL_END; i++)
 	{
-		std::string md5 = genFileMD5(std::string("./") + SupportLanguageFilePath[i] + _fileName + SupportLanguageFileSuffix[i]);
+		std::string md5 = genFileMD5(std::string("./") + SupportLanguageFilePath[i] + "/" + _fileName + SupportLanguageFileSuffix[i]);
 		text += std::string() + "<" + SupportLanguageString[i] + ">";
 		text += md5;
 		text += std::string() + "</" + SupportLanguageString[i] + ">" + LFCR;
