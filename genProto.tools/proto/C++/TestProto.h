@@ -97,11 +97,6 @@ inline zsummer::proto4z::ReadStream & operator >> (zsummer::proto4z::ReadStream 
     rs.skipOriginalData(sttLen - cursor); 
     return rs; 
 } 
-inline zsummer::log4z::Log4zStream & operator << (zsummer::log4z::Log4zStream & stm, const TestIntegerData & info) 
-{ 
-    stm << "_char=" << info._char << ", _uchar=" << info._uchar << ", _short=" << info._short << ", _ushort=" << info._ushort << ", _int=" << info._int << ", _uint=" << info._uint << ", _i64=" << info._i64 << ", _ui128=" << info._ui128 << ", _ui64=" << info._ui64; 
-    return stm; 
-} 
  
 struct TestFloatData //测试 
 { 
@@ -145,11 +140,6 @@ inline zsummer::proto4z::ReadStream & operator >> (zsummer::proto4z::ReadStream 
     rs.skipOriginalData(sttLen - cursor); 
     return rs; 
 } 
-inline zsummer::log4z::Log4zStream & operator << (zsummer::log4z::Log4zStream & stm, const TestFloatData & info) 
-{ 
-    stm << "_float=" << info._float << ", _double=" << info._double; 
-    return stm; 
-} 
  
 struct TestStringData //测试 
 { 
@@ -181,11 +171,6 @@ inline zsummer::proto4z::ReadStream & operator >> (zsummer::proto4z::ReadStream 
     cursor = cursor - rs.getStreamUnreadLen(); 
     rs.skipOriginalData(sttLen - cursor); 
     return rs; 
-} 
-inline zsummer::log4z::Log4zStream & operator << (zsummer::log4z::Log4zStream & stm, const TestStringData & info) 
-{ 
-    stm << "_string=" << info._string; 
-    return stm; 
 } 
  
 typedef std::vector<unsigned int> IntArray;  
@@ -266,11 +251,6 @@ inline zsummer::proto4z::ReadStream & operator >> (zsummer::proto4z::ReadStream 
     rs.skipOriginalData(sttLen - cursor); 
     return rs; 
 } 
-inline zsummer::log4z::Log4zStream & operator << (zsummer::log4z::Log4zStream & stm, const EchoPack & info) 
-{ 
-    stm << "_iarray=" << info._iarray << ", _farray=" << info._farray << ", _sarray=" << info._sarray << ", _imap=" << info._imap << ", _fmap=" << info._fmap << ", _smap=" << info._smap; 
-    return stm; 
-} 
  
 const unsigned short ID_Pulse = 30001;  
 struct Pulse 
@@ -299,11 +279,6 @@ inline zsummer::proto4z::ReadStream & operator >> (zsummer::proto4z::ReadStream 
     cursor = cursor - rs.getStreamUnreadLen(); 
     rs.skipOriginalData(sttLen - cursor); 
     return rs; 
-} 
-inline zsummer::log4z::Log4zStream & operator << (zsummer::log4z::Log4zStream & stm, const Pulse & info) 
-{ 
-; 
-    return stm; 
 } 
  
 #endif 

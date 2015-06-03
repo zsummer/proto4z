@@ -220,7 +220,7 @@ std::string GenCPP::genRealContent(const std::list<AnyData> & stores)
             text += "}" + LFCR;
 
             //input log4z operator
-            if (true)
+            if (false)
             {
                 text += "inline zsummer::log4z::Log4zStream & operator << (zsummer::log4z::Log4zStream & stm, const " + info._proto._struct._name + " & info)" + LFCR;
                 text += "{" + LFCR;
