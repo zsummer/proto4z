@@ -41,210 +41,210 @@
 
 std::string GenCPP::getRealType(const std::string & xmltype)
 {
-	if ( xmltype == "i8") return "char";
-	else if ( xmltype == "ui8") return "unsigned char";
-	else if ( xmltype == "i16") return "short";
-	else if ( xmltype == "ui16") return "unsigned short";
-	else if ( xmltype == "i32") return "int";
-	else if ( xmltype == "ui32") return "unsigned int";
-	else if ( xmltype == "i64") return "long long";
-	else if ( xmltype == "ui64") return "unsigned long long";
-	else if ( xmltype == "float") return "float";
-	else if ( xmltype == "double") return "double";
-	else if ( xmltype == "string") return "std::string";
-	return xmltype;
+    if ( xmltype == "i8") return "char";
+    else if ( xmltype == "ui8") return "unsigned char";
+    else if ( xmltype == "i16") return "short";
+    else if ( xmltype == "ui16") return "unsigned short";
+    else if ( xmltype == "i32") return "int";
+    else if ( xmltype == "ui32") return "unsigned int";
+    else if ( xmltype == "i64") return "long long";
+    else if ( xmltype == "ui64") return "unsigned long long";
+    else if ( xmltype == "float") return "float";
+    else if ( xmltype == "double") return "double";
+    else if ( xmltype == "string") return "std::string";
+    return xmltype;
 }
 
 
 std::string GenCPP::genRealContent(const std::list<AnyData> & stores)
 {
-	std::string macroFileName = std::string("_") + _filename  + "_H_";
-	std::transform(macroFileName.begin(), macroFileName.end(), macroFileName.begin(), [](char ch){ return std::toupper(ch); });
+    std::string macroFileName = std::string("_") + _filename  + "_H_";
+    std::transform(macroFileName.begin(), macroFileName.end(), macroFileName.begin(), [](char ch){ return std::toupper(ch); });
 
 
-	std::string text = LFCR + "#ifndef " + macroFileName + LFCR;
-	text += "#define " + macroFileName + LFCR + LFCR;
+    std::string text = LFCR + "#ifndef " + macroFileName + LFCR;
+    text += "#define " + macroFileName + LFCR + LFCR;
 
-	for (auto &info : stores)
-	{
-		if (info._type == GT_DataInclude)
-		{
-			text += "#include <" + info._include._filename + ".h> ";
-			if (!info._include._desc.empty())
-			{
-				text += "//" + info._include._desc;
-			}
-			text += LFCR;
-		}
-		else if (info._type == GT_DataConstValue)
-		{
-			text += "const " + getRealType(info._const._type) + " " + info._const._name + " = " + info._const._value + "; ";
-			if (!info._const._desc.empty())
-			{
-				text += "//" + info._const._desc;
-			}
-			text += LFCR;
-		}
-		else if (info._type == GT_DataArray)
-		{
-			text += LFCR + "typedef std::vector<" + getRealType(info._array._type) + "> " + info._array._arrayName + "; ";
-			if (!info._array._desc.empty())
-			{
-				text += "//" + info._array._desc;
-			}
-			text += LFCR;
-		}
-		else if (info._type == GT_DataMap)
-		{
-			text += LFCR + "typedef std::map<"
-				+ getRealType(info._map._typeKey) + ", " + getRealType(info._map._typeValue)
-				+ "> " + info._map._mapName + "; ";
-			if (!info._map._desc.empty())
-			{
-				text += "//" + info._map._desc;
-			}
-			text += LFCR;
-		}
-		else if (info._type == GT_DataStruct || info._type == GT_DataProto)
-		{
-			text += LFCR;
-			//write ProtoID
-			if (info._type == GT_DataProto)
-			{
-				text += "const " + getRealType(info._proto._const._type) + " " 
-					+ info._proto._const._name + " = " + info._proto._const._value + "; ";
-				if (!info._proto._const._desc.empty())
-				{
-					text += "//" + info._proto._const._desc;
-				}
-				text += LFCR;
-			}
+    for (auto &info : stores)
+    {
+        if (info._type == GT_DataInclude)
+        {
+            text += "#include <" + info._include._filename + ".h> ";
+            if (!info._include._desc.empty())
+            {
+                text += "//" + info._include._desc;
+            }
+            text += LFCR;
+        }
+        else if (info._type == GT_DataConstValue)
+        {
+            text += "const " + getRealType(info._const._type) + " " + info._const._name + " = " + info._const._value + "; ";
+            if (!info._const._desc.empty())
+            {
+                text += "//" + info._const._desc;
+            }
+            text += LFCR;
+        }
+        else if (info._type == GT_DataArray)
+        {
+            text += LFCR + "typedef std::vector<" + getRealType(info._array._type) + "> " + info._array._arrayName + "; ";
+            if (!info._array._desc.empty())
+            {
+                text += "//" + info._array._desc;
+            }
+            text += LFCR;
+        }
+        else if (info._type == GT_DataMap)
+        {
+            text += LFCR + "typedef std::map<"
+                + getRealType(info._map._typeKey) + ", " + getRealType(info._map._typeValue)
+                + "> " + info._map._mapName + "; ";
+            if (!info._map._desc.empty())
+            {
+                text += "//" + info._map._desc;
+            }
+            text += LFCR;
+        }
+        else if (info._type == GT_DataStruct || info._type == GT_DataProto)
+        {
+            text += LFCR;
+            //write ProtoID
+            if (info._type == GT_DataProto)
+            {
+                text += "const " + getRealType(info._proto._const._type) + " " 
+                    + info._proto._const._name + " = " + info._proto._const._value + "; ";
+                if (!info._proto._const._desc.empty())
+                {
+                    text += "//" + info._proto._const._desc;
+                }
+                text += LFCR;
+            }
 
-			//write struct
-			text += "struct " + info._proto._struct._name;
-			if (!info._proto._struct._desc.empty())
-			{
-				text += " //" + info._proto._struct._desc;
-			}
-			text += LFCR;
-			text += "{" + LFCR;
-
-
-			for (const auto & m : info._proto._struct._members)
-			{
-				text += "\t" + getRealType(m._type) + " " + m._name + "; ";
-				if (m._tag == MT_DELETE)
-				{
-					text += "//[already deleted]";
-				}
-				if (!m._desc.empty())
-				{
-					text += "//" + m._desc;
-				}
-				text += LFCR;
-			}
-
-			{	//struct init
-				std::string defaltInit = "\t" + info._proto._struct._name + "()" + LFCR;
-				defaltInit += "\t{" + LFCR;
-				std::string memberText;
-				for (const auto &m : info._proto._struct._members)
-				{
-					std::string def = getTypeDefault(m._type);
-					if (!def.empty())
-					{
-						memberText += "\t\t" + m._name + " = " + def + ";" + LFCR;
-					}
-				}
-				if (!memberText.empty())
-				{
-					text += defaltInit;
-					text += memberText;
-					text += "\t}" + LFCR;
-				}
-			}
-			if (info._type == GT_DataProto)
-			{
-				text += std::string("\tinline ") + getRealType(ProtoIDType) + " GetProtoID() { return " + info._proto._const._value + ";}" + LFCR;
-				text += std::string("\tinline ") + getRealType("string") + " GetProtoName() { return \""
-					+ info._proto._const._name + "\";}" + LFCR;
-			}
-			text += "};" + LFCR;
+            //write struct
+            text += "struct " + info._proto._struct._name;
+            if (!info._proto._struct._desc.empty())
+            {
+                text += " //" + info._proto._struct._desc;
+            }
+            text += LFCR;
+            text += "{" + LFCR;
 
 
-			//input stream operator
-			text += "inline zsummer::proto4z::WriteStream & operator << (zsummer::proto4z::WriteStream & ws, const " + info._proto._struct._name + " & data)" + LFCR;
-			text += "{" + LFCR;
-			text += "\tunsigned long long tag = " + boost::lexical_cast<std::string, unsigned long long>(info._proto._struct._tag) + "ULL;" + LFCR;
-			text += "\tif (zsummer::proto4z::__localEndianType() != zsummer::proto4z::LittleEndian) tag = zsummer::proto4z::reversalInteger(tag);" + LFCR;
-			text += "\tws << (zsummer::proto4z::Integer)0;" + LFCR;
-			text += "\tzsummer::proto4z::Integer offset = ws.getStreamLen();" + LFCR;
-			text += "\tws << tag;" + LFCR;
-			for (const auto &m : info._proto._struct._members)
-			{
-				if (m._tag == MT_DELETE)
-				{
-					text += "//\tws << data." + m._name + "; //[already deleted]" + LFCR;
-				}
-				else
-				{
-					text += "\tws << data." + m._name + ";" + LFCR;
-				}
-			}
-			text += "\tws.fixOriginalData(offset - 4, ws.getStreamLen() - offset);" + LFCR;
-			text += "\treturn ws;" + LFCR;
-			text += "}" + LFCR;
+            for (const auto & m : info._proto._struct._members)
+            {
+                text += "    " + getRealType(m._type) + " " + m._name + "; ";
+                if (m._tag == MT_DELETE)
+                {
+                    text += "//[already deleted]";
+                }
+                if (!m._desc.empty())
+                {
+                    text += "//" + m._desc;
+                }
+                text += LFCR;
+            }
+
+            {    //struct init
+                std::string defaltInit = "    " + info._proto._struct._name + "()" + LFCR;
+                defaltInit += "    {" + LFCR;
+                std::string memberText;
+                for (const auto &m : info._proto._struct._members)
+                {
+                    std::string def = getTypeDefault(m._type);
+                    if (!def.empty())
+                    {
+                        memberText += "        " + m._name + " = " + def + ";" + LFCR;
+                    }
+                }
+                if (!memberText.empty())
+                {
+                    text += defaltInit;
+                    text += memberText;
+                    text += "    }" + LFCR;
+                }
+            }
+            if (info._type == GT_DataProto)
+            {
+                text += std::string("    inline ") + getRealType(ProtoIDType) + " GetProtoID() { return " + info._proto._const._value + ";}" + LFCR;
+                text += std::string("    inline ") + getRealType("string") + " GetProtoName() { return \""
+                    + info._proto._const._name + "\";}" + LFCR;
+            }
+            text += "};" + LFCR;
 
 
-			//output stream operator
-			text += "inline zsummer::proto4z::ReadStream & operator >> (zsummer::proto4z::ReadStream & rs, " + info._proto._struct._name + " & data)" + LFCR;
-			text += "{" + LFCR;
-			text += "\tzsummer::proto4z::Integer sttLen = 0;" + LFCR;
-			text += "\trs >> sttLen;" + LFCR;
-			text += "\tzsummer::proto4z::Integer cursor = rs.getStreamUnreadLen();" + LFCR;
-			text += "\tunsigned long long tag = 0;" + LFCR;
-			text += "\trs >> tag;" + LFCR;
-			text += "\tif (zsummer::proto4z::__localEndianType() != zsummer::proto4z::LittleEndian) tag = zsummer::proto4z::reversalInteger(tag);" + LFCR;
-			int curTagIndex = 0;
-			for (const auto &m : info._proto._struct._members)
-			{
-				text += "\tif ( (1ULL << " + boost::lexical_cast<std::string, int>(curTagIndex)+") & tag)" + LFCR;
-				text += "\t{" + LFCR;
-				text += "\t\trs >> data." + m._name + "; " + LFCR;
-				text += "\t}" + LFCR;
-				curTagIndex++;
-			}
-			text += "\tcursor = cursor - rs.getStreamUnreadLen();" + LFCR;
-			text += "\trs.skipOriginalData(sttLen - cursor);" + LFCR;
-			text += "\treturn rs;" + LFCR;
-			text += "}" + LFCR;
+            //input stream operator
+            text += "inline zsummer::proto4z::WriteStream & operator << (zsummer::proto4z::WriteStream & ws, const " + info._proto._struct._name + " & data)" + LFCR;
+            text += "{" + LFCR;
+            text += "    unsigned long long tag = " + boost::lexical_cast<std::string, unsigned long long>(info._proto._struct._tag) + "ULL;" + LFCR;
+            text += "    if (zsummer::proto4z::__localEndianType() != zsummer::proto4z::LittleEndian) tag = zsummer::proto4z::reversalInteger(tag);" + LFCR;
+            text += "    ws << (zsummer::proto4z::Integer)0;" + LFCR;
+            text += "    zsummer::proto4z::Integer offset = ws.getStreamLen();" + LFCR;
+            text += "    ws << tag;" + LFCR;
+            for (const auto &m : info._proto._struct._members)
+            {
+                if (m._tag == MT_DELETE)
+                {
+                    text += "//    ws << data." + m._name + "; //[already deleted]" + LFCR;
+                }
+                else
+                {
+                    text += "    ws << data." + m._name + ";" + LFCR;
+                }
+            }
+            text += "    ws.fixOriginalData(offset - 4, ws.getStreamLen() - offset);" + LFCR;
+            text += "    return ws;" + LFCR;
+            text += "}" + LFCR;
 
-			//input log4z operator
-			if (true)
-			{
-				text += "inline zsummer::log4z::Log4zStream & operator << (zsummer::log4z::Log4zStream & stm, const " + info._proto._struct._name + " & info)" + LFCR;
-				text += "{" + LFCR;
-				bool bFirst = true;
-				for (const auto &m : info._proto._struct._members)
-				{
-					if (bFirst)
-					{
-						bFirst = false;
-						text += "\tstm << \"" + m._name + "=\"" + " << info." + m._name;
-					}
-					else
-					{
-						text += " << \", " + m._name + "=\"" + " << info." + m._name;
-					}
-				}
-				text += ";" + LFCR;
-				text += "\treturn stm;" + LFCR;
-				text += "}" + LFCR;
-			}
-		}
 
-	}
-	text += LFCR + "#endif" + LFCR;
+            //output stream operator
+            text += "inline zsummer::proto4z::ReadStream & operator >> (zsummer::proto4z::ReadStream & rs, " + info._proto._struct._name + " & data)" + LFCR;
+            text += "{" + LFCR;
+            text += "    zsummer::proto4z::Integer sttLen = 0;" + LFCR;
+            text += "    rs >> sttLen;" + LFCR;
+            text += "    zsummer::proto4z::Integer cursor = rs.getStreamUnreadLen();" + LFCR;
+            text += "    unsigned long long tag = 0;" + LFCR;
+            text += "    rs >> tag;" + LFCR;
+            text += "    if (zsummer::proto4z::__localEndianType() != zsummer::proto4z::LittleEndian) tag = zsummer::proto4z::reversalInteger(tag);" + LFCR;
+            int curTagIndex = 0;
+            for (const auto &m : info._proto._struct._members)
+            {
+                text += "    if ( (1ULL << " + boost::lexical_cast<std::string, int>(curTagIndex)+") & tag)" + LFCR;
+                text += "    {" + LFCR;
+                text += "        rs >> data." + m._name + "; " + LFCR;
+                text += "    }" + LFCR;
+                curTagIndex++;
+            }
+            text += "    cursor = cursor - rs.getStreamUnreadLen();" + LFCR;
+            text += "    rs.skipOriginalData(sttLen - cursor);" + LFCR;
+            text += "    return rs;" + LFCR;
+            text += "}" + LFCR;
 
-	return std::move(text);
+            //input log4z operator
+            if (true)
+            {
+                text += "inline zsummer::log4z::Log4zStream & operator << (zsummer::log4z::Log4zStream & stm, const " + info._proto._struct._name + " & info)" + LFCR;
+                text += "{" + LFCR;
+                bool bFirst = true;
+                for (const auto &m : info._proto._struct._members)
+                {
+                    if (bFirst)
+                    {
+                        bFirst = false;
+                        text += "    stm << \"" + m._name + "=\"" + " << info." + m._name;
+                    }
+                    else
+                    {
+                        text += " << \", " + m._name + "=\"" + " << info." + m._name;
+                    }
+                }
+                text += ";" + LFCR;
+                text += "    return stm;" + LFCR;
+                text += "}" + LFCR;
+            }
+        }
+
+    }
+    text += LFCR + "#endif" + LFCR;
+
+    return std::move(text);
 }

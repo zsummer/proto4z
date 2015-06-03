@@ -46,64 +46,64 @@ using namespace zsummer::utility;
 
 int main(int argc, char *argv[])
 {
-	zsummer::log4z::ILog4zManager::getRef().setLoggerFileLine(LOG4Z_MAIN_LOGGER_ID, false);
-	zsummer::log4z::ILog4zManager::getRef().setLoggerOutFile(LOG4Z_MAIN_LOGGER_ID, false);
-	zsummer::log4z::ILog4zManager::getRef().start();
-	std::vector<_FileInfo> files;
-	if (!searchFiles("./", files))
-	{
-		LOGE("searchFiles error.");
-		return 0;
-	}
-	try
-	{
-		for (auto & file : files)
-		{
-			std::string filename = file.filename;
-			if (filename.size() <= 4)
-			{
-				continue;
-			}
-			std::string xmlattr = filename.substr(filename.length() - 4, 4);
-			if (xmlattr != ".xml")
-			{
-				continue;
-			}
-			filename = filename.substr(0, filename.size() - 4);
+    zsummer::log4z::ILog4zManager::getRef().setLoggerFileLine(LOG4Z_MAIN_LOGGER_ID, false);
+    zsummer::log4z::ILog4zManager::getRef().setLoggerOutFile(LOG4Z_MAIN_LOGGER_ID, false);
+    zsummer::log4z::ILog4zManager::getRef().start();
+    std::vector<_FileInfo> files;
+    if (!searchFiles("./", files))
+    {
+        LOGE("searchFiles error.");
+        return 0;
+    }
+    try
+    {
+        for (auto & file : files)
+        {
+            std::string filename = file.filename;
+            if (filename.size() <= 4)
+            {
+                continue;
+            }
+            std::string xmlattr = filename.substr(filename.length() - 4, 4);
+            if (xmlattr != ".xml")
+            {
+                continue;
+            }
+            filename = filename.substr(0, filename.size() - 4);
 
-			ParseCache cache;
-			cache.parse(filename);
-			if (!cache.isNeedUpdate())
-			{
-				continue;
-			}
-			auto stores = parseProto(filename, cache);
-			for (int i = SL_NORMAL + 1; i < SL_END; i++)
-			{
-				auto gen = createGenerate((SupportLanguageType)i);
-				if (!gen)
-				{
-					continue;
-				}
-				gen->init(filename, (SupportLanguageType)i);
-				auto content = gen->genRealContent(stores);
-				gen->write(content);
-				destroyGenerate(gen);
-			}
-			cache.write();
-		}
-	}
-	catch (std::runtime_error e)
-	{
-		LOGE("catch error: " << e.what());
-		return -1;
-	}
+            ParseCache cache;
+            cache.parse(filename);
+            if (!cache.isNeedUpdate())
+            {
+                continue;
+            }
+            auto stores = parseProto(filename, cache);
+            for (int i = SL_NORMAL + 1; i < SL_END; i++)
+            {
+                auto gen = createGenerate((SupportLanguageType)i);
+                if (!gen)
+                {
+                    continue;
+                }
+                gen->init(filename, (SupportLanguageType)i);
+                auto content = gen->genRealContent(stores);
+                gen->write(content);
+                destroyGenerate(gen);
+            }
+            cache.write();
+        }
+    }
+    catch (std::runtime_error e)
+    {
+        LOGE("catch error: " << e.what());
+        return -1;
+    }
 
-	
-	LOGA("All Success..");
-	getchar();
+    
+    LOGA("All Success..");
+    getchar();
 
-	return 0;
+    return 0;
 }
 
 

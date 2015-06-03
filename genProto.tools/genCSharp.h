@@ -45,8 +45,8 @@
 class GenCSharp : public GenBase
 {
 public:
-	virtual std::string getRealType(const std::string & xmltype);
-	virtual std::string genRealContent(const std::list<AnyData> & stores);
+    virtual std::string getRealType(const std::string & xmltype);
+    virtual std::string genRealContent(const std::list<AnyData> & stores);
 };
 
 

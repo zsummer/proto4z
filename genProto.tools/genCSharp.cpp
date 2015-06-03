@@ -43,214 +43,214 @@
 
 std::string GenCSharp::getRealType(const std::string & xmltype)
 {
-	if ( xmltype == "i8") return "Proto4z.i8";
-	else if ( xmltype == "ui8") return "Proto4z.ui8";
-	else if ( xmltype == "i16") return "Proto4z.i16";
-	else if ( xmltype == "ui16") return "Proto4z.ui16";
-	else if ( xmltype == "i32") return "Proto4z.i32";
-	else if ( xmltype == "ui32") return "Proto4z.ui32";
-	else if ( xmltype == "i64") return "Proto4z.i64";
-	else if ( xmltype == "ui64") return "Proto4z.ui64";
-	else if ( xmltype == "float") return "Proto4z.Float";
-	else if ( xmltype == "double") return "Proto4z.Double";
-	else if ( xmltype == "string") return "Proto4z.String";
-	return xmltype;
+    if ( xmltype == "i8") return "Proto4z.i8";
+    else if ( xmltype == "ui8") return "Proto4z.ui8";
+    else if ( xmltype == "i16") return "Proto4z.i16";
+    else if ( xmltype == "ui16") return "Proto4z.ui16";
+    else if ( xmltype == "i32") return "Proto4z.i32";
+    else if ( xmltype == "ui32") return "Proto4z.ui32";
+    else if ( xmltype == "i64") return "Proto4z.i64";
+    else if ( xmltype == "ui64") return "Proto4z.ui64";
+    else if ( xmltype == "float") return "Proto4z.Float";
+    else if ( xmltype == "double") return "Proto4z.Double";
+    else if ( xmltype == "string") return "Proto4z.String";
+    return xmltype;
 }
 
 std::string GenCSharp::genRealContent(const std::list<AnyData> & stores)
 {
-	std::string text = LFCR;
+    std::string text = LFCR;
 
-	{
-		char buf[100];
-		time_t now = time(NULL);
-		tm *ptm = localtime(&now);
-		sprintf(buf, "%04d-%02d-%02d %02d:%02d:%02d", ptm->tm_year + 1990, ptm->tm_mon + 1, ptm->tm_yday, ptm->tm_hour, ptm->tm_min, ptm->tm_sec);
-	}
+    {
+        char buf[100];
+        time_t now = time(NULL);
+        tm *ptm = localtime(&now);
+        sprintf(buf, "%04d-%02d-%02d %02d:%02d:%02d", ptm->tm_year + 1990, ptm->tm_mon + 1, ptm->tm_yday, ptm->tm_hour, ptm->tm_min, ptm->tm_sec);
+    }
 
 
 
-	text += "namespace Proto4z " + LFCR + "{" + LFCR;
+    text += "namespace Proto4z " + LFCR + "{" + LFCR;
 
-	for (auto &info : stores)
-	{
-		if (info._type == GT_DataConstValue)
-		{
-			text += "\tclass STATIC_" + info._const._name + " ";
-			if (!info._const._desc.empty())
-			{
-				text += "//" + info._const._desc;
-			}
-			text += LFCR;
-			text += "\t{" + LFCR;
-			text += "\t\tpublic static " + getRealType(info._const._type) + " value = " + info._const._value + "; " + LFCR;
-			text += "\t}" + LFCR;
-		}
-		else if (info._type == GT_DataArray)
-		{
-			text += LFCR + "\tclass " + info._array._arrayName + " : System.Collections.Generic.List<" + getRealType(info._array._type) + ">, Proto4z.IProtoObject ";
-			if (!info._array._desc.empty())
-			{
-				text += "//" + info._array._desc;
-			}
-			text += LFCR;
-			text += "\t{" + LFCR;
-			text += "\t\t"   "public System.Collections.Generic.List<byte> __encode()" + LFCR;
-			text += "\t\t{" + LFCR;
-			text += "\t\t\t"   "var ret = new System.Collections.Generic.List<byte>();" + LFCR;
-			text += "\t\t\t"   " var len = new Proto4z.ui32((System.UInt32)this.Count);" + LFCR;
-			text += "\t\t\t"   "ret.AddRange(len.__encode());" + LFCR;
-			text += "\t\t\t"   "for (int i = 0; i < this.Count; i++ )" + LFCR;
-			text += "\t\t\t"   "{" + LFCR;
-			text += "\t\t\t\t"  "ret.AddRange(this[i].__encode());" + LFCR;
-			text += "\t\t\t"   "}" + LFCR;
-			text += "\t\t\t"   "return ret;" + LFCR;
-			text += "\t\t}" + LFCR;
-			text += LFCR;
+    for (auto &info : stores)
+    {
+        if (info._type == GT_DataConstValue)
+        {
+            text += "    class STATIC_" + info._const._name + " ";
+            if (!info._const._desc.empty())
+            {
+                text += "//" + info._const._desc;
+            }
+            text += LFCR;
+            text += "    {" + LFCR;
+            text += "        public static " + getRealType(info._const._type) + " value = " + info._const._value + "; " + LFCR;
+            text += "    }" + LFCR;
+        }
+        else if (info._type == GT_DataArray)
+        {
+            text += LFCR + "    class " + info._array._arrayName + " : System.Collections.Generic.List<" + getRealType(info._array._type) + ">, Proto4z.IProtoObject ";
+            if (!info._array._desc.empty())
+            {
+                text += "//" + info._array._desc;
+            }
+            text += LFCR;
+            text += "    {" + LFCR;
+            text += "        "   "public System.Collections.Generic.List<byte> __encode()" + LFCR;
+            text += "        {" + LFCR;
+            text += "            "   "var ret = new System.Collections.Generic.List<byte>();" + LFCR;
+            text += "            "   " var len = new Proto4z.ui32((System.UInt32)this.Count);" + LFCR;
+            text += "            "   "ret.AddRange(len.__encode());" + LFCR;
+            text += "            "   "for (int i = 0; i < this.Count; i++ )" + LFCR;
+            text += "            "   "{" + LFCR;
+            text += "                "  "ret.AddRange(this[i].__encode());" + LFCR;
+            text += "            "   "}" + LFCR;
+            text += "            "   "return ret;" + LFCR;
+            text += "        }" + LFCR;
+            text += LFCR;
 
-			text += "\t\t"   "public int __decode(byte[] binData, ref int pos)" + LFCR;
-			text += "\t\t{" + LFCR;
-			text += "\t\t\t"   "var len = new Proto4z.ui32(0);" + LFCR;
-			text += "\t\t\t"   "len.__decode(binData, ref pos);" + LFCR;
-			text += "\t\t\t"  "if(len.val > 0)" + LFCR;
-			text += "\t\t\t"   "{" + LFCR;
-			text += "\t\t\t\t"  "for (int i=0; i<len.val; i++)" + LFCR;
-			text += "\t\t\t\t"   "{" + LFCR;
-			text += "\t\t\t\t\t" "var data = new " + getRealType(info._array._type) + "();" + LFCR;
-			text += "\t\t\t\t\t"  " data.__decode(binData, ref pos);" + LFCR;
-			text += "\t\t\t\t\t"  "this.Add(data);" + LFCR;
-			text += "\t\t\t\t"   "}" + LFCR;
-			text += "\t\t\t"   "}" + LFCR;
-			text += "\t\t\t"   "return pos;" + LFCR;
-			text += "\t\t}" + LFCR;
-			text += "\t}" + LFCR;
-		}
-		else if (info._type == GT_DataMap)
-		{
-			text += LFCR + "\tclass " + info._map._mapName + " : System.Collections.Generic.Dictionary<" + getRealType(info._map._typeKey) + ", " + getRealType(info._map._typeValue) + ">, Proto4z.IProtoObject ";
-			if (!info._array._desc.empty())
-			{
-				text += "//" + info._array._desc;
-			}
-			text += LFCR;
-			text += "\t{" + LFCR;
-			text += "\t\t"   "public System.Collections.Generic.List<byte> __encode()" + LFCR;
-			text += "\t\t{" +  LFCR;
-			text += "\t\t\t"  "var ret = new System.Collections.Generic.List<byte>();" + LFCR;
-			text += "\t\t\t"   " var len = new Proto4z.ui32((System.UInt32)this.Count);" + LFCR;
-			text += "\t\t\t"   "ret.AddRange(len.__encode());" + LFCR;
-			text += "\t\t\t"   "foreach(var kv in this)" + LFCR;
-			text += "\t\t\t"   "{" + LFCR;
-			text += "\t\t\t\t"   "ret.AddRange(kv.Key.__encode());" + LFCR;
-			text += "\t\t\t\t"   "ret.AddRange(kv.Value.__encode());" + LFCR;
-			text += "\t\t\t"   "}" + LFCR;
-			text += "\t\t\t"   "return ret;" + LFCR;
-			text += "\t\t}" +  LFCR;
-			text += LFCR;
+            text += "        "   "public int __decode(byte[] binData, ref int pos)" + LFCR;
+            text += "        {" + LFCR;
+            text += "            "   "var len = new Proto4z.ui32(0);" + LFCR;
+            text += "            "   "len.__decode(binData, ref pos);" + LFCR;
+            text += "            "  "if(len.val > 0)" + LFCR;
+            text += "            "   "{" + LFCR;
+            text += "                "  "for (int i=0; i<len.val; i++)" + LFCR;
+            text += "                "   "{" + LFCR;
+            text += "                    " "var data = new " + getRealType(info._array._type) + "();" + LFCR;
+            text += "                    "  " data.__decode(binData, ref pos);" + LFCR;
+            text += "                    "  "this.Add(data);" + LFCR;
+            text += "                "   "}" + LFCR;
+            text += "            "   "}" + LFCR;
+            text += "            "   "return pos;" + LFCR;
+            text += "        }" + LFCR;
+            text += "    }" + LFCR;
+        }
+        else if (info._type == GT_DataMap)
+        {
+            text += LFCR + "    class " + info._map._mapName + " : System.Collections.Generic.Dictionary<" + getRealType(info._map._typeKey) + ", " + getRealType(info._map._typeValue) + ">, Proto4z.IProtoObject ";
+            if (!info._array._desc.empty())
+            {
+                text += "//" + info._array._desc;
+            }
+            text += LFCR;
+            text += "    {" + LFCR;
+            text += "        "   "public System.Collections.Generic.List<byte> __encode()" + LFCR;
+            text += "        {" +  LFCR;
+            text += "            "  "var ret = new System.Collections.Generic.List<byte>();" + LFCR;
+            text += "            "   " var len = new Proto4z.ui32((System.UInt32)this.Count);" + LFCR;
+            text += "            "   "ret.AddRange(len.__encode());" + LFCR;
+            text += "            "   "foreach(var kv in this)" + LFCR;
+            text += "            "   "{" + LFCR;
+            text += "                "   "ret.AddRange(kv.Key.__encode());" + LFCR;
+            text += "                "   "ret.AddRange(kv.Value.__encode());" + LFCR;
+            text += "            "   "}" + LFCR;
+            text += "            "   "return ret;" + LFCR;
+            text += "        }" +  LFCR;
+            text += LFCR;
 
-			text += "\t\t"   "public int __decode(byte[] binData, ref int pos)" + LFCR;
-			text += "\t\t{" + LFCR;
-			text += "\t\t\t"   "var len = new Proto4z.ui32(0);" + LFCR;
-			text += "\t\t\t"   "len.__decode(binData, ref pos);" + LFCR;
-			text += "\t\t\t"   "if(len.val > 0)" + LFCR;
-			text += "\t\t\t"   "{" + LFCR;
-			text += "\t\t\t\t"   "for (int i=0; i<len.val; i++)" + LFCR;
-			text += "\t\t\t\t"   "{" + LFCR;
-			text += "\t\t\t\t\t"   "var key = new " + getRealType(info._map._typeKey) + "();" + LFCR;
-			text += "\t\t\t\t\t"   "var val = new " + getRealType(info._map._typeValue) + "();" + LFCR;
-			text += "\t\t\t\t\t"    "key.__decode(binData, ref pos);" + LFCR;
-			text += "\t\t\t\t\t"   "val.__decode(binData, ref pos);" + LFCR;
-			text += "\t\t\t\t\t"   "this.Add(key, val);" + LFCR;
-			text += "\t\t\t\t"   "}" + LFCR;
-			text += "\t\t\t"   "}" + LFCR;
-			text += "\t\t\t"   "return pos;" + LFCR;
-			text += "\t\t}" + LFCR;
-			text += "\t}" + LFCR;
+            text += "        "   "public int __decode(byte[] binData, ref int pos)" + LFCR;
+            text += "        {" + LFCR;
+            text += "            "   "var len = new Proto4z.ui32(0);" + LFCR;
+            text += "            "   "len.__decode(binData, ref pos);" + LFCR;
+            text += "            "   "if(len.val > 0)" + LFCR;
+            text += "            "   "{" + LFCR;
+            text += "                "   "for (int i=0; i<len.val; i++)" + LFCR;
+            text += "                "   "{" + LFCR;
+            text += "                    "   "var key = new " + getRealType(info._map._typeKey) + "();" + LFCR;
+            text += "                    "   "var val = new " + getRealType(info._map._typeValue) + "();" + LFCR;
+            text += "                    "    "key.__decode(binData, ref pos);" + LFCR;
+            text += "                    "   "val.__decode(binData, ref pos);" + LFCR;
+            text += "                    "   "this.Add(key, val);" + LFCR;
+            text += "                "   "}" + LFCR;
+            text += "            "   "}" + LFCR;
+            text += "            "   "return pos;" + LFCR;
+            text += "        }" + LFCR;
+            text += "    }" + LFCR;
 
-		}
-		else if (info._type == GT_DataStruct || info._type == GT_DataProto)
-		{
-			text += LFCR;
-			text += "\tclass " + info._proto._struct._name + ": Proto4z.IProtoObject";
-			if (!info._proto._struct._desc.empty())
-			{
-				text += " //" + info._proto._struct._desc;
-			}
-			text += LFCR;
-			text += "\t{\t" + LFCR;
+        }
+        else if (info._type == GT_DataStruct || info._type == GT_DataProto)
+        {
+            text += LFCR;
+            text += "    class " + info._proto._struct._name + ": Proto4z.IProtoObject";
+            if (!info._proto._struct._desc.empty())
+            {
+                text += " //" + info._proto._struct._desc;
+            }
+            text += LFCR;
+            text += "    {    " + LFCR;
 
-			//write ProtoID
-			if (info._type == GT_DataProto)
-			{
-				text += "\t\t" "static public Proto4z.ui16 getProtoID() { return new Proto4z.ui16(" + info._proto._const._value + "); }" + LFCR;
-				text += "\t\t" "static public string getProtoName() { return \"" + info._proto._struct._name + "\"; }" + LFCR;
-			}
+            //write ProtoID
+            if (info._type == GT_DataProto)
+            {
+                text += "        " "static public Proto4z.ui16 getProtoID() { return new Proto4z.ui16(" + info._proto._const._value + "); }" + LFCR;
+                text += "        " "static public string getProtoName() { return \"" + info._proto._struct._name + "\"; }" + LFCR;
+            }
 
-			for (const auto & m : info._proto._struct._members)
-			{
-				text += "\t\tpublic " + getRealType(m._type) + " " + m._name + "; ";
-				if (!m._desc.empty())
-				{
-					text += "//" + m._desc;
-				}
-				text += LFCR;
-			}
+            for (const auto & m : info._proto._struct._members)
+            {
+                text += "        public " + getRealType(m._type) + " " + m._name + "; ";
+                if (!m._desc.empty())
+                {
+                    text += "//" + m._desc;
+                }
+                text += LFCR;
+            }
 
-			//encode
-			text += "\t\tpublic System.Collections.Generic.List<byte> __encode()" + LFCR;
-			text += "\t\t{" + LFCR;
-			text += "\t\t\t"   "Proto4z.ui32 sttLen = 0;" + LFCR;
-			text += "\t\t\t"   "Proto4z.ui64 tag = " + boost::lexical_cast<std::string, unsigned long long>(info._proto._struct._tag) + ";" + LFCR;
-			text += "\t\t\t"   "" + LFCR;
-			text += "\t\t\t"   "var data = new System.Collections.Generic.List<byte>();" + LFCR;
-			for (const auto &m : info._proto._struct._members)
-			{
-				if (m._tag == MT_DELETE)
-				{
-					text += "//\t\t\t"  "data.AddRange(" + m._name + ".__encode());//[already deleted]" + LFCR;
-				}
-				else
-				{
-					text += "\t\t\t"  "data.AddRange(" + m._name + ".__encode());" + LFCR;
-				}
-			}
-			text += "\t\t\t" "sttLen = (System.UInt32)data.Count + 8;" + LFCR;
-			text += "\t\t\t"  "var ret = new System.Collections.Generic.List<byte>();" + LFCR;
-			text += "\t\t\t"  "ret.AddRange(sttLen.__encode());" + LFCR;
-			text += "\t\t\t"  "ret.AddRange(tag.__encode());" + LFCR;
-			text += "\t\t\t"  "ret.AddRange(data);" + LFCR;
-			text += "\t\t\t"  "return ret;" + LFCR;
-			text += "\t\t}" + LFCR;
+            //encode
+            text += "        public System.Collections.Generic.List<byte> __encode()" + LFCR;
+            text += "        {" + LFCR;
+            text += "            "   "Proto4z.ui32 sttLen = 0;" + LFCR;
+            text += "            "   "Proto4z.ui64 tag = " + boost::lexical_cast<std::string, unsigned long long>(info._proto._struct._tag) + ";" + LFCR;
+            text += "            "   "" + LFCR;
+            text += "            "   "var data = new System.Collections.Generic.List<byte>();" + LFCR;
+            for (const auto &m : info._proto._struct._members)
+            {
+                if (m._tag == MT_DELETE)
+                {
+                    text += "//            "  "data.AddRange(" + m._name + ".__encode());//[already deleted]" + LFCR;
+                }
+                else
+                {
+                    text += "            "  "data.AddRange(" + m._name + ".__encode());" + LFCR;
+                }
+            }
+            text += "            " "sttLen = (System.UInt32)data.Count + 8;" + LFCR;
+            text += "            "  "var ret = new System.Collections.Generic.List<byte>();" + LFCR;
+            text += "            "  "ret.AddRange(sttLen.__encode());" + LFCR;
+            text += "            "  "ret.AddRange(tag.__encode());" + LFCR;
+            text += "            "  "ret.AddRange(data);" + LFCR;
+            text += "            "  "return ret;" + LFCR;
+            text += "        }" + LFCR;
 
-			//decode
-			text += "\t\tpublic int __decode(byte[] binData, ref int pos)" + LFCR;
-			text += "\t\t{" + LFCR;
-			text += "\t\t\t" "Proto4z.ui32 offset = 0;" + LFCR;
-			text += "\t\t\t" "Proto4z.ui64 tag = 0;" + LFCR;
-			text += "\t\t\t" "offset.__decode(binData, ref pos);" + LFCR;
-			text += "\t\t\t" "offset.val += (System.UInt32)pos;" + LFCR;
-			text += "\t\t\t" "tag.__decode(binData, ref pos);" + LFCR;
-			int i = 0;
-			for (const auto &m : info._proto._struct._members)
-			{
-				text += "\t\t\t" + m._name + " = new " + getRealType(m._type) + "();" + LFCR;
-				text += "\t\t\t" "if ((tag.val & ((System.UInt64)1 << " + boost::lexical_cast<std::string, int>(i) + ")) != 0)" + LFCR;
-				text += "\t\t\t" "{" + LFCR;
-				text += "\t\t\t\t" + m._name + ".__decode(binData, ref pos);" + LFCR;
-				text += "\t\t\t" "}" + LFCR;
-				i++;
-			}
-			text += "\t\t\treturn (int)offset.val;" + LFCR;
-			text += "\t\t}" + LFCR;
-			text += "\t}" + LFCR;
-		}
+            //decode
+            text += "        public int __decode(byte[] binData, ref int pos)" + LFCR;
+            text += "        {" + LFCR;
+            text += "            " "Proto4z.ui32 offset = 0;" + LFCR;
+            text += "            " "Proto4z.ui64 tag = 0;" + LFCR;
+            text += "            " "offset.__decode(binData, ref pos);" + LFCR;
+            text += "            " "offset.val += (System.UInt32)pos;" + LFCR;
+            text += "            " "tag.__decode(binData, ref pos);" + LFCR;
+            int i = 0;
+            for (const auto &m : info._proto._struct._members)
+            {
+                text += "            " + m._name + " = new " + getRealType(m._type) + "();" + LFCR;
+                text += "            " "if ((tag.val & ((System.UInt64)1 << " + boost::lexical_cast<std::string, int>(i) + ")) != 0)" + LFCR;
+                text += "            " "{" + LFCR;
+                text += "                " + m._name + ".__decode(binData, ref pos);" + LFCR;
+                text += "            " "}" + LFCR;
+                i++;
+            }
+            text += "            return (int)offset.val;" + LFCR;
+            text += "        }" + LFCR;
+            text += "    }" + LFCR;
+        }
 
-	}
-	text += LFCR;
-	text += "}" + LFCR;
-	text += LFCR + LFCR;
+    }
+    text += LFCR;
+    text += "}" + LFCR;
+    text += LFCR + LFCR;
 
-	return text;
+    return text;
 }
 
 

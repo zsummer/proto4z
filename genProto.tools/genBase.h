@@ -45,16 +45,16 @@
 class GenBase
 {
 public:
-	GenBase();
-	virtual ~GenBase();
-	virtual void init(std::string fileName, SupportLanguageType t);
-	virtual std::string getRealType(const std::string & xmltype);
-	virtual std::string getTypeDefault(const std::string & xmltype);
-	virtual std::string genRealContent(const std::list<AnyData> & stores);
-	virtual void write(const std::string & content);
+    GenBase();
+    virtual ~GenBase();
+    virtual void init(std::string fileName, SupportLanguageType t);
+    virtual std::string getRealType(const std::string & xmltype);
+    virtual std::string getTypeDefault(const std::string & xmltype);
+    virtual std::string genRealContent(const std::list<AnyData> & stores);
+    virtual void write(const std::string & content);
 protected:
-	std::string _filename;
-	SupportLanguageType _type = SL_NORMAL;
+    std::string _filename;
+    SupportLanguageType _type = SL_NORMAL;
 };
 
 

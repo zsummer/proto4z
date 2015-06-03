@@ -40,7 +40,7 @@
 class GenLUA : public GenBase
 {
 public:
-	virtual std::string genRealContent(const std::list<AnyData> & stores);
+    virtual std::string genRealContent(const std::list<AnyData> & stores);
 };
 
 #endif

@@ -45,145 +45,145 @@
 
 void ParseCache::parse(std::string filename)
 {
-	_fileName = filename;
-	std::string configFile = filename + ".xml.cache";
-	if (!zsummer::utility::GetFileStatus(configFile, 6))
-	{
-		LOGW("ParseCache::parse [" << configFile << " not found.");
-		return;
-	}
-	tinyxml2::XMLDocument doc;
-	if (doc.LoadFile(configFile.c_str()) != tinyxml2::XML_SUCCESS)
-	{
-		E(" ParseCache::parse Error. configFile=" << configFile << ", err1=" << doc.GetErrorStr1() << ", err2" << doc.GetErrorStr2());
-	}
+    _fileName = filename;
+    std::string configFile = filename + ".xml.cache";
+    if (!zsummer::utility::GetFileStatus(configFile, 6))
+    {
+        LOGW("ParseCache::parse [" << configFile << " not found.");
+        return;
+    }
+    tinyxml2::XMLDocument doc;
+    if (doc.LoadFile(configFile.c_str()) != tinyxml2::XML_SUCCESS)
+    {
+        E(" ParseCache::parse Error. configFile=" << configFile << ", err1=" << doc.GetErrorStr1() << ", err2" << doc.GetErrorStr2());
+    }
 
-	for (int i = SL_NORMAL+1; i < SL_END; i++)
-	{
-		XMLElement * md5 = doc.FirstChildElement(SupportLanguageString[i]);
-		if (md5 && md5->GetText())
-		{
-			_md5Cache[i] = md5->GetText();
-		}
-	}
-	
-	XMLElement * cacheEles = doc.FirstChildElement("cacheNumber");
-	if (cacheEles == NULL)
-	{
-		LOGW("ParseCache::parse can not found cacheNumber. configFile=" << configFile);
-		return ;
-	}
+    for (int i = SL_NORMAL+1; i < SL_END; i++)
+    {
+        XMLElement * md5 = doc.FirstChildElement(SupportLanguageString[i]);
+        if (md5 && md5->GetText())
+        {
+            _md5Cache[i] = md5->GetText();
+        }
+    }
+    
+    XMLElement * cacheEles = doc.FirstChildElement("cacheNumber");
+    if (cacheEles == NULL)
+    {
+        LOGW("ParseCache::parse can not found cacheNumber. configFile=" << configFile);
+        return ;
+    }
 
-	XMLElement * next = cacheEles->FirstChildElement("cache");
-	do
-	{
-		if (next == NULL)
-		{
-			break;
-		}
-		const char * key = next->Attribute("key");
-		const char * number = next->Attribute("Number");
-		if (key == NULL || number == NULL)
-		{
-			E("ParseCache::parse cache number is invalid. configFile=" << configFile);
-		}
+    XMLElement * next = cacheEles->FirstChildElement("cache");
+    do
+    {
+        if (next == NULL)
+        {
+            break;
+        }
+        const char * key = next->Attribute("key");
+        const char * number = next->Attribute("Number");
+        if (key == NULL || number == NULL)
+        {
+            E("ParseCache::parse cache number is invalid. configFile=" << configFile);
+        }
 
 
-		auto founder = _cacheNumber.find(key);
-		if (founder != _cacheNumber.end())
-		{
-			E("ParseCache::parse dumplicate key on " << key << " from " << configFile);
-		}
-		_cacheNumber[key] = atoi(number);
+        auto founder = _cacheNumber.find(key);
+        if (founder != _cacheNumber.end())
+        {
+            E("ParseCache::parse dumplicate key on " << key << " from " << configFile);
+        }
+        _cacheNumber[key] = atoi(number);
 
-		if (_currentProtoID <= atoi(number))
-		{
-			_currentProtoID = atoi(number) + 1;
-		}
+        if (_currentProtoID <= atoi(number))
+        {
+            _currentProtoID = atoi(number) + 1;
+        }
 
-		next = next->NextSiblingElement("cache");
-	} while (true);
+        next = next->NextSiblingElement("cache");
+    } while (true);
 }
 bool   ParseCache::write()
 {
-	std::string filename = _fileName + ".xml.cache";
-	LOGI("writeCache [" << filename );
-	std::ofstream os;
-	os.open(filename, std::ios::binary);
-	if (!os.is_open())
-	{
-		E(filename << " can not open!.");
-	}
-	std::string text = "<?xml version=\"1.0\" encoding=\"UTF - 8\"?>\n\n";
-	for (int i = SL_NORMAL + 1; i < SL_END; i++)
-	{
-		std::string md5 = genFileMD5(std::string("./") + SupportLanguageFilePath[i] + "/" + _fileName + SupportLanguageFileSuffix[i]);
-		text += std::string() + "<" + SupportLanguageString[i] + ">";
-		text += md5;
-		text += std::string() + "</" + SupportLanguageString[i] + ">" + LFCR;
-	}
-	
-	text += "<cacheNumber>\n";
+    std::string filename = _fileName + ".xml.cache";
+    LOGI("writeCache [" << filename );
+    std::ofstream os;
+    os.open(filename, std::ios::binary);
+    if (!os.is_open())
+    {
+        E(filename << " can not open!.");
+    }
+    std::string text = "<?xml version=\"1.0\" encoding=\"UTF - 8\"?>\n\n";
+    for (int i = SL_NORMAL + 1; i < SL_END; i++)
+    {
+        std::string md5 = genFileMD5(std::string("./") + SupportLanguageFilePath[i] + "/" + _fileName + SupportLanguageFileSuffix[i]);
+        text += std::string() + "<" + SupportLanguageString[i] + ">";
+        text += md5;
+        text += std::string() + "</" + SupportLanguageString[i] + ">" + LFCR;
+    }
+    
+    text += "<cacheNumber>\n";
 
-	for (auto &pr : _cacheNumber)
-	{
-		text += "\t<cache key = \"" + pr.first +"\" Number = \"" + boost::lexical_cast<std::string>(pr.second) + "\" /> \n";
-	}
-	text += "</cacheNumber>\n";
-	os.write(text.c_str(), text.length());
-	os.close();
-	return true;
+    for (auto &pr : _cacheNumber)
+    {
+        text += "    <cache key = \"" + pr.first +"\" Number = \"" + boost::lexical_cast<std::string>(pr.second) + "\" /> \n";
+    }
+    text += "</cacheNumber>\n";
+    os.write(text.c_str(), text.length());
+    os.close();
+    return true;
 }
 
 bool ParseCache::isNeedUpdate()
 {
-	for (int i = SL_NORMAL+1; i < SL_END; i++)
-	{
-		if (_md5Cache[i].empty())
-		{
-			return true;
-		}
-		std::string md5 = genFileMD5(std::string("./") + SupportLanguageFilePath[i] + _fileName + SupportLanguageFileSuffix[i]);
-		if (md5 != _md5Cache[i])
-		{
-			return true;
-		}
-	}
-	return false;
+    for (int i = SL_NORMAL+1; i < SL_END; i++)
+    {
+        if (_md5Cache[i].empty())
+        {
+            return true;
+        }
+        std::string md5 = genFileMD5(std::string("./") + SupportLanguageFilePath[i] + _fileName + SupportLanguageFileSuffix[i]);
+        if (md5 != _md5Cache[i])
+        {
+            return true;
+        }
+    }
+    return false;
 }
 
 unsigned short ParseCache::getCacheNumber(std::string key)
 {
-	auto founder = _cacheNumber.find(key);
-	if (founder == _cacheNumber.end())
-	{
-		return -1;
-	}
-	return founder->second;
+    auto founder = _cacheNumber.find(key);
+    if (founder == _cacheNumber.end())
+    {
+        return -1;
+    }
+    return founder->second;
 }
 bool ParseCache::setCacheNumber(std::string key, unsigned short number)
 {
-	auto founder = _cacheNumber.find(key);
-	if (founder != _cacheNumber.end())
-	{
-		return false;
-	}
-	_cacheNumber[key] = number;
-	return true;
+    auto founder = _cacheNumber.find(key);
+    if (founder != _cacheNumber.end())
+    {
+        return false;
+    }
+    _cacheNumber[key] = number;
+    return true;
 }
 
 unsigned short ParseCache::genProtoID(std::string key, unsigned short minProtoID, unsigned short maxProtoID)
 {
-	unsigned short ret = getCacheNumber(key);
-	if (ret == (unsigned short)-1)
-	{
-		ret = _currentProtoID++;
-		setCacheNumber(key, ret);
-		if (ret < minProtoID || ret >= maxProtoID)
-		{
-			E("proto number override. key=" << key << ", next number=" << ret);
-		}
-	}
-	return ret;
+    unsigned short ret = getCacheNumber(key);
+    if (ret == (unsigned short)-1)
+    {
+        ret = _currentProtoID++;
+        setCacheNumber(key, ret);
+        if (ret < minProtoID || ret >= maxProtoID)
+        {
+            E("proto number override. key=" << key << ", next number=" << ret);
+        }
+    }
+    return ret;
 }
 

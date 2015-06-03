@@ -39,114 +39,114 @@
 
 std::string GenLUA::genRealContent(const std::list<AnyData> & stores)
 {
-	std::string text;
-	for (auto &info : stores)
-	{
-		if (info._type == GT_DataInclude)
-		{
-			text += "require (\"" + info._include._filename + "\")";
-			if (!info._include._desc.empty())
-			{
-				text += "--" + info._include._desc;
-			}
-			text += LFCR;
-		}
-		else if (info._type == GT_DataConstValue)
-		{
-			text += "Proto4z." + info._const._name + " = " + info._const._value;
-			if (!info._const._desc.empty())
-			{
-				text += "--" + info._const._desc;
-			}
-			text += LFCR;
-		}
-		else if (info._type == GT_DataArray)
-		{
-			text += LFCR;
-			text += "Proto4z." + info._array._arrayName + " = {} ";
-			if (!info._array._desc.empty())
-			{
-				text += "--" + info._array._desc;
-			}
-			text += LFCR;
+    std::string text;
+    for (auto &info : stores)
+    {
+        if (info._type == GT_DataInclude)
+        {
+            text += "require (\"" + info._include._filename + "\")";
+            if (!info._include._desc.empty())
+            {
+                text += "--" + info._include._desc;
+            }
+            text += LFCR;
+        }
+        else if (info._type == GT_DataConstValue)
+        {
+            text += "Proto4z." + info._const._name + " = " + info._const._value;
+            if (!info._const._desc.empty())
+            {
+                text += "--" + info._const._desc;
+            }
+            text += LFCR;
+        }
+        else if (info._type == GT_DataArray)
+        {
+            text += LFCR;
+            text += "Proto4z." + info._array._arrayName + " = {} ";
+            if (!info._array._desc.empty())
+            {
+                text += "--" + info._array._desc;
+            }
+            text += LFCR;
 
-			text += "Proto4z." + info._array._arrayName + ".__getName = \"" + info._array._arrayName + "\"" + LFCR;
-			text += "Proto4z." + info._array._arrayName + ".__getDesc = \"array\"" + LFCR;
-			text += "Proto4z." + info._array._arrayName + ".__getTypeV = \"" + info._array._type + "\"" + LFCR;
-		}
-		else if (info._type == GT_DataMap)
-		{
-			text += LFCR;
-			text += "Proto4z." + info._map._mapName + " = {} ";
-			if (!info._map._desc.empty())
-			{
-				text += "--" + info._map._desc;
-			}
-			text += LFCR;
+            text += "Proto4z." + info._array._arrayName + ".__getName = \"" + info._array._arrayName + "\"" + LFCR;
+            text += "Proto4z." + info._array._arrayName + ".__getDesc = \"array\"" + LFCR;
+            text += "Proto4z." + info._array._arrayName + ".__getTypeV = \"" + info._array._type + "\"" + LFCR;
+        }
+        else if (info._type == GT_DataMap)
+        {
+            text += LFCR;
+            text += "Proto4z." + info._map._mapName + " = {} ";
+            if (!info._map._desc.empty())
+            {
+                text += "--" + info._map._desc;
+            }
+            text += LFCR;
 
-			text += "Proto4z." + info._map._mapName + ".__getName = \"" + info._map._mapName + "\"" + LFCR;
-			text += "Proto4z." + info._map._mapName + ".__getDesc = \"map\"" + LFCR;
-			text += "Proto4z." + info._map._mapName + ".__getTypeK = \"" + info._map._typeKey + "\"" + LFCR;
-			text += "Proto4z." + info._map._mapName + ".__getTypeV = \"" + info._map._typeValue + "\"" + LFCR;
-		}
-		else if (info._type == GT_DataStruct || info._type == GT_DataProto)
-		{
-			text += LFCR;
+            text += "Proto4z." + info._map._mapName + ".__getName = \"" + info._map._mapName + "\"" + LFCR;
+            text += "Proto4z." + info._map._mapName + ".__getDesc = \"map\"" + LFCR;
+            text += "Proto4z." + info._map._mapName + ".__getTypeK = \"" + info._map._typeKey + "\"" + LFCR;
+            text += "Proto4z." + info._map._mapName + ".__getTypeV = \"" + info._map._typeValue + "\"" + LFCR;
+        }
+        else if (info._type == GT_DataStruct || info._type == GT_DataProto)
+        {
+            text += LFCR;
 
-			if (info._type == GT_DataProto)
-			{
-				text += "Proto4z.register(" + info._proto._const._value + ",\"" + info._proto._struct._name + "\")" + LFCR;
-			}
+            if (info._type == GT_DataProto)
+            {
+                text += "Proto4z.register(" + info._proto._const._value + ",\"" + info._proto._struct._name + "\")" + LFCR;
+            }
 
-			text += "Proto4z." + info._proto._struct._name + " = {} ";
-			if (!info._proto._struct._desc.empty())
-			{
-				text += "--" + info._proto._struct._desc;
-			}
-			text += LFCR;
-			if (info._type == GT_DataProto)
-			{
-				text += "Proto4z." + info._proto._struct._name + ".__getID = " + info._proto._const._value + "" + LFCR;
-			}
-			text += "Proto4z." + info._proto._struct._name + ".__getName = \"" + info._proto._struct._name + "\"" + LFCR;
+            text += "Proto4z." + info._proto._struct._name + " = {} ";
+            if (!info._proto._struct._desc.empty())
+            {
+                text += "--" + info._proto._struct._desc;
+            }
+            text += LFCR;
+            if (info._type == GT_DataProto)
+            {
+                text += "Proto4z." + info._proto._struct._name + ".__getID = " + info._proto._const._value + "" + LFCR;
+            }
+            text += "Proto4z." + info._proto._struct._name + ".__getName = \"" + info._proto._struct._name + "\"" + LFCR;
 
-	
-			std::string tag = "";
-			for (auto &m : info._proto._struct._members)
-			{
-				if (m._tag == MT_DELETE)
-				{
-					tag.append("0");
-				}
-				else
-				{
-					tag.append("1");
-				}
-			}
-			text += "Proto4z." + info._proto._struct._name + ".__getTag = \"" + tag + "\"" + LFCR;
-			for (size_t i = 0; i < info._proto._struct._members.size(); ++i)
-			{
-				text += "Proto4z." + info._proto._struct._name + "[" + boost::lexical_cast<std::string>(i + 1)
-					+ "] = {name=\"" + info._proto._struct._members[i]._name + "\", type=\"" + info._proto._struct._members[i]._type + "\"";
-				if (info._proto._struct._members[i]._tag == MT_DELETE)
-				{
-					text += ", del = true";
-				}
-				text += " } ";
-				if (!info._proto._struct._members[i]._desc.empty())
-				{
-					text += "--" + info._proto._struct._members[i]._desc;
-				}
-				text += LFCR;
-			}
+    
+            std::string tag = "";
+            for (auto &m : info._proto._struct._members)
+            {
+                if (m._tag == MT_DELETE)
+                {
+                    tag.append("0");
+                }
+                else
+                {
+                    tag.append("1");
+                }
+            }
+            text += "Proto4z." + info._proto._struct._name + ".__getTag = \"" + tag + "\"" + LFCR;
+            for (size_t i = 0; i < info._proto._struct._members.size(); ++i)
+            {
+                text += "Proto4z." + info._proto._struct._name + "[" + boost::lexical_cast<std::string>(i + 1)
+                    + "] = {name=\"" + info._proto._struct._members[i]._name + "\", type=\"" + info._proto._struct._members[i]._type + "\"";
+                if (info._proto._struct._members[i]._tag == MT_DELETE)
+                {
+                    text += ", del = true";
+                }
+                text += " } ";
+                if (!info._proto._struct._members[i]._desc.empty())
+                {
+                    text += "--" + info._proto._struct._members[i]._desc;
+                }
+                text += LFCR;
+            }
 
-			
-		}
+            
+        }
 
-	}
+    }
 
 
-	return std::move(text);
+    return std::move(text);
 }
 
 

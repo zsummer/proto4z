@@ -63,79 +63,79 @@
 //store type enum
 enum AnyType : short
 {
-	GT_DataInclude,
-	GT_DataArray,
-	GT_DataMap,
-	GT_DataConstValue,
-	GT_DataStruct,
-	GT_DataProto,
+    GT_DataInclude,
+    GT_DataArray,
+    GT_DataMap,
+    GT_DataConstValue,
+    GT_DataStruct,
+    GT_DataProto,
 };
 
 //tag
 enum MemberTag : short
 {
-	MT_NORMAL,
-	MT_DB_KEY,
-	MT_DB_IGNORE,
-	MT_DELETE,
-	//MT_OPTION,
+    MT_NORMAL,
+    MT_DB_KEY,
+    MT_DB_IGNORE,
+    MT_DELETE,
+    //MT_OPTION,
 };
 
 //include file name, without suffix
 struct DataInclude
 {
-	std::string _filename;
-	std::string _desc;
+    std::string _filename;
+    std::string _desc;
 };
 
 //array type
 struct DataArray
 {
-	std::string _type;
-	std::string _arrayName;
-	std::string _desc;
+    std::string _type;
+    std::string _arrayName;
+    std::string _desc;
 };
 
 //dict type
 struct DataMap
 {
-	std::string _typeKey;
-	std::string _typeValue;
-	std::string _mapName;
-	std::string _desc;
+    std::string _typeKey;
+    std::string _typeValue;
+    std::string _mapName;
+    std::string _desc;
 };
 
 //const type
 struct DataConstValue
 {
-	std::string _type;
-	std::string _name;
-	std::string _value;
-	std::string _desc;
+    std::string _type;
+    std::string _name;
+    std::string _value;
+    std::string _desc;
 };
 
 //struct type
 struct DataStruct
 {
-	std::string _name;
-	std::string _desc;
-	unsigned long long _tag;
-	bool _isStore = false;
-	struct DataMember
-	{
-		std::string _type;
-		std::string _name;
-		std::string _desc;
-		MemberTag _tag;
-	};
-	std::vector<DataMember> _members;
+    std::string _name;
+    std::string _desc;
+    unsigned long long _tag;
+    bool _isStore = false;
+    struct DataMember
+    {
+        std::string _type;
+        std::string _name;
+        std::string _desc;
+        MemberTag _tag;
+    };
+    std::vector<DataMember> _members;
 };
 
 //proto type
 struct DataProto
 {
-	DataConstValue _const;
-	DataStruct _struct;
+    DataConstValue _const;
+    DataStruct _struct;
 };
 
 
@@ -143,12 +143,12 @@ struct DataProto
 //general store type
 struct AnyData
 {
-	AnyType _type;
-	DataInclude _include;
-	DataArray _array;
-	DataMap _map;
-	DataConstValue _const;
-	DataProto _proto;
+    AnyType _type;
+    DataInclude _include;
+    DataArray _array;
+    DataMap _map;
+    DataConstValue _const;
+    DataProto _proto;
 };
 
 

@@ -51,29 +51,29 @@ using namespace tinyxml2;
 
 struct DataCache
 {
-	std::string proto;
-	unsigned int number;
+    std::string proto;
+    unsigned int number;
 };
 
 //manager
 class ParseCache
 {
-	std::string _fileName;
-	std::string _md5Cache[SL_END];
-	//cache data
-	unsigned short _currentProtoID = 0;
+    std::string _fileName;
+    std::string _md5Cache[SL_END];
+    //cache data
+    unsigned short _currentProtoID = 0;
 
-	std::map<std::string, unsigned short> _cacheNumber;
+    std::map<std::string, unsigned short> _cacheNumber;
 public:
-	void parse(std::string filename);
-	bool  write();
-	bool isNeedUpdate();
-	inline void setCurrentProtoID(unsigned short n){ _currentProtoID = n; }
-	inline unsigned short getCurrentProtoID(){ return _currentProtoID; }
-	unsigned short genProtoID(std::string key, unsigned short minProtoID, unsigned short maxProtoID);
+    void parse(std::string filename);
+    bool  write();
+    bool isNeedUpdate();
+    inline void setCurrentProtoID(unsigned short n){ _currentProtoID = n; }
+    inline unsigned short getCurrentProtoID(){ return _currentProtoID; }
+    unsigned short genProtoID(std::string key, unsigned short minProtoID, unsigned short maxProtoID);
 protected:
-	unsigned short getCacheNumber(std::string key);
-	bool setCacheNumber(std::string key, unsigned short number);
+    unsigned short getCacheNumber(std::string key);
+    bool setCacheNumber(std::string key, unsigned short number);
 };
 
 
