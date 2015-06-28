@@ -165,8 +165,8 @@ std::string GenCPP::genRealContent(const std::list<AnyData> & stores)
             }
             if (info._type == GT_DataProto)
             {
-                text += std::string("    inline ") + getRealType(ProtoIDType) + " GetProtoID() { return " + info._proto._const._value + ";}" + LFCR;
-                text += std::string("    inline ") + getRealType("string") + " GetProtoName() { return \""
+                text += std::string("    static const ") + getRealType(ProtoIDType) + " GetProtoID() { return " + info._proto._const._value + ";}" + LFCR;
+                text += std::string("    static const ") + getRealType("string") + " GetProtoName() { return \""
                     + info._proto._const._name + "\";}" + LFCR;
             }
             text += "};" + LFCR;
