@@ -69,10 +69,6 @@ end
 now = os.time() - now
 print(now)
 
-local num = "101200010000"
-local bin = proto.stringToStream(num)
-num = proto.streamToString(bin)
-print(num)
 
 
 

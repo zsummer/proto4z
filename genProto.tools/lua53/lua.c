@@ -545,7 +545,7 @@ static int handle_luainit (lua_State *L) {
     return dostring(L, init, name);
 }
 
-int luaopen_protoz_bit(lua_State *L);
+int luaopen_proto4z_tag(lua_State *L);
 /*
 ** Main body of stand-alone interpreter (to be called in protected mode).
 ** Reads the options and handles them all.
@@ -569,7 +569,7 @@ static int pmain (lua_State *L) {
   }
   luaL_openlibs(L);  /* open standard libraries */
   luaopen_pack(L);
-  luaopen_protoz_bit(L);
+  luaopen_proto4z_tag(L);
   createargtable(L, argv, argc, script);  /* create table 'arg' */
   if (!(args & has_E)) {  /* no option '-E'? */
     if (handle_luainit(L) != LUA_OK)  /* run LUA_INIT */
