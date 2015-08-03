@@ -5,7 +5,7 @@ include_directories(../../luasrc/)
 include_directories(./)
 aux_source_directory(./ source) 
 aux_source_directory(../../luasrc/ luasrc) 
-set(EXECUTABLE_OUTPUT_PATH ../proto)
+set(EXECUTABLE_OUTPUT_PATH ${PROTO4Z_BIN_OUT_PATH})
 
 
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")

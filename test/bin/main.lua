@@ -41,10 +41,10 @@
 -- mail:yawei.zhang@foxmail.com
 -- date: 2015-01-12
 
-package.path =  "../../?.lua;" .. package.path
+package.path =package.path ..  ";../../?.lua;../genCode/lua/?.lua"
 --require
 require("proto4z")
-require("lua.TestProto")
+require("TestProto")
 
 local proto = Proto4z
 
