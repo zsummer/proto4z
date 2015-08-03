@@ -4,7 +4,7 @@ project(genProto)
 
 add_definitions(-Wall  -O0 -g -ggdb  -DNDEBUG -std=c++11 -D_GLIBCXX_USE_NANOSLEEP )
 
-set(EXECUTABLE_OUTPUT_PATH ./proto)
+set(EXECUTABLE_OUTPUT_PATH ../test/bin)
 
 aux_source_directory(./ source)
 add_executable(genProto ${source})

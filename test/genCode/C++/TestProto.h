@@ -196,8 +196,8 @@ struct EchoPack
     TestIntegerDataMap _imap;  
     TestFloatDataMap _fmap;  
     TestStringDataMap _smap;  
-    inline unsigned short GetProtoID() { return 30000;} 
-    inline std::string GetProtoName() { return "ID_EchoPack";} 
+    static const unsigned short GetProtoID() { return 30000;} 
+    static const std::string GetProtoName() { return "ID_EchoPack";} 
 }; 
 inline zsummer::proto4z::WriteStream & operator << (zsummer::proto4z::WriteStream & ws, const EchoPack & data) 
 { 
@@ -255,8 +255,8 @@ inline zsummer::proto4z::ReadStream & operator >> (zsummer::proto4z::ReadStream 
 const unsigned short ID_Pulse = 30001;  
 struct Pulse 
 { 
-    inline unsigned short GetProtoID() { return 30001;} 
-    inline std::string GetProtoName() { return "ID_Pulse";} 
+    static const unsigned short GetProtoID() { return 30001;} 
+    static const std::string GetProtoName() { return "ID_Pulse";} 
 }; 
 inline zsummer::proto4z::WriteStream & operator << (zsummer::proto4z::WriteStream & ws, const Pulse & data) 
 { 

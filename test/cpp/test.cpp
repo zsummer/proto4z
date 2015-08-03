@@ -1,6 +1,6 @@
 ﻿//! yawei_zhang@foxmail.com
 
-#include "../proto4z.h"
+#include <proto4z.h>
 
 #include <iostream>
 #include <time.h>

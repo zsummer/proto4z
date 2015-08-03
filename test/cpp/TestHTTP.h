@@ -9,7 +9,7 @@
 #include <deque>
 #include <queue>
 #include <typeinfo>
-#include "../proto4z.h"
+#include <proto4z.h>
 using namespace  std;
 using namespace zsummer::proto4z;
 
