@@ -176,7 +176,7 @@ std::string GenCPP::genRealContent(const std::list<AnyData> & stores)
             text += "inline zsummer::proto4z::WriteStream & operator << (zsummer::proto4z::WriteStream & ws, const " + info._proto._struct._name + " & data)" + LFCR;
             text += "{" + LFCR;
             text += "    unsigned long long tag = " + boost::lexical_cast<std::string, unsigned long long>(info._proto._struct._tag) + "ULL;" + LFCR;
-            text += "    if (zsummer::proto4z::__localEndianType() != zsummer::proto4z::LittleEndian) tag = zsummer::proto4z::reversalInteger(tag);" + LFCR;
+            text += "    if (zsummer::proto4z::__localEndianType() != zsummer::proto4z::LittleEndian) tag = zsummer::proto4z::byteRevese(tag);" + LFCR;
             text += "    ws << (zsummer::proto4z::Integer)0;" + LFCR;
             text += "    zsummer::proto4z::Integer offset = ws.getStreamLen();" + LFCR;
             text += "    ws << tag;" + LFCR;
@@ -204,7 +204,7 @@ std::string GenCPP::genRealContent(const std::list<AnyData> & stores)
             text += "    zsummer::proto4z::Integer cursor = rs.getStreamUnreadLen();" + LFCR;
             text += "    unsigned long long tag = 0;" + LFCR;
             text += "    rs >> tag;" + LFCR;
-            text += "    if (zsummer::proto4z::__localEndianType() != zsummer::proto4z::LittleEndian) tag = zsummer::proto4z::reversalInteger(tag);" + LFCR;
+            text += "    if (zsummer::proto4z::__localEndianType() != zsummer::proto4z::LittleEndian) tag = zsummer::proto4z::byteRevese(tag);" + LFCR;
             int curTagIndex = 0;
             for (const auto &m : info._proto._struct._members)
             {
