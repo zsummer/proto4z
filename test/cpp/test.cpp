@@ -12,48 +12,57 @@
 #include <sys/time.h>
 #endif // WIN32
 
+#ifdef __APPLE__
+#include<mach/mach_time.h>
+#endif // __APPLE__
 
 using namespace std;
 using namespace zsummer::proto4z;
 
-#include "TestStream.h"
+#include "C++/TestProto.h"
 #include "TestHTTP.h"
 
-
-
-unsigned int GetTimeMillisecond();
-
-struct StressTest
+void  fillOnePack(EchoPack &pack)
 {
-    std::string name;
-    std::string mail;
-    int id;
-    std::string number;
-    int type;
-};
+    TestIntegerData idata;
+    idata._char = 'a';
+    idata._uchar = 100;
+    idata._short = 200;
+    idata._ushort = 300;
+    idata._int = 400;
+    idata._uint = 500;
+    idata._i64 = 600;
+    idata._ui64 = 700;
+    idata._ui128 = 255;
+
+    TestFloatData fdata;
+    fdata._float = (float)123123.111111;
+    fdata._double = 12312312.88888;
+
+    TestStringData sdata;
+    sdata._string = "abcdefg";
+
+    pack._iarray.push_back(idata);
+    pack._iarray.push_back(idata);
+    pack._farray.push_back(fdata);
+    pack._farray.push_back(fdata);
+    pack._sarray.push_back(sdata);
+    pack._sarray.push_back(sdata);
+
+    pack._imap.insert(std::make_pair("123", idata));
+    pack._imap.insert(std::make_pair("223", idata));
+    pack._fmap.insert(std::make_pair("323", fdata));
+    pack._fmap.insert(std::make_pair("423", fdata));
+    pack._smap.insert(std::make_pair("523", sdata));
+    pack._smap.insert(std::make_pair("623", sdata));
+}
+
+
+unsigned int getSteadyTime();
+
 
 int main()
 {
-    unsigned long long tag = 0ULL;
-    tag |= (1ULL << 1);
-    bool bAllCheckOK = false;
-    do 
-    {
-        TestBase test;
-        if (!test.CheckLenght()) break;
-        cout << endl;
-        if (!test.CheckAttachProtocol()) break;
-        cout << endl;
-        if (!test.CheckNoAttachProtocol()) break;
-        cout << endl;
-        if (!test.CheckRouteProtocol()) break;
-        cout << endl << endl;
-        bAllCheckOK = true;
-    } while (0);
-    cout << endl;
-    if (bAllCheckOK) cout << "all check OK . " << endl;
-    else cout << "check failed . " << endl;
-
     cout << "check http proto ..." << endl;
     TestHTTP th;
     WriteHTTP whGet;
@@ -75,97 +84,68 @@ int main()
     whResult.response("200", "");
     th.Test(whResult);
 
-
-
-    char buf[1000];
-    StressTest t1;
-    StressTest t2;
-    StressTest t3;
-    StressTest t4;
-    unsigned int now = GetTimeMillisecond();
-    int len = 0;
-    const int StressCount = 100*10000;
-    for( int i=0; i<StressCount; i++)
+    cout << "check binary proto" << endl;
+    try
     {
-        WriteStream ws(100, buf, 1000);
-        {
-            
-            //StressTest t1;
-            t1.name = "Alice";
-            t1.id = 10000;
-            t1.mail = "fdaf";
-            t1.number = "12345#@fdsafdsaf.com";
-            t1.type = 2;
-            //StressTest t2 = t1;
-            t2 = t1;
-            ws << t1.name << t1.id << t1.mail << t1.number << t1.type << t2.name << t2.id << t2.mail << t2.number << t2.type;
-            if(i == 0) len = ws.getStreamLen();
-            ReadStream rs(ws.getStream(), ws.getStreamLen());
-            StressTest t3;
-            StressTest t4;
-            rs >> t3.name >> t3.id >> t3.mail >>t3.number >> t3.type  >> t4.name >> t4.id >> t4.mail >> t4.number >> t4.type;
-        }
-    }    
-    std::cout << "encode and decode " << StressCount <<" used time:" << GetTimeMillisecond() - now << std::endl;
-
-    now = GetTimeMillisecond();
-    for (int i = 0; i < 100 * 10000; i++)
-    {
-        WriteStream ws(100, buf, 1000);
-        {
-
-            //StressTest t1;
-            t1.name = "Alice";
-            t1.id = 10000;
-            t1.mail = "fdafa@fsadf.com";
-            t1.number = "123456789";
-            t1.type = 2;
-            //StressTest t2 = t1;
-            t2 = t1;
-            ws << t1.name << t1.id << t1.mail << t1.number << t1.type << t2.name << t2.id << t2.mail << t2.number << t2.type;
-        }
+        WriteStream ws(100);
+        EchoPack echo;
+        fillOnePack(echo);
+        ws << echo;
+        ReadStream rs(ws.getStream(), ws.getStreamLen());
+        rs >> echo;
+        cout << "success" << endl;
     }
-    std::cout << "encode " << StressCount  << "used time: " << GetTimeMillisecond() - now << std::endl;
+    catch (std::runtime_error & e)
+    {
+        cout << "error:" << e.what() << endl;
+    }
+
     
-    now = GetTimeMillisecond();
-    WriteStream ws(100);
-    //StressTest t1;
-    t1.name = "Alice";
-    t1.id = 10000;
-    t1.mail = "fdafa@fsadf.com";
-    t1.number = "123456789";
-    t1.type = 2;
-    //StressTest t2 = t1;
-    t2 = t1;
-    ws << t1.name << t1.id << t1.mail << t1.number << t1.type << t2.name << t2.id << t2.mail << t2.number << t2.type;
-    for (int i = 0; i < 100 * 10000; i++)
+
+#define StressCount 1*10000
+    unsigned int now = getSteadyTime();
+    for (int i = 0; i < StressCount; i++)
     {
-
-        {
-            ReadStream rs(ws.getStream(), ws.getStreamLen());
-            //StressTest t3;
-            //StressTest t4;
-            rs >> t3.name >> t3.id >> t3.mail >> t3.number >> t3.type >> t4.name >> t4.id >> t4.mail >> t4.number >> t4.type;
-        }
+        WriteStream ws(100);
+        EchoPack echo;
+        fillOnePack(echo);
+        ws << echo;
     }
-    std::cout << "decode " << StressCount  << "used time: " << GetTimeMillisecond() - now << std::endl;
+    std::cout << "writeStream used time: " << getSteadyTime() - now << std::endl;
+    
+    now = getSteadyTime();
+    for (int i = 0; i < StressCount; i++)
+    {
+        WriteStream ws(100);
+        EchoPack echo;
+        fillOnePack(echo);
+        ws << echo;
+        ReadStream rs(ws.getStream(), ws.getStreamLen());
+        rs >> echo;
+    }
+    std::cout << "write and read stream used time: " << getSteadyTime() - now << std::endl;
 
-
-    std::cout << len << std::endl;
+  
     cout << "press any key to continue." << endl;
     getchar();
     return 0;
 }
 
 
-unsigned int GetTimeMillisecond()
+unsigned int getSteadyTime()
 {
 #ifdef WIN32
     return ::GetTickCount();
+#elif defined(__APPLE__)
+    const int64_t kOneMillion = 1000 * 1000;
+    mach_timebase_info_data_t timebase_info;
+    mach_timebase_info(&timebase_info);
+    return (unsigned int)((mach_absolute_time() * s_timebase_info.numer) / (kOneMillion * s_timebase_info.denom));
 #else
-    struct timeval tm;
-    gettimeofday(&tm, NULL);
-    return (tm.tv_sec * 1000 + (tm.tv_usec / 1000));
+    timespec ts;
+    if(clock_gettime(CLOCK_MONOTONIC_RAW, &ts) != 0)
+        return 0;
+    return ts.tv_sec * 1000 + (ts.tv_nsec / 1000/1000);
 #endif
 }
 

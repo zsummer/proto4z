@@ -163,9 +163,8 @@
     <ClCompile Include="test.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\proto4z.h" />
     <ClInclude Include="TestHTTP.h" />
-    <ClInclude Include="TestStream.h" />
-    <ClInclude Include="..\proto4z.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

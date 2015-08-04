@@ -19,10 +19,7 @@
     <ClInclude Include="TestHTTP.h">
       <Filter>源文件</Filter>
     </ClInclude>
-    <ClInclude Include="TestStream.h">
-      <Filter>源文件</Filter>
-    </ClInclude>
-    <ClInclude Include="..\proto4z.h">
+    <ClInclude Include="..\..\proto4z.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
