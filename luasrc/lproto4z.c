@@ -53,7 +53,7 @@
 #include<mach/mach_time.h>
 #endif // __APPLE__
 
-int luaopen_proto4z_tag(lua_State *L);
+int luaopen_proto4z_util(lua_State *L);
 
 static const unsigned short __gc_localEndianType = 1;
 static int isEndianType()
@@ -395,7 +395,7 @@ static luaL_Reg tagReg[] = {
 };
 
 
-int luaopen_proto4z_tag(lua_State *L)
+int luaopen_proto4z_util(lua_State *L)
 {
     lua_newtable(L);
     luaL_Reg *l;

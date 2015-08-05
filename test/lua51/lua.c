@@ -338,7 +338,7 @@ struct Smain {
   int status;
 };
 
-int luaopen_proto4z_tag(lua_State *L);
+int luaopen_proto4z_util(lua_State *L);
 static int pmain (lua_State *L) {
   struct Smain *s = (struct Smain *)lua_touserdata(L, 1);
   char **argv = s->argv;
@@ -348,7 +348,7 @@ static int pmain (lua_State *L) {
   if (argv[0] && argv[0][0]) progname = argv[0];
   lua_gc(L, LUA_GCSTOP, 0);  /* stop collector during initialization */
   luaL_openlibs(L);  /* open libraries */
-  luaopen_proto4z_tag(L);
+  luaopen_proto4z_util(L);
   lua_gc(L, LUA_GCRESTART, 0);
   s->status = handle_luainit(L);
   if (s->status != 0) return 0;
