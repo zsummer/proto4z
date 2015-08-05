@@ -61,8 +61,15 @@ void  fillOnePack(EchoPack &pack)
 unsigned int getSteadyTime();
 
 
+
 int main()
 {
+
+    short a = -100; short b = 200;   
+    unsigned char c = a; 
+    char d = b;
+
+
     cout << "check http proto ..." << endl;
     TestHTTP th;
     WriteHTTP whGet;

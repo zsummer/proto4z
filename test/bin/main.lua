@@ -58,7 +58,7 @@ local echo = {  _iarray = {{_char=1,_uchar=2,_short=3,_ushort=4,_int=5,_uint=6,_
 
 proto.dump(echo)
 
-local now = os.time()
+local now = Proto4zUtil.now()
 for i=1, 10000 do
 	local data = proto.encode(echo, "EchoPack")
 	--proto.putbin(data)
@@ -66,7 +66,7 @@ for i=1, 10000 do
 	--proto.dump(dr)
 
 end
-now = os.time() - now
+now = Proto4zUtil.now() - now
 print(now)
 
 

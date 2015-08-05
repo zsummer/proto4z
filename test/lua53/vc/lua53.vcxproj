@@ -19,7 +19,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\luasrc\lpack.c" />
     <ClCompile Include="..\..\..\luasrc\lproto4z.c" />
     <ClCompile Include="..\lapi.c" />
     <ClCompile Include="..\lauxlib.c" />
@@ -57,7 +56,6 @@
     <ClCompile Include="..\lzio.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\luasrc\lpack.h" />
     <ClInclude Include="..\lapi.h" />
     <ClInclude Include="..\lauxlib.h" />
     <ClInclude Include="..\lcode.h" />

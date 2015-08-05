@@ -18,7 +18,7 @@
 
 #include "lauxlib.h"
 #include "lualib.h"
-#include "lpack.h"
+
 
 #if !defined(LUA_PROMPT)
 #define LUA_PROMPT		"> "
@@ -568,7 +568,7 @@ static int pmain (lua_State *L) {
     lua_setfield(L, LUA_REGISTRYINDEX, "LUA_NOENV");
   }
   luaL_openlibs(L);  /* open standard libraries */
-  luaopen_pack(L);
+
   luaopen_proto4z_tag(L);
   createargtable(L, argv, argc, script);  /* create table 'arg' */
   if (!(args & has_E)) {  /* no option '-E'? */
