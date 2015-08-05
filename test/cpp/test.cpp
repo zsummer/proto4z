@@ -140,7 +140,7 @@ unsigned int getSteadyTime()
     const int64_t kOneMillion = 1000 * 1000;
     mach_timebase_info_data_t timebase_info;
     mach_timebase_info(&timebase_info);
-    return (unsigned int)((mach_absolute_time() * s_timebase_info.numer) / (kOneMillion * s_timebase_info.denom));
+    return (unsigned int)((mach_absolute_time() * timebase_info.numer) / (kOneMillion * timebase_info.denom));
 #else
     timespec ts;
     if(clock_gettime(CLOCK_MONOTONIC_RAW, &ts) != 0)
