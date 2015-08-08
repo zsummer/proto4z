@@ -387,9 +387,10 @@ static int checkULL(lua_State * L)
     size_t strLen = 0;
     const char * str = luaL_checklstring(L, 1, &strLen);
     int isULL = false;
+    int i = 0;
     if (strLen == 8)
     {
-        for (int i = 0; i < 8; i++)
+        for (i = 0; i < 8; i++)
         {
             if (str[i] >126 || str[i] < 32)
             {
