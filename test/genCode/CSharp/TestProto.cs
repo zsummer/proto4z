@@ -3,208 +3,201 @@ namespace Proto4z
 { 
     class STATIC_EC_SUCCESS //success 
     { 
-        public static Proto4z.ui16 value = 0;  
+        public static System.UInt16 value = 0;  
     } 
     class STATIC_EC_ERROR //error 
     { 
-        public static Proto4z.ui16 value = 1;  
+        public static System.UInt16 value = 1;  
     } 
     class STATIC_EC_INVALID_PARAM //invalid param 
     { 
-        public static Proto4z.ui16 value = 1000;  
+        public static System.UInt16 value = 1000;  
     } 
     class STATIC_EC_UNKNOWN_ID //unknwon id 
     { 
-        public static Proto4z.ui16 value = 1001;  
+        public static System.UInt16 value = 1001;  
     } 
  
     class TestIntegerData: Proto4z.IProtoObject //测试 
     {     
-        public Proto4z.i8 _char;  
-        public Proto4z.ui8 _uchar;  
-        public Proto4z.i16 _short;  
-        public Proto4z.ui16 _ushort;  
-        public Proto4z.i32 _int;  
-        public Proto4z.ui32 _uint;  
-        public Proto4z.i64 _i64;  
-        public Proto4z.ui64 _ui128;  
-        public Proto4z.ui64 _ui64;  
+        public System.Char _char;  
+        public System.Byte _uchar;  
+        public System.Int16 _short;  
+        public System.UInt16 _ushort;  
+        public System.Int32 _int;  
+        public System.UInt32 _uint;  
+        public System.Int64 _i64;  
+        public System.UInt64 _ui128;  
+        public System.UInt64 _ui64;  
         public System.Collections.Generic.List<byte> __encode() 
         { 
-            Proto4z.ui32 sttLen = 0; 
-            Proto4z.ui64 tag = 383; 
+            System.Int32 sttLen = 0; 
+            System.UInt64 tag = 383; 
              
             var data = new System.Collections.Generic.List<byte>(); 
-            data.AddRange(_char.__encode()); 
-            data.AddRange(_uchar.__encode()); 
-            data.AddRange(_short.__encode()); 
-            data.AddRange(_ushort.__encode()); 
-            data.AddRange(_int.__encode()); 
-            data.AddRange(_uint.__encode()); 
-            data.AddRange(_i64.__encode()); 
-//            data.AddRange(_ui128.__encode());//[already deleted] 
-            data.AddRange(_ui64.__encode()); 
-            sttLen = (System.UInt32)data.Count + 8; 
+            data.AddRange(Proto4z.BaseProtoObject.encodeI8(_char)); 
+            data.AddRange(Proto4z.BaseProtoObject.encodeUI8(_uchar)); 
+            data.AddRange(Proto4z.BaseProtoObject.encodeI16(_short)); 
+            data.AddRange(Proto4z.BaseProtoObject.encodeUI16(_ushort)); 
+            data.AddRange(Proto4z.BaseProtoObject.encodeI32(_int)); 
+            data.AddRange(Proto4z.BaseProtoObject.encodeUI32(_uint)); 
+            data.AddRange(Proto4z.BaseProtoObject.encodeI64(_i64)); 
+//            data.AddRange(Proto4z.BaseProtoObject.encodeUI64(_ui128)); 
+            data.AddRange(Proto4z.BaseProtoObject.encodeUI64(_ui64)); 
+            sttLen = data.Count + 8; 
             var ret = new System.Collections.Generic.List<byte>(); 
-            ret.AddRange(sttLen.__encode()); 
-            ret.AddRange(tag.__encode()); 
+            ret.AddRange(Proto4z.BaseProtoObject.encodeI32(sttLen)); 
+            ret.AddRange(Proto4z.BaseProtoObject.encodeUI64(tag)); 
             ret.AddRange(data); 
             return ret; 
         } 
         public int __decode(byte[] binData, ref int pos) 
         { 
-            Proto4z.ui32 offset = 0; 
-            Proto4z.ui64 tag = 0; 
-            offset.__decode(binData, ref pos); 
-            offset.val += (System.UInt32)pos; 
-            tag.__decode(binData, ref pos); 
-            _char = new Proto4z.i8(); 
-            if ((tag.val & ((System.UInt64)1 << 0)) != 0) 
+            System.Int32 offset = Proto4z.BaseProtoObject.decodeI32(binData, ref pos); 
+            offset += pos; 
+            System.UInt64 tag = Proto4z.BaseProtoObject.decodeUI64(binData, ref pos); 
+            _char = '\0'; 
+            if ((tag & ((System.UInt64)1 << 0)) != 0) 
             { 
-                _char.__decode(binData, ref pos); 
+                _char = Proto4z.BaseProtoObject.decodeI8(binData, ref pos); 
             } 
-            _uchar = new Proto4z.ui8(); 
-            if ((tag.val & ((System.UInt64)1 << 1)) != 0) 
+            _uchar = 0; 
+            if ((tag & ((System.UInt64)1 << 1)) != 0) 
             { 
-                _uchar.__decode(binData, ref pos); 
+                _uchar = Proto4z.BaseProtoObject.decodeUI8(binData, ref pos); 
             } 
-            _short = new Proto4z.i16(); 
-            if ((tag.val & ((System.UInt64)1 << 2)) != 0) 
+            _short = 0; 
+            if ((tag & ((System.UInt64)1 << 2)) != 0) 
             { 
-                _short.__decode(binData, ref pos); 
+                _short = Proto4z.BaseProtoObject.decodeI16(binData, ref pos); 
             } 
-            _ushort = new Proto4z.ui16(); 
-            if ((tag.val & ((System.UInt64)1 << 3)) != 0) 
+            _ushort = 0; 
+            if ((tag & ((System.UInt64)1 << 3)) != 0) 
             { 
-                _ushort.__decode(binData, ref pos); 
+                _ushort = Proto4z.BaseProtoObject.decodeUI16(binData, ref pos); 
             } 
-            _int = new Proto4z.i32(); 
-            if ((tag.val & ((System.UInt64)1 << 4)) != 0) 
+            _int = 0; 
+            if ((tag & ((System.UInt64)1 << 4)) != 0) 
             { 
-                _int.__decode(binData, ref pos); 
+                _int = Proto4z.BaseProtoObject.decodeI32(binData, ref pos); 
             } 
-            _uint = new Proto4z.ui32(); 
-            if ((tag.val & ((System.UInt64)1 << 5)) != 0) 
+            _uint = 0; 
+            if ((tag & ((System.UInt64)1 << 5)) != 0) 
             { 
-                _uint.__decode(binData, ref pos); 
+                _uint = Proto4z.BaseProtoObject.decodeUI32(binData, ref pos); 
             } 
-            _i64 = new Proto4z.i64(); 
-            if ((tag.val & ((System.UInt64)1 << 6)) != 0) 
+            _i64 = 0; 
+            if ((tag & ((System.UInt64)1 << 6)) != 0) 
             { 
-                _i64.__decode(binData, ref pos); 
+                _i64 = Proto4z.BaseProtoObject.decodeI64(binData, ref pos); 
             } 
-            _ui128 = new Proto4z.ui64(); 
-            if ((tag.val & ((System.UInt64)1 << 7)) != 0) 
+            _ui128 = 0; 
+            if ((tag & ((System.UInt64)1 << 7)) != 0) 
             { 
-                _ui128.__decode(binData, ref pos); 
+                _ui128 = Proto4z.BaseProtoObject.decodeUI64(binData, ref pos); 
             } 
-            _ui64 = new Proto4z.ui64(); 
-            if ((tag.val & ((System.UInt64)1 << 8)) != 0) 
+            _ui64 = 0; 
+            if ((tag & ((System.UInt64)1 << 8)) != 0) 
             { 
-                _ui64.__decode(binData, ref pos); 
+                _ui64 = Proto4z.BaseProtoObject.decodeUI64(binData, ref pos); 
             } 
-            return (int)offset.val; 
+            pos = offset; 
+            return pos; 
         } 
     } 
  
     class TestFloatData: Proto4z.IProtoObject //测试 
     {     
-        public Proto4z.Float _float;  
-        public Proto4z.Double _double;  
+        public System.Single _float;  
+        public System.Double _double;  
         public System.Collections.Generic.List<byte> __encode() 
         { 
-            Proto4z.ui32 sttLen = 0; 
-            Proto4z.ui64 tag = 3; 
+            System.Int32 sttLen = 0; 
+            System.UInt64 tag = 3; 
              
             var data = new System.Collections.Generic.List<byte>(); 
-            data.AddRange(_float.__encode()); 
-            data.AddRange(_double.__encode()); 
-            sttLen = (System.UInt32)data.Count + 8; 
+            data.AddRange(Proto4z.BaseProtoObject.encodeSingle(_float)); 
+            data.AddRange(Proto4z.BaseProtoObject.encodeDouble(_double)); 
+            sttLen = data.Count + 8; 
             var ret = new System.Collections.Generic.List<byte>(); 
-            ret.AddRange(sttLen.__encode()); 
-            ret.AddRange(tag.__encode()); 
+            ret.AddRange(Proto4z.BaseProtoObject.encodeI32(sttLen)); 
+            ret.AddRange(Proto4z.BaseProtoObject.encodeUI64(tag)); 
             ret.AddRange(data); 
             return ret; 
         } 
         public int __decode(byte[] binData, ref int pos) 
         { 
-            Proto4z.ui32 offset = 0; 
-            Proto4z.ui64 tag = 0; 
-            offset.__decode(binData, ref pos); 
-            offset.val += (System.UInt32)pos; 
-            tag.__decode(binData, ref pos); 
-            _float = new Proto4z.Float(); 
-            if ((tag.val & ((System.UInt64)1 << 0)) != 0) 
+            System.Int32 offset = Proto4z.BaseProtoObject.decodeI32(binData, ref pos); 
+            offset += pos; 
+            System.UInt64 tag = Proto4z.BaseProtoObject.decodeUI64(binData, ref pos); 
+            _float = 0.0F; 
+            if ((tag & ((System.UInt64)1 << 0)) != 0) 
             { 
-                _float.__decode(binData, ref pos); 
+                _float = Proto4z.BaseProtoObject.decodeSingle(binData, ref pos); 
             } 
-            _double = new Proto4z.Double(); 
-            if ((tag.val & ((System.UInt64)1 << 1)) != 0) 
+            _double = 0.0; 
+            if ((tag & ((System.UInt64)1 << 1)) != 0) 
             { 
-                _double.__decode(binData, ref pos); 
+                _double = Proto4z.BaseProtoObject.decodeDouble(binData, ref pos); 
             } 
-            return (int)offset.val; 
+            pos = offset; 
+            return pos; 
         } 
     } 
  
     class TestStringData: Proto4z.IProtoObject //测试 
     {     
-        public Proto4z.String _string;  
+        public System.String _string;  
         public System.Collections.Generic.List<byte> __encode() 
         { 
-            Proto4z.ui32 sttLen = 0; 
-            Proto4z.ui64 tag = 1; 
+            System.Int32 sttLen = 0; 
+            System.UInt64 tag = 1; 
              
             var data = new System.Collections.Generic.List<byte>(); 
-            data.AddRange(_string.__encode()); 
-            sttLen = (System.UInt32)data.Count + 8; 
+            data.AddRange(Proto4z.BaseProtoObject.encodeString(_string)); 
+            sttLen = data.Count + 8; 
             var ret = new System.Collections.Generic.List<byte>(); 
-            ret.AddRange(sttLen.__encode()); 
-            ret.AddRange(tag.__encode()); 
+            ret.AddRange(Proto4z.BaseProtoObject.encodeI32(sttLen)); 
+            ret.AddRange(Proto4z.BaseProtoObject.encodeUI64(tag)); 
             ret.AddRange(data); 
             return ret; 
         } 
         public int __decode(byte[] binData, ref int pos) 
         { 
-            Proto4z.ui32 offset = 0; 
-            Proto4z.ui64 tag = 0; 
-            offset.__decode(binData, ref pos); 
-            offset.val += (System.UInt32)pos; 
-            tag.__decode(binData, ref pos); 
-            _string = new Proto4z.String(); 
-            if ((tag.val & ((System.UInt64)1 << 0)) != 0) 
+            System.Int32 offset = Proto4z.BaseProtoObject.decodeI32(binData, ref pos); 
+            offset += pos; 
+            System.UInt64 tag = Proto4z.BaseProtoObject.decodeUI64(binData, ref pos); 
+            if ((tag & ((System.UInt64)1 << 0)) != 0) 
             { 
-                _string.__decode(binData, ref pos); 
+                _string = Proto4z.BaseProtoObject.decodeString(binData, ref pos); 
             } 
-            return (int)offset.val; 
+            pos = offset; 
+            return pos; 
         } 
     } 
  
-    class IntArray : System.Collections.Generic.List<Proto4z.ui32>, Proto4z.IProtoObject  
+    class IntArray : System.Collections.Generic.List<System.UInt32>, Proto4z.IProtoObject  
     { 
         public System.Collections.Generic.List<byte> __encode() 
         { 
             var ret = new System.Collections.Generic.List<byte>(); 
-             var len = new Proto4z.ui32((System.UInt32)this.Count); 
-            ret.AddRange(len.__encode()); 
+            System.Int32 len = (System.Int32)this.Count; 
+            ret.AddRange(Proto4z.BaseProtoObject.encodeI32(len)); 
             for (int i = 0; i < this.Count; i++ ) 
             { 
-                ret.AddRange(this[i].__encode()); 
+                ret.AddRange(Proto4z.BaseProtoObject.encodeUI32(this[i]));  
             } 
             return ret; 
         } 
  
         public int __decode(byte[] binData, ref int pos) 
         { 
-            var len = new Proto4z.ui32(0); 
-            len.__decode(binData, ref pos); 
-            if(len.val > 0) 
+            System.Int32 len = Proto4z.BaseProtoObject.decodeI32(binData, ref pos); 
+            if(len > 0) 
             { 
-                for (int i=0; i<len.val; i++) 
+                for (int i=0; i<len; i++) 
                 { 
-                    var data = new Proto4z.ui32(); 
-                     data.__decode(binData, ref pos); 
-                    this.Add(data); 
+                    this.Add(Proto4z.BaseProtoObject.decodeUI32(binData, ref pos)); 
                 } 
             } 
             return pos; 
@@ -216,8 +209,8 @@ namespace Proto4z
         public System.Collections.Generic.List<byte> __encode() 
         { 
             var ret = new System.Collections.Generic.List<byte>(); 
-             var len = new Proto4z.ui32((System.UInt32)this.Count); 
-            ret.AddRange(len.__encode()); 
+            System.Int32 len = (System.Int32)this.Count; 
+            ret.AddRange(Proto4z.BaseProtoObject.encodeI32(len)); 
             for (int i = 0; i < this.Count; i++ ) 
             { 
                 ret.AddRange(this[i].__encode()); 
@@ -227,14 +220,13 @@ namespace Proto4z
  
         public int __decode(byte[] binData, ref int pos) 
         { 
-            var len = new Proto4z.ui32(0); 
-            len.__decode(binData, ref pos); 
-            if(len.val > 0) 
+            System.Int32 len = Proto4z.BaseProtoObject.decodeI32(binData, ref pos); 
+            if(len > 0) 
             { 
-                for (int i=0; i<len.val; i++) 
+                for (int i=0; i<len; i++) 
                 { 
                     var data = new TestIntegerData(); 
-                     data.__decode(binData, ref pos); 
+                    data.__decode(binData, ref pos); 
                     this.Add(data); 
                 } 
             } 
@@ -247,8 +239,8 @@ namespace Proto4z
         public System.Collections.Generic.List<byte> __encode() 
         { 
             var ret = new System.Collections.Generic.List<byte>(); 
-             var len = new Proto4z.ui32((System.UInt32)this.Count); 
-            ret.AddRange(len.__encode()); 
+            System.Int32 len = (System.Int32)this.Count; 
+            ret.AddRange(Proto4z.BaseProtoObject.encodeI32(len)); 
             for (int i = 0; i < this.Count; i++ ) 
             { 
                 ret.AddRange(this[i].__encode()); 
@@ -258,14 +250,13 @@ namespace Proto4z
  
         public int __decode(byte[] binData, ref int pos) 
         { 
-            var len = new Proto4z.ui32(0); 
-            len.__decode(binData, ref pos); 
-            if(len.val > 0) 
+            System.Int32 len = Proto4z.BaseProtoObject.decodeI32(binData, ref pos); 
+            if(len > 0) 
             { 
-                for (int i=0; i<len.val; i++) 
+                for (int i=0; i<len; i++) 
                 { 
                     var data = new TestFloatData(); 
-                     data.__decode(binData, ref pos); 
+                    data.__decode(binData, ref pos); 
                     this.Add(data); 
                 } 
             } 
@@ -278,8 +269,8 @@ namespace Proto4z
         public System.Collections.Generic.List<byte> __encode() 
         { 
             var ret = new System.Collections.Generic.List<byte>(); 
-             var len = new Proto4z.ui32((System.UInt32)this.Count); 
-            ret.AddRange(len.__encode()); 
+            System.Int32 len = (System.Int32)this.Count; 
+            ret.AddRange(Proto4z.BaseProtoObject.encodeI32(len)); 
             for (int i = 0; i < this.Count; i++ ) 
             { 
                 ret.AddRange(this[i].__encode()); 
@@ -289,14 +280,13 @@ namespace Proto4z
  
         public int __decode(byte[] binData, ref int pos) 
         { 
-            var len = new Proto4z.ui32(0); 
-            len.__decode(binData, ref pos); 
-            if(len.val > 0) 
+            System.Int32 len = Proto4z.BaseProtoObject.decodeI32(binData, ref pos); 
+            if(len > 0) 
             { 
-                for (int i=0; i<len.val; i++) 
+                for (int i=0; i<len; i++) 
                 { 
                     var data = new TestStringData(); 
-                     data.__decode(binData, ref pos); 
+                    data.__decode(binData, ref pos); 
                     this.Add(data); 
                 } 
             } 
@@ -304,16 +294,16 @@ namespace Proto4z
         } 
     } 
  
-    class TestIntegerDataMap : System.Collections.Generic.Dictionary<Proto4z.String, TestIntegerData>, Proto4z.IProtoObject  
+    class TestIntegerDataMap : System.Collections.Generic.Dictionary<System.String, TestIntegerData>, Proto4z.IProtoObject  
     { 
         public System.Collections.Generic.List<byte> __encode() 
         { 
             var ret = new System.Collections.Generic.List<byte>(); 
-             var len = new Proto4z.ui32((System.UInt32)this.Count); 
-            ret.AddRange(len.__encode()); 
+            System.Int32 len = (System.Int32)this.Count; 
+            ret.AddRange(Proto4z.BaseProtoObject.encodeI32(len)); 
             foreach(var kv in this) 
             { 
-                ret.AddRange(kv.Key.__encode()); 
+                ret.AddRange(Proto4z.BaseProtoObject.encodeString(kv.Key)); 
                 ret.AddRange(kv.Value.__encode()); 
             } 
             return ret; 
@@ -321,15 +311,13 @@ namespace Proto4z
  
         public int __decode(byte[] binData, ref int pos) 
         { 
-            var len = new Proto4z.ui32(0); 
-            len.__decode(binData, ref pos); 
-            if(len.val > 0) 
+            System.Int32 len = Proto4z.BaseProtoObject.decodeI32(binData, ref pos); 
+            if(len > 0) 
             { 
-                for (int i=0; i<len.val; i++) 
+                for (int i=0; i<len; i++) 
                 { 
-                    var key = new Proto4z.String(); 
+                    var key = Proto4z.BaseProtoObject.decodeString(binData, ref pos); 
                     var val = new TestIntegerData(); 
-                    key.__decode(binData, ref pos); 
                     val.__decode(binData, ref pos); 
                     this.Add(key, val); 
                 } 
@@ -338,16 +326,16 @@ namespace Proto4z
         } 
     } 
  
-    class TestFloatDataMap : System.Collections.Generic.Dictionary<Proto4z.String, TestFloatData>, Proto4z.IProtoObject  
+    class TestFloatDataMap : System.Collections.Generic.Dictionary<System.String, TestFloatData>, Proto4z.IProtoObject  
     { 
         public System.Collections.Generic.List<byte> __encode() 
         { 
             var ret = new System.Collections.Generic.List<byte>(); 
-             var len = new Proto4z.ui32((System.UInt32)this.Count); 
-            ret.AddRange(len.__encode()); 
+            System.Int32 len = (System.Int32)this.Count; 
+            ret.AddRange(Proto4z.BaseProtoObject.encodeI32(len)); 
             foreach(var kv in this) 
             { 
-                ret.AddRange(kv.Key.__encode()); 
+                ret.AddRange(Proto4z.BaseProtoObject.encodeString(kv.Key)); 
                 ret.AddRange(kv.Value.__encode()); 
             } 
             return ret; 
@@ -355,15 +343,13 @@ namespace Proto4z
  
         public int __decode(byte[] binData, ref int pos) 
         { 
-            var len = new Proto4z.ui32(0); 
-            len.__decode(binData, ref pos); 
-            if(len.val > 0) 
+            System.Int32 len = Proto4z.BaseProtoObject.decodeI32(binData, ref pos); 
+            if(len > 0) 
             { 
-                for (int i=0; i<len.val; i++) 
+                for (int i=0; i<len; i++) 
                 { 
-                    var key = new Proto4z.String(); 
+                    var key = Proto4z.BaseProtoObject.decodeString(binData, ref pos); 
                     var val = new TestFloatData(); 
-                    key.__decode(binData, ref pos); 
                     val.__decode(binData, ref pos); 
                     this.Add(key, val); 
                 } 
@@ -372,16 +358,16 @@ namespace Proto4z
         } 
     } 
  
-    class TestStringDataMap : System.Collections.Generic.Dictionary<Proto4z.String, TestStringData>, Proto4z.IProtoObject  
+    class TestStringDataMap : System.Collections.Generic.Dictionary<System.String, TestStringData>, Proto4z.IProtoObject  
     { 
         public System.Collections.Generic.List<byte> __encode() 
         { 
             var ret = new System.Collections.Generic.List<byte>(); 
-             var len = new Proto4z.ui32((System.UInt32)this.Count); 
-            ret.AddRange(len.__encode()); 
+            System.Int32 len = (System.Int32)this.Count; 
+            ret.AddRange(Proto4z.BaseProtoObject.encodeI32(len)); 
             foreach(var kv in this) 
             { 
-                ret.AddRange(kv.Key.__encode()); 
+                ret.AddRange(Proto4z.BaseProtoObject.encodeString(kv.Key)); 
                 ret.AddRange(kv.Value.__encode()); 
             } 
             return ret; 
@@ -389,15 +375,13 @@ namespace Proto4z
  
         public int __decode(byte[] binData, ref int pos) 
         { 
-            var len = new Proto4z.ui32(0); 
-            len.__decode(binData, ref pos); 
-            if(len.val > 0) 
+            System.Int32 len = Proto4z.BaseProtoObject.decodeI32(binData, ref pos); 
+            if(len > 0) 
             { 
-                for (int i=0; i<len.val; i++) 
+                for (int i=0; i<len; i++) 
                 { 
-                    var key = new Proto4z.String(); 
+                    var key = Proto4z.BaseProtoObject.decodeString(binData, ref pos); 
                     var val = new TestStringData(); 
-                    key.__decode(binData, ref pos); 
                     val.__decode(binData, ref pos); 
                     this.Add(key, val); 
                 } 
@@ -408,7 +392,7 @@ namespace Proto4z
  
     class EchoPack: Proto4z.IProtoObject 
     {     
-        static public Proto4z.ui16 getProtoID() { return new Proto4z.ui16(30000); } 
+        static public System.UInt16 getProtoID() { return 30000; } 
         static public string getProtoName() { return "EchoPack"; } 
         public TestIntegerDataArray _iarray;  
         public TestFloatDataArray _farray;  
@@ -418,8 +402,8 @@ namespace Proto4z
         public TestStringDataMap _smap;  
         public System.Collections.Generic.List<byte> __encode() 
         { 
-            Proto4z.ui32 sttLen = 0; 
-            Proto4z.ui64 tag = 63; 
+            System.Int32 sttLen = 0; 
+            System.UInt64 tag = 63; 
              
             var data = new System.Collections.Generic.List<byte>(); 
             data.AddRange(_iarray.__encode()); 
@@ -428,79 +412,77 @@ namespace Proto4z
             data.AddRange(_imap.__encode()); 
             data.AddRange(_fmap.__encode()); 
             data.AddRange(_smap.__encode()); 
-            sttLen = (System.UInt32)data.Count + 8; 
+            sttLen = data.Count + 8; 
             var ret = new System.Collections.Generic.List<byte>(); 
-            ret.AddRange(sttLen.__encode()); 
-            ret.AddRange(tag.__encode()); 
+            ret.AddRange(Proto4z.BaseProtoObject.encodeI32(sttLen)); 
+            ret.AddRange(Proto4z.BaseProtoObject.encodeUI64(tag)); 
             ret.AddRange(data); 
             return ret; 
         } 
         public int __decode(byte[] binData, ref int pos) 
         { 
-            Proto4z.ui32 offset = 0; 
-            Proto4z.ui64 tag = 0; 
-            offset.__decode(binData, ref pos); 
-            offset.val += (System.UInt32)pos; 
-            tag.__decode(binData, ref pos); 
+            System.Int32 offset = Proto4z.BaseProtoObject.decodeI32(binData, ref pos); 
+            offset += pos; 
+            System.UInt64 tag = Proto4z.BaseProtoObject.decodeUI64(binData, ref pos); 
             _iarray = new TestIntegerDataArray(); 
-            if ((tag.val & ((System.UInt64)1 << 0)) != 0) 
+            if ((tag & ((System.UInt64)1 << 0)) != 0) 
             { 
                 _iarray.__decode(binData, ref pos); 
             } 
             _farray = new TestFloatDataArray(); 
-            if ((tag.val & ((System.UInt64)1 << 1)) != 0) 
+            if ((tag & ((System.UInt64)1 << 1)) != 0) 
             { 
                 _farray.__decode(binData, ref pos); 
             } 
             _sarray = new TestStringDataArray(); 
-            if ((tag.val & ((System.UInt64)1 << 2)) != 0) 
+            if ((tag & ((System.UInt64)1 << 2)) != 0) 
             { 
                 _sarray.__decode(binData, ref pos); 
             } 
             _imap = new TestIntegerDataMap(); 
-            if ((tag.val & ((System.UInt64)1 << 3)) != 0) 
+            if ((tag & ((System.UInt64)1 << 3)) != 0) 
             { 
                 _imap.__decode(binData, ref pos); 
             } 
             _fmap = new TestFloatDataMap(); 
-            if ((tag.val & ((System.UInt64)1 << 4)) != 0) 
+            if ((tag & ((System.UInt64)1 << 4)) != 0) 
             { 
                 _fmap.__decode(binData, ref pos); 
             } 
             _smap = new TestStringDataMap(); 
-            if ((tag.val & ((System.UInt64)1 << 5)) != 0) 
+            if ((tag & ((System.UInt64)1 << 5)) != 0) 
             { 
                 _smap.__decode(binData, ref pos); 
             } 
-            return (int)offset.val; 
+            pos = offset; 
+            return pos; 
         } 
     } 
  
     class Pulse: Proto4z.IProtoObject 
     {     
-        static public Proto4z.ui16 getProtoID() { return new Proto4z.ui16(30001); } 
+        static public System.UInt16 getProtoID() { return 30001; } 
         static public string getProtoName() { return "Pulse"; } 
         public System.Collections.Generic.List<byte> __encode() 
         { 
-            Proto4z.ui32 sttLen = 0; 
-            Proto4z.ui64 tag = 0; 
+            System.Int32 sttLen = 0; 
+            System.UInt64 tag = 0; 
              
             var data = new System.Collections.Generic.List<byte>(); 
-            sttLen = (System.UInt32)data.Count + 8; 
+            sttLen = data.Count + 8; 
             var ret = new System.Collections.Generic.List<byte>(); 
-            ret.AddRange(sttLen.__encode()); 
-            ret.AddRange(tag.__encode()); 
+            ret.AddRange(Proto4z.BaseProtoObject.encodeI32(sttLen)); 
+            ret.AddRange(Proto4z.BaseProtoObject.encodeUI64(tag)); 
             ret.AddRange(data); 
             return ret; 
         } 
         public int __decode(byte[] binData, ref int pos) 
         { 
-            Proto4z.ui32 offset = 0; 
-            Proto4z.ui64 tag = 0; 
-            offset.__decode(binData, ref pos); 
-            offset.val += (System.UInt32)pos; 
-            tag.__decode(binData, ref pos); 
-            return (int)offset.val; 
+            System.Int32 offset = Proto4z.BaseProtoObject.decodeI32(binData, ref pos); 
+            offset += pos; 
+            System.UInt64 tag = Proto4z.BaseProtoObject.decodeUI64(binData, ref pos); 
+            pos = offset; 
+            return pos; 
         } 
     } 
  

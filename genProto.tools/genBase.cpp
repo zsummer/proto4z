@@ -71,28 +71,16 @@ std::string GenBase::getRealType(const std::string & xmltype)
 
 std::string GenBase::getTypeDefault(const std::string & xmltype)
 {
-    if (xmltype == "i8")
-        return "0";
-    else if (xmltype == "ui8")
-        return "0";
-    else if (xmltype == "i8")
-        return "0";
-    else if (xmltype == "i16")
-        return "0";
-    else if (xmltype == "ui16")
-        return "0";
-    else if (xmltype == "i32")
-        return "0";
-    else if (xmltype == "ui32")
-        return "0";
-    else if (xmltype == "ui64")
-        return "0";
-    else if (xmltype == "float")
-        return "0.0";
-    else if (xmltype == "double")
-        return "0.0";
-    else if (xmltype == "float")
-        return "0.0";
+    if (xmltype == "i8") return "0";
+    else if (xmltype == "ui8") return "0";
+    else if (xmltype == "i16") return "0";
+    else if (xmltype == "ui16") return "0";
+    else if (xmltype == "i32") return "0";
+    else if (xmltype == "ui32") return "0";
+    else if (xmltype == "i64") return "0";
+    else if (xmltype == "ui64") return "0";
+    else if (xmltype == "float") return "0.0";
+    else if (xmltype == "double") return "0.0";
     return "";
 }
 

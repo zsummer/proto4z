@@ -41,20 +41,29 @@
 #include <time.h>
 #include <algorithm>
 
-std::string GenCSharp::getRealType(const std::string & xmltype)
+
+CSharpType GenCSharp::getCSharpType(const std::string & xmltype)
 {
-    if ( xmltype == "i8") return "Proto4z.i8";
-    else if ( xmltype == "ui8") return "Proto4z.ui8";
-    else if ( xmltype == "i16") return "Proto4z.i16";
-    else if ( xmltype == "ui16") return "Proto4z.ui16";
-    else if ( xmltype == "i32") return "Proto4z.i32";
-    else if ( xmltype == "ui32") return "Proto4z.ui32";
-    else if ( xmltype == "i64") return "Proto4z.i64";
-    else if ( xmltype == "ui64") return "Proto4z.ui64";
-    else if ( xmltype == "float") return "Proto4z.Float";
-    else if ( xmltype == "double") return "Proto4z.Double";
-    else if ( xmltype == "string") return "Proto4z.String";
-    return xmltype;
+    if (xmltype == "i8") return{ true, "System.Char", "Proto4z.BaseProtoObject.encodeI8", "Proto4z.BaseProtoObject.decodeI8" };
+    if (xmltype == "ui8") return{ true, "System.Byte", "Proto4z.BaseProtoObject.encodeUI8", "Proto4z.BaseProtoObject.decodeUI8" };
+    if (xmltype == "i16") return{ true, "System.Int16", "Proto4z.BaseProtoObject.encodeI16", "Proto4z.BaseProtoObject.decodeI16" };
+    if (xmltype == "ui16") return{ true, "System.UInt16", "Proto4z.BaseProtoObject.encodeUI16", "Proto4z.BaseProtoObject.decodeUI16" };
+    if (xmltype == "i32") return{ true, "System.Int32", "Proto4z.BaseProtoObject.encodeI32", "Proto4z.BaseProtoObject.decodeI32" };
+    if (xmltype == "ui32") return{ true, "System.UInt32", "Proto4z.BaseProtoObject.encodeUI32", "Proto4z.BaseProtoObject.decodeUI32" };
+    if (xmltype == "i64") return{ true, "System.Int64", "Proto4z.BaseProtoObject.encodeI64", "Proto4z.BaseProtoObject.decodeI64" };
+    if (xmltype == "ui64") return{ true, "System.UInt64", "Proto4z.BaseProtoObject.encodeUI64", "Proto4z.BaseProtoObject.decodeUI64" };
+    if (xmltype == "float") return{ true, "System.Single", "Proto4z.BaseProtoObject.encodeSingle", "Proto4z.BaseProtoObject.decodeSingle" };
+    if (xmltype == "double") return{ true, "System.Double", "Proto4z.BaseProtoObject.encodeDouble", "Proto4z.BaseProtoObject.decodeDouble" };
+    if (xmltype == "string") return{ true, "System.String", "Proto4z.BaseProtoObject.encodeString", "Proto4z.BaseProtoObject.decodeString" };
+
+    return{ false, xmltype, "", "" };
+}
+
+std::string  GenCSharp::getTypeDefault(const std::string & xmltype)
+{
+    if (xmltype == "i8") return "'\\0'";
+    else if (xmltype == "float") return "0.0F";
+    return GenBase::getTypeDefault(xmltype);
 }
 
 std::string GenCSharp::genRealContent(const std::list<AnyData> & stores)
@@ -83,12 +92,12 @@ std::string GenCSharp::genRealContent(const std::list<AnyData> & stores)
             }
             text += LFCR;
             text += "    {" + LFCR;
-            text += "        public static " + getRealType(info._const._type) + " value = " + info._const._value + "; " + LFCR;
+            text += "        public static " + getCSharpType(info._const._type).realType + " value = " + info._const._value + "; " + LFCR;
             text += "    }" + LFCR;
         }
         else if (info._type == GT_DataArray)
         {
-            text += LFCR + "    class " + info._array._arrayName + " : System.Collections.Generic.List<" + getRealType(info._array._type) + ">, Proto4z.IProtoObject ";
+            text += LFCR + "    class " + info._array._arrayName + " : System.Collections.Generic.List<" + getCSharpType(info._array._type).realType + ">, Proto4z.IProtoObject ";
             if (!info._array._desc.empty())
             {
                 text += "//" + info._array._desc;
@@ -98,11 +107,18 @@ std::string GenCSharp::genRealContent(const std::list<AnyData> & stores)
             text += "        "   "public System.Collections.Generic.List<byte> __encode()" + LFCR;
             text += "        {" + LFCR;
             text += "            "   "var ret = new System.Collections.Generic.List<byte>();" + LFCR;
-            text += "            "   " var len = new Proto4z.ui32((System.UInt32)this.Count);" + LFCR;
-            text += "            "   "ret.AddRange(len.__encode());" + LFCR;
+            text += "            "   "System.Int32 len = (System.Int32)this.Count;" + LFCR;
+            text += "            "   "ret.AddRange(Proto4z.BaseProtoObject.encodeI32(len));" + LFCR;
             text += "            "   "for (int i = 0; i < this.Count; i++ )" + LFCR;
             text += "            "   "{" + LFCR;
-            text += "                "  "ret.AddRange(this[i].__encode());" + LFCR;
+            if (getCSharpType(info._array._type).isBase)
+            {
+                text += "                "  "ret.AddRange(" + getCSharpType(info._array._type).baseEncode + "(this[i])); " + LFCR;
+            }
+            else
+            {
+                text += "                "  "ret.AddRange(this[i].__encode());" + LFCR;
+            }
             text += "            "   "}" + LFCR;
             text += "            "   "return ret;" + LFCR;
             text += "        }" + LFCR;
@@ -110,15 +126,21 @@ std::string GenCSharp::genRealContent(const std::list<AnyData> & stores)
 
             text += "        "   "public int __decode(byte[] binData, ref int pos)" + LFCR;
             text += "        {" + LFCR;
-            text += "            "   "var len = new Proto4z.ui32(0);" + LFCR;
-            text += "            "   "len.__decode(binData, ref pos);" + LFCR;
-            text += "            "  "if(len.val > 0)" + LFCR;
+            text += "            "   "System.Int32 len = Proto4z.BaseProtoObject.decodeI32(binData, ref pos);" + LFCR;
+            text += "            "  "if(len > 0)" + LFCR;
             text += "            "   "{" + LFCR;
-            text += "                "  "for (int i=0; i<len.val; i++)" + LFCR;
+            text += "                "  "for (int i=0; i<len; i++)" + LFCR;
             text += "                "   "{" + LFCR;
-            text += "                    " "var data = new " + getRealType(info._array._type) + "();" + LFCR;
-            text += "                    "  " data.__decode(binData, ref pos);" + LFCR;
-            text += "                    "  "this.Add(data);" + LFCR;
+            if (getCSharpType(info._array._type).isBase)
+            {
+                text += "                    "  "this.Add(" + getCSharpType(info._array._type).baseDecode + "(binData, ref pos));" + LFCR;
+            }
+            else
+            {
+                text += "                    "  "var data = new " + getCSharpType(info._array._type).realType + "();" + LFCR;
+                text += "                    "  "data.__decode(binData, ref pos);" + LFCR;
+                text += "                    "  "this.Add(data);" + LFCR;
+            }
             text += "                "   "}" + LFCR;
             text += "            "   "}" + LFCR;
             text += "            "   "return pos;" + LFCR;
@@ -127,7 +149,7 @@ std::string GenCSharp::genRealContent(const std::list<AnyData> & stores)
         }
         else if (info._type == GT_DataMap)
         {
-            text += LFCR + "    class " + info._map._mapName + " : System.Collections.Generic.Dictionary<" + getRealType(info._map._typeKey) + ", " + getRealType(info._map._typeValue) + ">, Proto4z.IProtoObject ";
+            text += LFCR + "    class " + info._map._mapName + " : System.Collections.Generic.Dictionary<" + getCSharpType(info._map._typeKey).realType + ", " + getCSharpType(info._map._typeValue).realType + ">, Proto4z.IProtoObject ";
             if (!info._array._desc.empty())
             {
                 text += "//" + info._array._desc;
@@ -136,13 +158,27 @@ std::string GenCSharp::genRealContent(const std::list<AnyData> & stores)
             text += "    {" + LFCR;
             text += "        "   "public System.Collections.Generic.List<byte> __encode()" + LFCR;
             text += "        {" +  LFCR;
-            text += "            "  "var ret = new System.Collections.Generic.List<byte>();" + LFCR;
-            text += "            "   " var len = new Proto4z.ui32((System.UInt32)this.Count);" + LFCR;
-            text += "            "   "ret.AddRange(len.__encode());" + LFCR;
+            text += "            "   "var ret = new System.Collections.Generic.List<byte>();" + LFCR;
+            text += "            "   "System.Int32 len = (System.Int32)this.Count;" + LFCR;
+            text += "            "   "ret.AddRange(Proto4z.BaseProtoObject.encodeI32(len));" + LFCR;
             text += "            "   "foreach(var kv in this)" + LFCR;
             text += "            "   "{" + LFCR;
-            text += "                "   "ret.AddRange(kv.Key.__encode());" + LFCR;
-            text += "                "   "ret.AddRange(kv.Value.__encode());" + LFCR;
+            if (getCSharpType(info._map._typeKey).isBase)
+            {
+                text += "                "   "ret.AddRange(" + getCSharpType(info._map._typeKey).baseEncode + "(kv.Key));" + LFCR;
+            }
+            else
+            {
+                text += "                "   "ret.AddRange(kv.Key.__encode());" + LFCR;
+            }
+            if (getCSharpType(info._map._typeValue).isBase)
+            {
+                text += "                "   "ret.AddRange(" + getCSharpType(info._map._typeValue).baseEncode + "(kv.Value));" + LFCR;
+            }
+            else
+            {
+                text += "                "   "ret.AddRange(kv.Value.__encode());" + LFCR;
+            }
             text += "            "   "}" + LFCR;
             text += "            "   "return ret;" + LFCR;
             text += "        }" +  LFCR;
@@ -150,16 +186,30 @@ std::string GenCSharp::genRealContent(const std::list<AnyData> & stores)
 
             text += "        "   "public int __decode(byte[] binData, ref int pos)" + LFCR;
             text += "        {" + LFCR;
-            text += "            "   "var len = new Proto4z.ui32(0);" + LFCR;
-            text += "            "   "len.__decode(binData, ref pos);" + LFCR;
-            text += "            "   "if(len.val > 0)" + LFCR;
+            text += "            "   "System.Int32 len = Proto4z.BaseProtoObject.decodeI32(binData, ref pos);" + LFCR;
+            text += "            "   "if(len > 0)" + LFCR;
             text += "            "   "{" + LFCR;
-            text += "                "   "for (int i=0; i<len.val; i++)" + LFCR;
+            text += "                "   "for (int i=0; i<len; i++)" + LFCR;
             text += "                "   "{" + LFCR;
-            text += "                    "   "var key = new " + getRealType(info._map._typeKey) + "();" + LFCR;
-            text += "                    "   "var val = new " + getRealType(info._map._typeValue) + "();" + LFCR;
-            text += "                    "    "key.__decode(binData, ref pos);" + LFCR;
-            text += "                    "   "val.__decode(binData, ref pos);" + LFCR;
+            if (getCSharpType(info._map._typeKey).isBase)
+            {
+                text += "                    "   "var key = " + getCSharpType(info._map._typeKey).baseDecode + "(binData, ref pos);" + LFCR;
+            }
+            else
+            {
+                text += "                    "   "var key = new " + getCSharpType(info._map._typeKey).realType + "();" + LFCR;
+                text += "                    "    "key.__decode(binData, ref pos);" + LFCR;
+            }
+           
+            if (getCSharpType(info._map._typeValue).isBase)
+            {
+                text += "                    "   "var val = " + getCSharpType(info._map._typeValue).baseDecode + "(binData, ref pos);" + LFCR;
+            }
+            else
+            {
+                text += "                    "   "var val = new " + getCSharpType(info._map._typeValue).realType + "();" + LFCR;
+                text += "                    "    "val.__decode(binData, ref pos);" + LFCR;
+            }
             text += "                    "   "this.Add(key, val);" + LFCR;
             text += "                "   "}" + LFCR;
             text += "            "   "}" + LFCR;
@@ -182,13 +232,13 @@ std::string GenCSharp::genRealContent(const std::list<AnyData> & stores)
             //write ProtoID
             if (info._type == GT_DataProto)
             {
-                text += "        " "static public Proto4z.ui16 getProtoID() { return new Proto4z.ui16(" + info._proto._const._value + "); }" + LFCR;
+                text += "        " "static public System.UInt16 getProtoID() { return " + info._proto._const._value + "; }" + LFCR;
                 text += "        " "static public string getProtoName() { return \"" + info._proto._struct._name + "\"; }" + LFCR;
             }
 
             for (const auto & m : info._proto._struct._members)
             {
-                text += "        public " + getRealType(m._type) + " " + m._name + "; ";
+                text += "        public " + getCSharpType(m._type).realType + " " + m._name + "; ";
                 if (!m._desc.empty())
                 {
                     text += "//" + m._desc;
@@ -199,25 +249,29 @@ std::string GenCSharp::genRealContent(const std::list<AnyData> & stores)
             //encode
             text += "        public System.Collections.Generic.List<byte> __encode()" + LFCR;
             text += "        {" + LFCR;
-            text += "            "   "Proto4z.ui32 sttLen = 0;" + LFCR;
-            text += "            "   "Proto4z.ui64 tag = " + boost::lexical_cast<std::string, unsigned long long>(info._proto._struct._tag) + ";" + LFCR;
+            text += "            "   "System.Int32 sttLen = 0;" + LFCR;
+            text += "            "   "System.UInt64 tag = " + boost::lexical_cast<std::string, unsigned long long>(info._proto._struct._tag) + ";" + LFCR;
             text += "            "   "" + LFCR;
             text += "            "   "var data = new System.Collections.Generic.List<byte>();" + LFCR;
             for (const auto &m : info._proto._struct._members)
             {
                 if (m._tag == MT_DELETE)
                 {
-                    text += "//            "  "data.AddRange(" + m._name + ".__encode());//[already deleted]" + LFCR;
+                    text += "//";
+                }
+                if (getCSharpType(m._type).isBase)
+                {
+                    text += "            "  "data.AddRange(" + getCSharpType(m._type).baseEncode + "(" + m._name + "));" + LFCR;
                 }
                 else
                 {
                     text += "            "  "data.AddRange(" + m._name + ".__encode());" + LFCR;
                 }
             }
-            text += "            " "sttLen = (System.UInt32)data.Count + 8;" + LFCR;
+            text += "            " "sttLen = data.Count + 8;" + LFCR;
             text += "            "  "var ret = new System.Collections.Generic.List<byte>();" + LFCR;
-            text += "            "  "ret.AddRange(sttLen.__encode());" + LFCR;
-            text += "            "  "ret.AddRange(tag.__encode());" + LFCR;
+            text += "            "  "ret.AddRange(Proto4z.BaseProtoObject.encodeI32(sttLen));" + LFCR;
+            text += "            "  "ret.AddRange(Proto4z.BaseProtoObject.encodeUI64(tag));" + LFCR;
             text += "            "  "ret.AddRange(data);" + LFCR;
             text += "            "  "return ret;" + LFCR;
             text += "        }" + LFCR;
@@ -225,22 +279,40 @@ std::string GenCSharp::genRealContent(const std::list<AnyData> & stores)
             //decode
             text += "        public int __decode(byte[] binData, ref int pos)" + LFCR;
             text += "        {" + LFCR;
-            text += "            " "Proto4z.ui32 offset = 0;" + LFCR;
-            text += "            " "Proto4z.ui64 tag = 0;" + LFCR;
-            text += "            " "offset.__decode(binData, ref pos);" + LFCR;
-            text += "            " "offset.val += (System.UInt32)pos;" + LFCR;
-            text += "            " "tag.__decode(binData, ref pos);" + LFCR;
+            text += "            " "System.Int32 offset = Proto4z.BaseProtoObject.decodeI32(binData, ref pos);" + LFCR;
+            text += "            " "offset += pos;" + LFCR;
+            text += "            " "System.UInt64 tag = Proto4z.BaseProtoObject.decodeUI64(binData, ref pos);" + LFCR;
             int i = 0;
             for (const auto &m : info._proto._struct._members)
             {
-                text += "            " + m._name + " = new " + getRealType(m._type) + "();" + LFCR;
-                text += "            " "if ((tag.val & ((System.UInt64)1 << " + boost::lexical_cast<std::string, int>(i) + ")) != 0)" + LFCR;
+                if (getCSharpType(m._type).isBase)
+                {
+                    if (!getTypeDefault(m._type).empty())
+                    {
+                        text += "            " + m._name + " = " + getTypeDefault(m._type) + ";" + LFCR;
+                    }
+                }
+                else
+                {
+                    text += "            " + m._name + " = new " + getCSharpType(m._type).realType + "();" + LFCR;
+                }
+                
+                text += "            " "if ((tag & ((System.UInt64)1 << " + boost::lexical_cast<std::string, int>(i) + ")) != 0)" + LFCR;
                 text += "            " "{" + LFCR;
-                text += "                " + m._name + ".__decode(binData, ref pos);" + LFCR;
+                if (getCSharpType(m._type).isBase)
+                {
+                    text += "                " + m._name + " = " + getCSharpType(m._type).baseDecode + "(binData, ref pos);" + LFCR;
+                }
+                else
+                {
+                    text += "                " + m._name + ".__decode(binData, ref pos);" + LFCR;
+                }
+                
                 text += "            " "}" + LFCR;
                 i++;
             }
-            text += "            return (int)offset.val;" + LFCR;
+            text += "            pos = offset;" + LFCR;
+            text += "            return pos;" + LFCR;
             text += "        }" + LFCR;
             text += "    }" + LFCR;
         }

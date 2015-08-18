@@ -41,11 +41,21 @@
 #include <time.h>
 #include <algorithm>
 
+class CSharpType
+{
+public:
+    CSharpType(bool b, std::string t, std::string e, std::string d) :isBase(b), realType(t), baseEncode(e), baseDecode(d){}
+    bool isBase = true;
+    std::string realType;
+    std::string baseEncode;
+    std::string baseDecode;
+};
 
 class GenCSharp : public GenBase
 {
 public:
-    virtual std::string getRealType(const std::string & xmltype);
+    CSharpType getCSharpType(const std::string & xmltype);
+    virtual std::string getTypeDefault(const std::string & xmltype);
     virtual std::string genRealContent(const std::list<AnyData> & stores);
 };
 

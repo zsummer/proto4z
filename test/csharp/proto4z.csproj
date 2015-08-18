@@ -61,7 +61,9 @@
     <Compile Include="Proto4z.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="TestProto.cs" />
+    <Compile Include="TestProto.cs">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

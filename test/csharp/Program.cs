@@ -54,21 +54,19 @@ namespace ConsoleApplication2
     {
         class NetHeader : IProtoObject
         {
-            public Proto4z.ui32 packLen;
-            public Proto4z.ui16 protoID;
+            public uint packLen;
+            public ushort protoID;
             public System.Collections.Generic.List<byte> __encode()
             {
                 var ret = new System.Collections.Generic.List<byte>();
-                ret.AddRange(packLen.__encode());
-                ret.AddRange(protoID.__encode());
+                ret.AddRange(BaseProtoObject.encodeUI32(packLen));
+                ret.AddRange(BaseProtoObject.encodeUI16(protoID));
                 return ret;
             }
             public System.Int32 __decode(byte[] binData, ref System.Int32 pos)
             {
-                packLen = new Proto4z.ui32();
-                protoID = new Proto4z.ui16();
-                packLen.__decode(binData, ref pos);
-                protoID.__decode(binData, ref pos);
+                packLen = BaseProtoObject.decodeUI32(binData, ref pos);
+                protoID = BaseProtoObject.decodeUI16(binData, ref pos);
                 return pos;
             }
         }
@@ -122,7 +120,7 @@ namespace ConsoleApplication2
                     {
                         int pos = 0;
                         recvHead.__decode(recvBytes, ref pos);
-                        needLen = recvHead.packLen.val - 4 - 2;
+                        needLen = recvHead.packLen - 4 - 2;
                     }
                     else if (needLen == 0)
                     {
@@ -192,28 +190,37 @@ namespace ConsoleApplication2
             pack._smap = new Proto4z.TestStringDataMap();
             pack._smap.Add("723", sdata);
             pack._smap.Add("823", sdata);
-            var byteData = pack.__encode();
-            var binData = byteData.ToArray();
 
-            for (int i = 0; i < binData.Length; i++)
+            var now = DateTime.UtcNow;
+            for (int i=0; i< 10000; i++)
             {
-                System.Console.WriteLine((int)binData[i]);
+                var byteData = pack.__encode();
+                var binData = byteData.ToArray();
+
+//                 for (int i = 0; i < binData.Length; i++)
+//                 {
+//                     System.Console.WriteLine((int)binData[i]);
+//                 }
+                rc4Server.encryption(binData, binData.Length);
+                rc4Client.encryption(binData, binData.Length);
+//                 for (int i = 0; i < binData.Length; i++)
+//                 {
+//                     System.Console.WriteLine((int)binData[i]);
+//                 }
+
+                var v = new EchoPack();
+
+                int pos = 0;
+                v.__decode(binData, ref pos);
+
+                 Client client = new Client();
+                 client.Run(binData);
             }
-            rc4Server.encryption(binData, binData.Length);
-            rc4Client.encryption(binData, binData.Length);
-            for (int i = 0; i < binData.Length; i++)
-            {
-                System.Console.WriteLine((int)binData[i]);
-            }
-
-            var v = new EchoPack();
-
-            int pos = 0;
-            v.__decode(binData, ref pos);
+            System.Console.WriteLine(DateTime.UtcNow - now);
+            
 
 
-            Client client = new Client();
-            client.Run(binData);
+
 
 
 
