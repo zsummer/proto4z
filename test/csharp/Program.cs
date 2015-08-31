@@ -55,17 +55,20 @@ namespace ConsoleApplication2
         class NetHeader : IProtoObject
         {
             public uint packLen;
+            public ushort reserve;
             public ushort protoID;
             public System.Collections.Generic.List<byte> __encode()
             {
                 var ret = new System.Collections.Generic.List<byte>();
                 ret.AddRange(BaseProtoObject.encodeUI32(packLen));
+                ret.AddRange(BaseProtoObject.encodeUI16(reserve));
                 ret.AddRange(BaseProtoObject.encodeUI16(protoID));
                 return ret;
             }
             public System.Int32 __decode(byte[] binData, ref System.Int32 pos)
             {
                 packLen = BaseProtoObject.decodeUI32(binData, ref pos);
+                reserve = BaseProtoObject.decodeUI16(binData, ref pos);
                 protoID = BaseProtoObject.decodeUI16(binData, ref pos);
                 return pos;
             }
@@ -92,7 +95,7 @@ namespace ConsoleApplication2
                 var sendData = new System.Collections.Generic.List<byte>();
 
                 NetHeader head = new NetHeader();
-                head.packLen = (UInt32)(4 + 2 + binData.Length);
+                head.packLen = (UInt32)(4 + 2 + 2 + binData.Length);
                 head.protoID = Proto4z.EchoPack.getProtoID();
 
                 sendData.AddRange(head.__encode());
@@ -104,7 +107,7 @@ namespace ConsoleApplication2
                 
                 var recvBytes = new byte[2000];
                 uint curLen = 0;
-                uint needLen = 4 + 2;
+                uint needLen = 4 + 2 + 2;
                 uint recvLen = 0;
                 NetHeader recvHead = new NetHeader();
                 do
@@ -116,18 +119,18 @@ namespace ConsoleApplication2
                     }
                     curLen += recvLen;
                     needLen -= recvLen;
-                    if (needLen == 0 && curLen == 4 + 2) //head already read finish
+                    if (needLen == 0 && curLen == 4 + 2 + 2) //head already read finish
                     {
                         int pos = 0;
                         recvHead.__decode(recvBytes, ref pos);
-                        needLen = recvHead.packLen - 4 - 2;
+                        needLen = recvHead.packLen - 4 - 2 - 2;
                     }
                     else if (needLen == 0)
                     {
                         if (recvHead.protoID == Proto4z.EchoPack.getProtoID())
                         {
                             Proto4z.EchoPack result = new Proto4z.EchoPack();
-                            int pos = 4+2;
+                            int pos = 4+2+2;
                             result.__decode(recvBytes, ref pos);
                             //System.Console.WriteLine("echo =" + result.text.val);
                         }
