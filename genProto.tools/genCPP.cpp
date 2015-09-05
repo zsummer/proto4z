@@ -175,11 +175,13 @@ std::string GenCPP::genRealContent(const std::list<AnyData> & stores)
             //input stream operator
             text += "inline zsummer::proto4z::WriteStream & operator << (zsummer::proto4z::WriteStream & ws, const " + info._proto._struct._name + " & data)" + LFCR;
             text += "{" + LFCR;
+#ifdef __WITH_TAG
             text += "    unsigned long long tag = " + boost::lexical_cast<std::string, unsigned long long>(info._proto._struct._tag) + "ULL;" + LFCR;
             text += "    if (zsummer::proto4z::__localEndianType() != zsummer::proto4z::LittleEndian) tag = zsummer::proto4z::byteRevese(tag);" + LFCR;
             text += "    ws << (zsummer::proto4z::Integer)0;" + LFCR;
             text += "    zsummer::proto4z::Integer offset = ws.getStreamLen();" + LFCR;
             text += "    ws << tag;" + LFCR;
+#endif
             for (const auto &m : info._proto._struct._members)
             {
                 if (m._tag == MT_DELETE)
@@ -191,7 +193,9 @@ std::string GenCPP::genRealContent(const std::list<AnyData> & stores)
                     text += "    ws << data." + m._name + ";" + LFCR;
                 }
             }
+#ifdef __WITH_TAG
             text += "    ws.fixOriginalData(offset - 4, ws.getStreamLen() - offset);" + LFCR;
+#endif
             text += "    return ws;" + LFCR;
             text += "}" + LFCR;
 
@@ -199,23 +203,41 @@ std::string GenCPP::genRealContent(const std::list<AnyData> & stores)
             //output stream operator
             text += "inline zsummer::proto4z::ReadStream & operator >> (zsummer::proto4z::ReadStream & rs, " + info._proto._struct._name + " & data)" + LFCR;
             text += "{" + LFCR;
+#ifdef __WITH_TAG
             text += "    zsummer::proto4z::Integer sttLen = 0;" + LFCR;
             text += "    rs >> sttLen;" + LFCR;
             text += "    zsummer::proto4z::Integer cursor = rs.getStreamUnreadLen();" + LFCR;
             text += "    unsigned long long tag = 0;" + LFCR;
             text += "    rs >> tag;" + LFCR;
             text += "    if (zsummer::proto4z::__localEndianType() != zsummer::proto4z::LittleEndian) tag = zsummer::proto4z::byteRevese(tag);" + LFCR;
+#endif
             int curTagIndex = 0;
             for (const auto &m : info._proto._struct._members)
             {
+#ifdef __WITH_TAG
                 text += "    if ( (1ULL << " + boost::lexical_cast<std::string, int>(curTagIndex)+") & tag)" + LFCR;
                 text += "    {" + LFCR;
-                text += "        rs >> data." + m._name + "; " + LFCR;
+#endif
+
+#ifndef __WITH_TAG
+                if (m._tag == MT_DELETE)
+                    text += "//        rs >> data." + m._name + "; " + LFCR;
+                else
+#endif
+                    text += "        rs >> data." + m._name + "; " + LFCR;
+
+
+
+#ifdef __WITH_TAG
                 text += "    }" + LFCR;
+#endif
                 curTagIndex++;
             }
+
+#ifdef __WITH_TAG
             text += "    cursor = cursor - rs.getStreamUnreadLen();" + LFCR;
             text += "    rs.skipOriginalData(sttLen - cursor);" + LFCR;
+#endif
             text += "    return rs;" + LFCR;
             text += "}" + LFCR;
 

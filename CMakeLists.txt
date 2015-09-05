@@ -27,7 +27,8 @@ else(WIN32)
     set(LIB_SUFFIX "")
   endif()
 endif(WIN32)
-
+#add_definitions(-D__WITH_TAG)
+SET(PROTO4Z_GEN_CODE_PATH ${proto4z_SOURCE_DIR}/test/genCode)
 SET(PROTO4Z_BIN_OUT_PATH ${proto4z_SOURCE_DIR}/test/bin)
 
 add_subdirectory(genProto.tools)

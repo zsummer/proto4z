@@ -249,9 +249,11 @@ std::string GenCSharp::genRealContent(const std::list<AnyData> & stores)
             //encode
             text += "        public System.Collections.Generic.List<byte> __encode()" + LFCR;
             text += "        {" + LFCR;
+#ifdef __WITH_TAG
             text += "            "   "System.Int32 sttLen = 0;" + LFCR;
             text += "            "   "System.UInt64 tag = " + boost::lexical_cast<std::string, unsigned long long>(info._proto._struct._tag) + ";" + LFCR;
             text += "            "   "" + LFCR;
+#endif
             text += "            "   "var data = new System.Collections.Generic.List<byte>();" + LFCR;
             for (const auto &m : info._proto._struct._members)
             {
@@ -268,10 +270,14 @@ std::string GenCSharp::genRealContent(const std::list<AnyData> & stores)
                     text += "            "  "data.AddRange(" + m._name + ".__encode());" + LFCR;
                 }
             }
+#ifdef __WITH_TAG
             text += "            " "sttLen = data.Count + 8;" + LFCR;
+#endif
             text += "            "  "var ret = new System.Collections.Generic.List<byte>();" + LFCR;
+#ifdef __WITH_TAG
             text += "            "  "ret.AddRange(Proto4z.BaseProtoObject.encodeI32(sttLen));" + LFCR;
             text += "            "  "ret.AddRange(Proto4z.BaseProtoObject.encodeUI64(tag));" + LFCR;
+#endif
             text += "            "  "ret.AddRange(data);" + LFCR;
             text += "            "  "return ret;" + LFCR;
             text += "        }" + LFCR;
@@ -279,9 +285,11 @@ std::string GenCSharp::genRealContent(const std::list<AnyData> & stores)
             //decode
             text += "        public int __decode(byte[] binData, ref int pos)" + LFCR;
             text += "        {" + LFCR;
+#ifdef __WITH_TAG
             text += "            " "System.Int32 offset = Proto4z.BaseProtoObject.decodeI32(binData, ref pos);" + LFCR;
             text += "            " "offset += pos;" + LFCR;
             text += "            " "System.UInt64 tag = Proto4z.BaseProtoObject.decodeUI64(binData, ref pos);" + LFCR;
+#endif
             int i = 0;
             for (const auto &m : info._proto._struct._members)
             {
@@ -296,9 +304,10 @@ std::string GenCSharp::genRealContent(const std::list<AnyData> & stores)
                 {
                     text += "            " + m._name + " = new " + getCSharpType(m._type).realType + "();" + LFCR;
                 }
-                
+#ifdef __WITH_TAG
                 text += "            " "if ((tag & ((System.UInt64)1 << " + boost::lexical_cast<std::string, int>(i) + ")) != 0)" + LFCR;
                 text += "            " "{" + LFCR;
+#endif
                 if (getCSharpType(m._type).isBase)
                 {
                     text += "                " + m._name + " = " + getCSharpType(m._type).baseDecode + "(binData, ref pos);" + LFCR;
@@ -307,11 +316,14 @@ std::string GenCSharp::genRealContent(const std::list<AnyData> & stores)
                 {
                     text += "                " + m._name + ".__decode(binData, ref pos);" + LFCR;
                 }
-                
+#ifdef __WITH_TAG
                 text += "            " "}" + LFCR;
+#endif
                 i++;
             }
+#ifdef __WITH_TAG
             text += "            pos = offset;" + LFCR;
+#endif
             text += "            return pos;" + LFCR;
             text += "        }" + LFCR;
             text += "    }" + LFCR;

@@ -43,7 +43,7 @@
 #include "parseCache.h"
 #include "parseProto.h"
 using namespace zsummer::utility;
-
+//#define __WITH_TAG
 int main(int argc, char *argv[])
 {
     zsummer::log4z::ILog4zManager::getRef().setLoggerFileLine(LOG4Z_MAIN_LOGGER_ID, false);

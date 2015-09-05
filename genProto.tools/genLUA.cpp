@@ -123,7 +123,7 @@ std::string GenLUA::genRealContent(const std::list<AnyData> & stores)
                     tag.append("1");
                 }
             }
-            text += "Proto4z." + info._proto._struct._name + ".__getTag = \"" + tag + "\"" + LFCR;
+            //text += "Proto4z." + info._proto._struct._name + ".__getTag = \"" + tag + "\"" + LFCR;
             for (size_t i = 0; i < info._proto._struct._members.size(); ++i)
             {
                 text += "Proto4z." + info._proto._struct._name + "[" + boost::lexical_cast<std::string>(i + 1)
