@@ -72,7 +72,7 @@ std::string GenCPP::genRealContent(const std::list<AnyData> & stores)
             text += "#include <" + info._include._filename + ".h> ";
             if (!info._include._desc.empty())
             {
-                text += "//" + info._include._desc;
+                text += "//" + info._include._desc + " ";
             }
             text += LFCR;
         }
@@ -81,7 +81,7 @@ std::string GenCPP::genRealContent(const std::list<AnyData> & stores)
             text += "const " + getRealType(info._const._type) + " " + info._const._name + " = " + info._const._value + "; ";
             if (!info._const._desc.empty())
             {
-                text += "//" + info._const._desc;
+                text += "//" + info._const._desc + " ";
             }
             text += LFCR;
         }
@@ -90,7 +90,7 @@ std::string GenCPP::genRealContent(const std::list<AnyData> & stores)
             text += LFCR + "typedef std::vector<" + getRealType(info._array._type) + "> " + info._array._arrayName + "; ";
             if (!info._array._desc.empty())
             {
-                text += "//" + info._array._desc;
+                text += "//" + info._array._desc + " ";
             }
             text += LFCR;
         }
@@ -101,7 +101,7 @@ std::string GenCPP::genRealContent(const std::list<AnyData> & stores)
                 + "> " + info._map._mapName + "; ";
             if (!info._map._desc.empty())
             {
-                text += "//" + info._map._desc;
+                text += "//" + info._map._desc + " ";
             }
             text += LFCR;
         }
@@ -115,7 +115,7 @@ std::string GenCPP::genRealContent(const std::list<AnyData> & stores)
                     + info._proto._const._name + " = " + info._proto._const._value + "; ";
                 if (!info._proto._const._desc.empty())
                 {
-                    text += "//" + info._proto._const._desc;
+                    text += "//" + info._proto._const._desc + " ";
                 }
                 text += LFCR;
             }
@@ -124,7 +124,7 @@ std::string GenCPP::genRealContent(const std::list<AnyData> & stores)
             text += "struct " + info._proto._struct._name;
             if (!info._proto._struct._desc.empty())
             {
-                text += " //" + info._proto._struct._desc;
+                text += " //" + info._proto._struct._desc + " ";
             }
             text += LFCR;
             text += "{" + LFCR;
@@ -135,11 +135,11 @@ std::string GenCPP::genRealContent(const std::list<AnyData> & stores)
                 text += "    " + getRealType(m._type) + " " + m._name + "; ";
                 if (m._tag == MT_DELETE)
                 {
-                    text += "//[already deleted]";
+                    text += "//[already deleted] ";
                 }
                 if (!m._desc.empty())
                 {
-                    text += "//" + m._desc;
+                    text += "//" + m._desc + " ";
                 }
                 text += LFCR;
             }
@@ -186,11 +186,11 @@ std::string GenCPP::genRealContent(const std::list<AnyData> & stores)
             {
                 if (m._tag == MT_DELETE)
                 {
-                    text += "//    ws << data." + m._name + "; //[already deleted]" + LFCR;
+                    text += "//    ws << data." + m._name + "; //[already deleted] " + LFCR;
                 }
                 else
                 {
-                    text += "    ws << data." + m._name + ";" + LFCR;
+                    text += "    ws << data." + m._name + "; " + LFCR;
                 }
             }
 #ifdef __WITH_TAG

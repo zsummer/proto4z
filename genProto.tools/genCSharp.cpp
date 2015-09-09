@@ -88,7 +88,7 @@ std::string GenCSharp::genRealContent(const std::list<AnyData> & stores)
             text += "    class STATIC_" + info._const._name + " ";
             if (!info._const._desc.empty())
             {
-                text += "//" + info._const._desc;
+                text += "//" + info._const._desc + " ";
             }
             text += LFCR;
             text += "    {" + LFCR;
@@ -100,7 +100,7 @@ std::string GenCSharp::genRealContent(const std::list<AnyData> & stores)
             text += LFCR + "    class " + info._array._arrayName + " : System.Collections.Generic.List<" + getCSharpType(info._array._type).realType + ">, Proto4z.IProtoObject ";
             if (!info._array._desc.empty())
             {
-                text += "//" + info._array._desc;
+                text += "//" + info._array._desc + " ";
             }
             text += LFCR;
             text += "    {" + LFCR;
@@ -152,7 +152,7 @@ std::string GenCSharp::genRealContent(const std::list<AnyData> & stores)
             text += LFCR + "    class " + info._map._mapName + " : System.Collections.Generic.Dictionary<" + getCSharpType(info._map._typeKey).realType + ", " + getCSharpType(info._map._typeValue).realType + ">, Proto4z.IProtoObject ";
             if (!info._array._desc.empty())
             {
-                text += "//" + info._array._desc;
+                text += "//" + info._array._desc + " ";
             }
             text += LFCR;
             text += "    {" + LFCR;
@@ -224,7 +224,7 @@ std::string GenCSharp::genRealContent(const std::list<AnyData> & stores)
             text += "    class " + info._proto._struct._name + ": Proto4z.IProtoObject";
             if (!info._proto._struct._desc.empty())
             {
-                text += " //" + info._proto._struct._desc;
+                text += " //" + info._proto._struct._desc + " ";
             }
             text += LFCR;
             text += "    {    " + LFCR;
@@ -241,7 +241,7 @@ std::string GenCSharp::genRealContent(const std::list<AnyData> & stores)
                 text += "        public " + getCSharpType(m._type).realType + " " + m._name + "; ";
                 if (!m._desc.empty())
                 {
-                    text += "//" + m._desc;
+                    text += "//" + m._desc + " ";
                 }
                 text += LFCR;
             }
