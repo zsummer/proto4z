@@ -67,7 +67,11 @@ std::string GenCPP::genRealContent(const std::list<AnyData> & stores)
 
     for (auto &info : stores)
     {
-        if (info._type == GT_DataInclude)
+        if (info._type == GT_DataComment)
+        {
+            text += "/*" + info._comment._desc + "*/" + LFCR;
+        }
+        else if (info._type == GT_DataInclude)
         {
             text += "#include <" + info._include._filename + ".h> ";
             if (!info._include._desc.empty())

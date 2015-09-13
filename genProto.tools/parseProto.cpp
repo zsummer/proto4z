@@ -171,6 +171,30 @@ std::list<AnyData> parseProto(std::string fileName, ParseCache & cache)
                 }
                 enumType = ele->Attribute("type");
 
+                //comments
+                {
+                    AnyData comment;
+                    comment._type = GT_DataComment;
+                    comment._comment._desc += "--enum--[name=";
+                    if (ele->Attribute("name"))
+                    {
+                        comment._comment._desc += ele->Attribute("name");
+                    }
+                    else
+                    {
+                        comment._comment._desc += "Anonymous";
+                    }
+                    comment._comment._desc += ", type=";
+                    comment._comment._desc += ele->Attribute("type");
+                    if (ele->Attribute("desc"))
+                    {
+                        comment._comment._desc += ", desc=";
+                        comment._comment._desc += ele->Attribute("desc");
+                    }
+                    comment._comment._desc += "]--";
+                    anydata.push_back(comment);
+                }
+
                 XMLElement * member = ele->FirstChildElement("member");
                 do
                 {

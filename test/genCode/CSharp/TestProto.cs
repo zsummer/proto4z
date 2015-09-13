@@ -1,24 +1,24 @@
  
 namespace Proto4z  
 { 
-    class STATIC_EC_SUCCESS //success 
+    class STATIC_EC_SUCCESS //success  
     { 
         public static System.UInt16 value = 0;  
     } 
-    class STATIC_EC_ERROR //error 
+    class STATIC_EC_ERROR //error  
     { 
         public static System.UInt16 value = 1;  
     } 
-    class STATIC_EC_INVALID_PARAM //invalid param 
+    class STATIC_EC_INVALID_PARAM //invalid param  
     { 
         public static System.UInt16 value = 1000;  
     } 
-    class STATIC_EC_UNKNOWN_ID //unknwon id 
+    class STATIC_EC_UNKNOWN_ID //unknwon id  
     { 
         public static System.UInt16 value = 1001;  
     } 
  
-    class TestIntegerData: Proto4z.IProtoObject //测试 
+    class TestIntegerData: Proto4z.IProtoObject //测试  
     {     
         public System.Char _char;  
         public System.Byte _uchar;  
@@ -69,7 +69,7 @@ namespace Proto4z
         } 
     } 
  
-    class TestFloatData: Proto4z.IProtoObject //测试 
+    class TestFloatData: Proto4z.IProtoObject //测试  
     {     
         public System.Single _float;  
         public System.Double _double;  
@@ -92,7 +92,7 @@ namespace Proto4z
         } 
     } 
  
-    class TestStringData: Proto4z.IProtoObject //测试 
+    class TestStringData: Proto4z.IProtoObject //测试  
     {     
         public System.String _string;  
         public System.Collections.Generic.List<byte> __encode() 

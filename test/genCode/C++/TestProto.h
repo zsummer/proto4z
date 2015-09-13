@@ -2,12 +2,13 @@
 #ifndef _TESTPROTO_H_ 
 #define _TESTPROTO_H_ 
  
-const unsigned short EC_SUCCESS = 0; //success 
-const unsigned short EC_ERROR = 1; //error 
-const unsigned short EC_INVALID_PARAM = 1000; //invalid param 
-const unsigned short EC_UNKNOWN_ID = 1001; //unknwon id 
+/*--enum--[name=Anonymous, type=ui16]--*/ 
+const unsigned short EC_SUCCESS = 0; //success  
+const unsigned short EC_ERROR = 1; //error  
+const unsigned short EC_INVALID_PARAM = 1000; //invalid param  
+const unsigned short EC_UNKNOWN_ID = 1001; //unknwon id  
  
-struct TestIntegerData //测试 
+struct TestIntegerData //测试  
 { 
     char _char;  
     unsigned char _uchar;  
@@ -16,7 +17,7 @@ struct TestIntegerData //测试
     int _int;  
     unsigned int _uint;  
     long long _i64;  
-    unsigned long long _ui128; //[already deleted] 
+    unsigned long long _ui128; //[already deleted]  
     unsigned long long _ui64;  
     TestIntegerData() 
     { 
@@ -33,15 +34,15 @@ struct TestIntegerData //测试
 }; 
 inline zsummer::proto4z::WriteStream & operator << (zsummer::proto4z::WriteStream & ws, const TestIntegerData & data) 
 { 
-    ws << data._char; 
-    ws << data._uchar; 
-    ws << data._short; 
-    ws << data._ushort; 
-    ws << data._int; 
-    ws << data._uint; 
-    ws << data._i64; 
-//    ws << data._ui128; //[already deleted] 
-    ws << data._ui64; 
+    ws << data._char;  
+    ws << data._uchar;  
+    ws << data._short;  
+    ws << data._ushort;  
+    ws << data._int;  
+    ws << data._uint;  
+    ws << data._i64;  
+//    ws << data._ui128; //[already deleted]  
+    ws << data._ui64;  
     return ws; 
 } 
 inline zsummer::proto4z::ReadStream & operator >> (zsummer::proto4z::ReadStream & rs, TestIntegerData & data) 
@@ -58,7 +59,7 @@ inline zsummer::proto4z::ReadStream & operator >> (zsummer::proto4z::ReadStream 
     return rs; 
 } 
  
-struct TestFloatData //测试 
+struct TestFloatData //测试  
 { 
     float _float;  
     double _double;  
@@ -70,8 +71,8 @@ struct TestFloatData //测试
 }; 
 inline zsummer::proto4z::WriteStream & operator << (zsummer::proto4z::WriteStream & ws, const TestFloatData & data) 
 { 
-    ws << data._float; 
-    ws << data._double; 
+    ws << data._float;  
+    ws << data._double;  
     return ws; 
 } 
 inline zsummer::proto4z::ReadStream & operator >> (zsummer::proto4z::ReadStream & rs, TestFloatData & data) 
@@ -81,13 +82,13 @@ inline zsummer::proto4z::ReadStream & operator >> (zsummer::proto4z::ReadStream 
     return rs; 
 } 
  
-struct TestStringData //测试 
+struct TestStringData //测试  
 { 
     std::string _string;  
 }; 
 inline zsummer::proto4z::WriteStream & operator << (zsummer::proto4z::WriteStream & ws, const TestStringData & data) 
 { 
-    ws << data._string; 
+    ws << data._string;  
     return ws; 
 } 
 inline zsummer::proto4z::ReadStream & operator >> (zsummer::proto4z::ReadStream & rs, TestStringData & data) 
@@ -124,12 +125,12 @@ struct EchoPack
 }; 
 inline zsummer::proto4z::WriteStream & operator << (zsummer::proto4z::WriteStream & ws, const EchoPack & data) 
 { 
-    ws << data._iarray; 
-    ws << data._farray; 
-    ws << data._sarray; 
-    ws << data._imap; 
-    ws << data._fmap; 
-    ws << data._smap; 
+    ws << data._iarray;  
+    ws << data._farray;  
+    ws << data._sarray;  
+    ws << data._imap;  
+    ws << data._fmap;  
+    ws << data._smap;  
     return ws; 
 } 
 inline zsummer::proto4z::ReadStream & operator >> (zsummer::proto4z::ReadStream & rs, EchoPack & data) 

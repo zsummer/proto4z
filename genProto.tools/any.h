@@ -63,6 +63,7 @@
 //store type enum
 enum AnyType : short
 {
+    GT_DataComment,
     GT_DataInclude,
     GT_DataArray,
     GT_DataMap,
@@ -80,6 +81,13 @@ enum MemberTag : short
     MT_DELETE,
     //MT_OPTION,
 };
+
+//comment
+struct DataComment
+{
+    std::string _desc;
+};
+
 
 //include file name, without suffix
 struct DataInclude
@@ -144,6 +152,7 @@ struct DataProto
 struct AnyData
 {
     AnyType _type;
+    DataComment _comment;
     DataInclude _include;
     DataArray _array;
     DataMap _map;
