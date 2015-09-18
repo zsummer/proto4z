@@ -59,15 +59,29 @@ local echo = {  _iarray = {{_char=1,_uchar=2,_short=3,_ushort=4,_int=5,_uint=6,_
 proto.dump(echo)
 
 local now = Proto4zUtil.now()
-for i=1, 10000 do
+for i=1, 1000 do
 	local data = proto.encode(echo, "EchoPack")
 	--proto.putbin(data)
 	local dr = proto.decode(data, proto.getName(proto.EchoPack.__getID)) -- "EchoPack"
 	--proto.dump(dr)
 
 end
-now = Proto4zUtil.now() - now
-print(now)
+
+print("used time=" .. (Proto4zUtil.now() - now))
+
+local uID = Proto4zUtil.makeULL(1234)
+print(Proto4zUtil.fromULL(uID))
+
+uID = Proto4zUtil.makeULL("2322")
+print(Proto4zUtil.fromULL(uID))
+
+uID = Proto4zUtil.makeULL("12345612314")
+print(Proto4zUtil.fromULL(uID))
+
+
+
+
+
 
 
 
