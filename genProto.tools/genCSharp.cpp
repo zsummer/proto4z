@@ -85,19 +85,19 @@ std::string GenCSharp::genRealContent(const std::list<AnyData> & stores)
     {
         if (info._type == GT_DataConstValue)
         {
-            text += "    class STATIC_" + info._const._name + " ";
+            text += "    public class STATIC_" + info._const._name + " ";
             if (!info._const._desc.empty())
             {
                 text += "//" + info._const._desc + " ";
             }
             text += LFCR;
             text += "    {" + LFCR;
-            text += "        public static " + getCSharpType(info._const._type).realType + " value = " + info._const._value + "; " + LFCR;
+            text += "        public const " + getCSharpType(info._const._type).realType + " value = " + info._const._value + "; " + LFCR;
             text += "    }" + LFCR;
         }
         else if (info._type == GT_DataArray)
         {
-            text += LFCR + "    class " + info._array._arrayName + " : System.Collections.Generic.List<" + getCSharpType(info._array._type).realType + ">, Proto4z.IProtoObject ";
+            text += LFCR + "    public class " + info._array._arrayName + " : System.Collections.Generic.List<" + getCSharpType(info._array._type).realType + ">, Proto4z.IProtoObject ";
             if (!info._array._desc.empty())
             {
                 text += "//" + info._array._desc + " ";
@@ -149,7 +149,7 @@ std::string GenCSharp::genRealContent(const std::list<AnyData> & stores)
         }
         else if (info._type == GT_DataMap)
         {
-            text += LFCR + "    class " + info._map._mapName + " : System.Collections.Generic.Dictionary<" + getCSharpType(info._map._typeKey).realType + ", " + getCSharpType(info._map._typeValue).realType + ">, Proto4z.IProtoObject ";
+            text += LFCR + "    public class " + info._map._mapName + " : System.Collections.Generic.Dictionary<" + getCSharpType(info._map._typeKey).realType + ", " + getCSharpType(info._map._typeValue).realType + ">, Proto4z.IProtoObject ";
             if (!info._array._desc.empty())
             {
                 text += "//" + info._array._desc + " ";
@@ -221,7 +221,7 @@ std::string GenCSharp::genRealContent(const std::list<AnyData> & stores)
         else if (info._type == GT_DataStruct || info._type == GT_DataProto)
         {
             text += LFCR;
-            text += "    class " + info._proto._struct._name + ": Proto4z.IProtoObject";
+            text += "    public class " + info._proto._struct._name + ": Proto4z.IProtoObject";
             if (!info._proto._struct._desc.empty())
             {
                 text += " //" + info._proto._struct._desc + " ";
@@ -232,6 +232,7 @@ std::string GenCSharp::genRealContent(const std::list<AnyData> & stores)
             //write ProtoID
             if (info._type == GT_DataProto)
             {
+                text += "        " "public const System.UInt16 protoID = " + info._proto._const._value + "; " + LFCR;
                 text += "        " "static public System.UInt16 getProtoID() { return " + info._proto._const._value + "; }" + LFCR;
                 text += "        " "static public string getProtoName() { return \"" + info._proto._struct._name + "\"; }" + LFCR;
             }
