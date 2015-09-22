@@ -85,7 +85,7 @@ std::string GenCSharp::genRealContent(const std::list<AnyData> & stores)
     {
         if (info._type == GT_DataConstValue)
         {
-            text += "    public class STATIC_" + info._const._name + " ";
+            text += "    public class " + info._const._name + " ";
             if (!info._const._desc.empty())
             {
                 text += "//" + info._const._desc + " ";
