@@ -62,7 +62,8 @@ CSharpType GenCSharp::getCSharpType(const std::string & xmltype)
 std::string  GenCSharp::getTypeDefault(const std::string & xmltype)
 {
     if (xmltype == "i8") return "'\\0'";
-    else if (xmltype == "float") return "0.0F";
+    else if (xmltype == "float") return "0.0f";
+    else if (xmltype == "string") return "\"\"";
     return GenBase::getTypeDefault(xmltype);
 }
 
@@ -221,113 +222,7 @@ std::string GenCSharp::genRealContent(const std::list<AnyData> & stores)
         else if (info._type == GT_DataStruct || info._type == GT_DataProto)
         {
             text += LFCR;
-            text += "    public class " + info._proto._struct._name + ": Proto4z.IProtoObject";
-            if (!info._proto._struct._desc.empty())
-            {
-                text += " //" + info._proto._struct._desc + " ";
-            }
-            text += LFCR;
-            text += "    {    " + LFCR;
-
-            //write ProtoID
-            if (info._type == GT_DataProto)
-            {
-                text += "        " "public const System.UInt16 protoID = " + info._proto._const._value + "; " + LFCR;
-                text += "        " "static public System.UInt16 getProtoID() { return " + info._proto._const._value + "; }" + LFCR;
-                text += "        " "static public string getProtoName() { return \"" + info._proto._struct._name + "\"; }" + LFCR;
-            }
-
-            for (const auto & m : info._proto._struct._members)
-            {
-                text += "        public " + getCSharpType(m._type).realType + " " + m._name + "; ";
-                if (!m._desc.empty())
-                {
-                    text += "//" + m._desc + " ";
-                }
-                text += LFCR;
-            }
-
-            //encode
-            text += "        public System.Collections.Generic.List<byte> __encode()" + LFCR;
-            text += "        {" + LFCR;
-#ifdef __WITH_TAG
-            text += "            "   "System.Int32 sttLen = 0;" + LFCR;
-            text += "            "   "System.UInt64 tag = " + boost::lexical_cast<std::string, unsigned long long>(info._proto._struct._tag) + ";" + LFCR;
-            text += "            "   "" + LFCR;
-#endif
-            text += "            "   "var data = new System.Collections.Generic.List<byte>();" + LFCR;
-            for (const auto &m : info._proto._struct._members)
-            {
-                if (m._tag == MT_DELETE)
-                {
-                    text += "//";
-                }
-                if (getCSharpType(m._type).isBase)
-                {
-                    text += "            "  "data.AddRange(" + getCSharpType(m._type).baseEncode + "(" + m._name + "));" + LFCR;
-                }
-                else
-                {
-                    text += "            "  "data.AddRange(" + m._name + ".__encode());" + LFCR;
-                }
-            }
-#ifdef __WITH_TAG
-            text += "            " "sttLen = data.Count + 8;" + LFCR;
-#endif
-            text += "            "  "var ret = new System.Collections.Generic.List<byte>();" + LFCR;
-#ifdef __WITH_TAG
-            text += "            "  "ret.AddRange(Proto4z.BaseProtoObject.encodeI32(sttLen));" + LFCR;
-            text += "            "  "ret.AddRange(Proto4z.BaseProtoObject.encodeUI64(tag));" + LFCR;
-#endif
-            text += "            "  "ret.AddRange(data);" + LFCR;
-            text += "            "  "return ret;" + LFCR;
-            text += "        }" + LFCR;
-
-            //decode
-            text += "        public int __decode(byte[] binData, ref int pos)" + LFCR;
-            text += "        {" + LFCR;
-#ifdef __WITH_TAG
-            text += "            " "System.Int32 offset = Proto4z.BaseProtoObject.decodeI32(binData, ref pos);" + LFCR;
-            text += "            " "offset += pos;" + LFCR;
-            text += "            " "System.UInt64 tag = Proto4z.BaseProtoObject.decodeUI64(binData, ref pos);" + LFCR;
-#endif
-            int i = 0;
-            for (const auto &m : info._proto._struct._members)
-            {
-                if (getCSharpType(m._type).isBase)
-                {
-                    if (!getTypeDefault(m._type).empty())
-                    {
-                        text += "            " + m._name + " = " + getTypeDefault(m._type) + ";" + LFCR;
-                    }
-                }
-                else
-                {
-                    text += "            " + m._name + " = new " + getCSharpType(m._type).realType + "();" + LFCR;
-                }
-#ifdef __WITH_TAG
-                text += "            " "if ((tag & ((System.UInt64)1 << " + boost::lexical_cast<std::string, int>(i) + ")) != 0)" + LFCR;
-                text += "            " "{" + LFCR;
-#endif
-                if (getCSharpType(m._type).isBase)
-                {
-                    text += "                " + m._name + " = " + getCSharpType(m._type).baseDecode + "(binData, ref pos);" + LFCR;
-                }
-                else
-                {
-                    text += "                " + m._name + ".__decode(binData, ref pos);" + LFCR;
-                }
-#ifdef __WITH_TAG
-                text += "            " "}" + LFCR;
-#endif
-                i++;
-            }
-#ifdef __WITH_TAG
-            text += "            pos = offset;" + LFCR;
-#endif
-            text += "            return pos;" + LFCR;
-            text += "        }" + LFCR;
-            text += "    }" + LFCR;
+            text += genDataProto(info._proto, info._type == GT_DataProto);
         }
 
     }
@@ -338,7 +233,130 @@ std::string GenCSharp::genRealContent(const std::list<AnyData> & stores)
     return text;
 }
 
+std::string GenCSharp::genDataProto(const DataProto & dp, bool isProto)
+{
+    std::string text;
+    text += "    public class " + dp._struct._name + ": Proto4z.IProtoObject";
+    if (!dp._struct._desc.empty())
+    {
+        text += " //" + dp._struct._desc + " ";
+    }
+    text += LFCR;
+    text += "    {    " + LFCR;
 
+    //write ProtoID
+    if (isProto)
+    {
+        text += "        " "//proto id  " + LFCR;
+        text += "        " "public const System.UInt16 protoID = " + dp._const._value + "; " + LFCR;
+        text += "        " "static public System.UInt16 getProtoID() { return " + dp._const._value + "; }" + LFCR;
+        text += "        " "static public string getProtoName() { return \"" + dp._struct._name + "\"; }" + LFCR;
+    }
+
+    //members
+    text += "        " "//members  " + LFCR;
+    for (const auto & m : dp._struct._members)
+    {
+        text += "        public " + getCSharpType(m._type).realType + " " + m._name + "; ";
+        if (!m._desc.empty())
+        {
+            text += "//" + m._desc + " ";
+        }
+        text += LFCR;
+    }
+    //default struct ()
+    text += "        public " + dp._struct._name + "() " + LFCR;
+    text += "        {" + LFCR;
+    for (const auto & m : dp._struct._members)
+    {
+        text += "            " + m._name + " = ";
+        if (getCSharpType(m._type).isBase)
+        {
+            text += getTypeDefault(m._type);
+        }
+        else
+        {
+            text += "new " + getCSharpType(m._type).realType + "()";
+        }
+        text += "; " + LFCR;
+    }
+    text += "        }" + LFCR;
+
+    //default struct (....) 
+    if (!dp._struct._members.empty())
+    {
+        text += "        public " + dp._struct._name + "(";
+        for (size_t i = 0; i < dp._struct._members.size(); i ++)
+        {
+            const auto &m = dp._struct._members[i];
+            if (i > 0) text += ", ";
+            text += "" + getCSharpType(m._type).realType + " " + m._name;
+        }
+        text += ")" + LFCR;
+        text += "        {" + LFCR;
+        for (const auto & m : dp._struct._members)
+        {
+            text += "            this." + m._name + " = " + m._name + ";" + LFCR;
+        }
+        text += "        }" + LFCR;
+    }
+
+
+    //encode
+    text += "        public System.Collections.Generic.List<byte> __encode()" + LFCR;
+    text += "        {" + LFCR;
+    text += "            "   "var data = new System.Collections.Generic.List<byte>();" + LFCR;
+    for (const auto &m : dp._struct._members)
+    {
+        if (m._tag == MT_DELETE)
+        {
+            continue;
+        }
+
+        //null
+        if (!getCSharpType(m._type).isBase)
+        {
+            text += "            if (" + m._name + " == null) " + m._name + " = new " + m._type + "();" + LFCR;
+        }
+
+
+        //encode
+        if (getCSharpType(m._type).isBase)
+        {
+            text += "            "  "data.AddRange(" + getCSharpType(m._type).baseEncode + "(" + m._name + "));" + LFCR;
+        }
+        else
+        {
+            text += "            "  "data.AddRange(" + m._name + ".__encode());" + LFCR;
+        }
+    }
+    text += "            "  "return data;" + LFCR;
+    text += "        }" + LFCR;
+
+    //decode
+    text += "        public int __decode(byte[] binData, ref int pos)" + LFCR;
+    text += "        {" + LFCR;
+    for (const auto &m : dp._struct._members)
+    {
+        if (m._tag == MT_DELETE)
+        {
+            continue;
+        }
+        if (getCSharpType(m._type).isBase)
+        {
+            text += "            this." + m._name + " = " + getCSharpType(m._type).baseDecode + "(binData, ref pos);" + LFCR;
+        }
+        else
+        {
+            text += "            this." + m._name + " = new " + getCSharpType(m._type).realType + "();" + LFCR;
+            text += "            this." + m._name + ".__decode(binData, ref pos);" + LFCR;
+        }
+    }
+    text += "            return pos;" + LFCR;
+    text += "        }" + LFCR;
+    text += "    }" + LFCR;
+    return text;
+}
 
 
 

@@ -148,25 +148,39 @@ std::string GenCPP::genRealContent(const std::list<AnyData> & stores)
                 text += LFCR;
             }
 
+            if (!info._proto._struct._members.empty())
             {    //struct init
-                std::string defaltInit = "    " + info._proto._struct._name + "()" + LFCR;
-                defaltInit += "    {" + LFCR;
-                std::string memberText;
+                text += "    " + info._proto._struct._name + "()" + LFCR;
+                text += "    {" + LFCR;
                 for (const auto &m : info._proto._struct._members)
                 {
                     std::string def = getTypeDefault(m._type);
                     if (!def.empty())
                     {
-                        memberText += "        " + m._name + " = " + def + ";" + LFCR;
+                        text += "        " + m._name + " = " + def + ";" + LFCR;
                     }
                 }
-                if (!memberText.empty())
-                {
-                    text += defaltInit;
-                    text += memberText;
-                    text += "    }" + LFCR;
-                }
+                text += "    }" + LFCR;
             }
+
+            if (!info._proto._struct._members.empty())
+            {    //struct init
+                text += "    " + info._proto._struct._name + "(";
+                for (size_t i = 0; i < info._proto._struct._members.size(); i++)
+                {
+                    const auto & m = info._proto._struct._members[i];
+                    if (i != 0) text += ", ";
+                    text += "const " + getRealType(m._type) + " & " + m._name;
+                }
+                text += ")" + LFCR;
+                text += "    {" + LFCR;
+                for (const auto &m : info._proto._struct._members)
+                {
+                    text += "        this->" + m._name + " = " + m._name + ";" + LFCR;  
+                }
+                text += "    }" + LFCR;
+            }
+
             if (info._type == GT_DataProto)
             {
                 text += std::string("    static const ") + getRealType(ProtoIDType) + " GetProtoID() { return " + info._proto._const._value + ";}" + LFCR;

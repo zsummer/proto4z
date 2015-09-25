@@ -57,6 +57,7 @@ public:
     CSharpType getCSharpType(const std::string & xmltype);
     virtual std::string getTypeDefault(const std::string & xmltype);
     virtual std::string genRealContent(const std::list<AnyData> & stores);
+    std::string genDataProto(const DataProto & dp, bool isProto = false);
 };
 
 

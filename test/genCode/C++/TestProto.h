@@ -31,6 +31,18 @@ struct TestIntegerData //测试
         _ui128 = 0; 
         _ui64 = 0; 
     } 
+    TestIntegerData(const char & _char, const unsigned char & _uchar, const short & _short, const unsigned short & _ushort, const int & _int, const unsigned int & _uint, const long long & _i64, const unsigned long long & _ui128, const unsigned long long & _ui64) 
+    { 
+        this->_char = _char; 
+        this->_uchar = _uchar; 
+        this->_short = _short; 
+        this->_ushort = _ushort; 
+        this->_int = _int; 
+        this->_uint = _uint; 
+        this->_i64 = _i64; 
+        this->_ui128 = _ui128; 
+        this->_ui64 = _ui64; 
+    } 
 }; 
 inline zsummer::proto4z::WriteStream & operator << (zsummer::proto4z::WriteStream & ws, const TestIntegerData & data) 
 { 
@@ -68,6 +80,11 @@ struct TestFloatData //测试
         _float = 0.0; 
         _double = 0.0; 
     } 
+    TestFloatData(const float & _float, const double & _double) 
+    { 
+        this->_float = _float; 
+        this->_double = _double; 
+    } 
 }; 
 inline zsummer::proto4z::WriteStream & operator << (zsummer::proto4z::WriteStream & ws, const TestFloatData & data) 
 { 
@@ -85,6 +102,13 @@ inline zsummer::proto4z::ReadStream & operator >> (zsummer::proto4z::ReadStream 
 struct TestStringData //测试  
 { 
     std::string _string;  
+    TestStringData() 
+    { 
+    } 
+    TestStringData(const std::string & _string) 
+    { 
+        this->_string = _string; 
+    } 
 }; 
 inline zsummer::proto4z::WriteStream & operator << (zsummer::proto4z::WriteStream & ws, const TestStringData & data) 
 { 
@@ -120,6 +144,18 @@ struct EchoPack
     TestIntegerDataMap _imap;  
     TestFloatDataMap _fmap;  
     TestStringDataMap _smap;  
+    EchoPack() 
+    { 
+    } 
+    EchoPack(const TestIntegerDataArray & _iarray, const TestFloatDataArray & _farray, const TestStringDataArray & _sarray, const TestIntegerDataMap & _imap, const TestFloatDataMap & _fmap, const TestStringDataMap & _smap) 
+    { 
+        this->_iarray = _iarray; 
+        this->_farray = _farray; 
+        this->_sarray = _sarray; 
+        this->_imap = _imap; 
+        this->_fmap = _fmap; 
+        this->_smap = _smap; 
+    } 
     static const unsigned short GetProtoID() { return 30000;} 
     static const std::string GetProtoName() { return "ID_EchoPack";} 
 }; 

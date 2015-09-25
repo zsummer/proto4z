@@ -153,21 +153,10 @@ namespace ConsoleApplication2
             RC4Encryption rc4Client = new RC4Encryption();
             rc4Server.makeSBox("zhangyawei");
             rc4Client.makeSBox("zhangyawei");
-            TestIntegerData idata = new TestIntegerData();
-            idata._char = 'a';
-            idata._uchar = 1;
-            idata._short = 5;
-            idata._ushort = 20;
-            idata._int = 30;
-            idata._uint = 40;
-            idata._i64 = 60;
-            idata._ui64 = 80;
+            TestIntegerData idata = new TestIntegerData('a', 1, 5, 20, 30, 40, 50, 60, 70);
+            TestFloatData fdata = new TestFloatData(243.123123f, 32432.123);
+            TestStringData sdata = new TestStringData("love");
 
-            TestFloatData fdata = new TestFloatData();
-            fdata._float = 243.2222F;
-            fdata._double = 3423.11123;
-            TestStringData sdata = new TestStringData();
-            sdata._string = "love";
 
             EchoPack pack = new EchoPack();
             pack._iarray = new Proto4z.TestIntegerDataArray();
@@ -195,7 +184,7 @@ namespace ConsoleApplication2
             pack._smap.Add("823", sdata);
 
             var now = DateTime.UtcNow;
-            for (int i=0; i< 10000; i++)
+            for (int i=0; i< 1; i++)
             {
                 var byteData = pack.__encode();
                 var binData = byteData.ToArray();

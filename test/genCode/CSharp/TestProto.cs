@@ -1,25 +1,26 @@
  
 namespace Proto4z  
 { 
-    class STATIC_EC_SUCCESS //success  
+    public class EC_SUCCESS //success  
     { 
-        public static System.UInt16 value = 0;  
+        public const System.UInt16 value = 0;  
     } 
-    class STATIC_EC_ERROR //error  
+    public class EC_ERROR //error  
     { 
-        public static System.UInt16 value = 1;  
+        public const System.UInt16 value = 1;  
     } 
-    class STATIC_EC_INVALID_PARAM //invalid param  
+    public class EC_INVALID_PARAM //invalid param  
     { 
-        public static System.UInt16 value = 1000;  
+        public const System.UInt16 value = 1000;  
     } 
-    class STATIC_EC_UNKNOWN_ID //unknwon id  
+    public class EC_UNKNOWN_ID //unknwon id  
     { 
-        public static System.UInt16 value = 1001;  
+        public const System.UInt16 value = 1001;  
     } 
  
-    class TestIntegerData: Proto4z.IProtoObject //测试  
+    public class TestIntegerData: Proto4z.IProtoObject //测试  
     {     
+        //members   
         public System.Char _char;  
         public System.Byte _uchar;  
         public System.Int16 _short;  
@@ -29,6 +30,30 @@ namespace Proto4z
         public System.Int64 _i64;  
         public System.UInt64 _ui128;  
         public System.UInt64 _ui64;  
+        public TestIntegerData()  
+        { 
+            _char = '\0';  
+            _uchar = 0;  
+            _short = 0;  
+            _ushort = 0;  
+            _int = 0;  
+            _uint = 0;  
+            _i64 = 0;  
+            _ui128 = 0;  
+            _ui64 = 0;  
+        } 
+        public TestIntegerData(System.Char _char, System.Byte _uchar, System.Int16 _short, System.UInt16 _ushort, System.Int32 _int, System.UInt32 _uint, System.Int64 _i64, System.UInt64 _ui128, System.UInt64 _ui64) 
+        { 
+            this._char = _char; 
+            this._uchar = _uchar; 
+            this._short = _short; 
+            this._ushort = _ushort; 
+            this._int = _int; 
+            this._uint = _uint; 
+            this._i64 = _i64; 
+            this._ui128 = _ui128; 
+            this._ui64 = _ui64; 
+        } 
         public System.Collections.Generic.List<byte> __encode() 
         { 
             var data = new System.Collections.Generic.List<byte>(); 
@@ -39,78 +64,79 @@ namespace Proto4z
             data.AddRange(Proto4z.BaseProtoObject.encodeI32(_int)); 
             data.AddRange(Proto4z.BaseProtoObject.encodeUI32(_uint)); 
             data.AddRange(Proto4z.BaseProtoObject.encodeI64(_i64)); 
-//            data.AddRange(Proto4z.BaseProtoObject.encodeUI64(_ui128)); 
             data.AddRange(Proto4z.BaseProtoObject.encodeUI64(_ui64)); 
-            var ret = new System.Collections.Generic.List<byte>(); 
-            ret.AddRange(data); 
-            return ret; 
+            return data; 
         } 
         public int __decode(byte[] binData, ref int pos) 
         { 
-            _char = '\0'; 
-                _char = Proto4z.BaseProtoObject.decodeI8(binData, ref pos); 
-            _uchar = 0; 
-                _uchar = Proto4z.BaseProtoObject.decodeUI8(binData, ref pos); 
-            _short = 0; 
-                _short = Proto4z.BaseProtoObject.decodeI16(binData, ref pos); 
-            _ushort = 0; 
-                _ushort = Proto4z.BaseProtoObject.decodeUI16(binData, ref pos); 
-            _int = 0; 
-                _int = Proto4z.BaseProtoObject.decodeI32(binData, ref pos); 
-            _uint = 0; 
-                _uint = Proto4z.BaseProtoObject.decodeUI32(binData, ref pos); 
-            _i64 = 0; 
-                _i64 = Proto4z.BaseProtoObject.decodeI64(binData, ref pos); 
-            _ui128 = 0; 
-                _ui128 = Proto4z.BaseProtoObject.decodeUI64(binData, ref pos); 
-            _ui64 = 0; 
-                _ui64 = Proto4z.BaseProtoObject.decodeUI64(binData, ref pos); 
+            this._char = Proto4z.BaseProtoObject.decodeI8(binData, ref pos); 
+            this._uchar = Proto4z.BaseProtoObject.decodeUI8(binData, ref pos); 
+            this._short = Proto4z.BaseProtoObject.decodeI16(binData, ref pos); 
+            this._ushort = Proto4z.BaseProtoObject.decodeUI16(binData, ref pos); 
+            this._int = Proto4z.BaseProtoObject.decodeI32(binData, ref pos); 
+            this._uint = Proto4z.BaseProtoObject.decodeUI32(binData, ref pos); 
+            this._i64 = Proto4z.BaseProtoObject.decodeI64(binData, ref pos); 
+            this._ui64 = Proto4z.BaseProtoObject.decodeUI64(binData, ref pos); 
             return pos; 
         } 
     } 
  
-    class TestFloatData: Proto4z.IProtoObject //测试  
+    public class TestFloatData: Proto4z.IProtoObject //测试  
     {     
+        //members   
         public System.Single _float;  
         public System.Double _double;  
+        public TestFloatData()  
+        { 
+            _float = 0.0f;  
+            _double = 0.0;  
+        } 
+        public TestFloatData(System.Single _float, System.Double _double) 
+        { 
+            this._float = _float; 
+            this._double = _double; 
+        } 
         public System.Collections.Generic.List<byte> __encode() 
         { 
             var data = new System.Collections.Generic.List<byte>(); 
             data.AddRange(Proto4z.BaseProtoObject.encodeSingle(_float)); 
             data.AddRange(Proto4z.BaseProtoObject.encodeDouble(_double)); 
-            var ret = new System.Collections.Generic.List<byte>(); 
-            ret.AddRange(data); 
-            return ret; 
+            return data; 
         } 
         public int __decode(byte[] binData, ref int pos) 
         { 
-            _float = 0.0F; 
-                _float = Proto4z.BaseProtoObject.decodeSingle(binData, ref pos); 
-            _double = 0.0; 
-                _double = Proto4z.BaseProtoObject.decodeDouble(binData, ref pos); 
+            this._float = Proto4z.BaseProtoObject.decodeSingle(binData, ref pos); 
+            this._double = Proto4z.BaseProtoObject.decodeDouble(binData, ref pos); 
             return pos; 
         } 
     } 
  
-    class TestStringData: Proto4z.IProtoObject //测试  
+    public class TestStringData: Proto4z.IProtoObject //测试  
     {     
+        //members   
         public System.String _string;  
+        public TestStringData()  
+        { 
+            _string = "";  
+        } 
+        public TestStringData(System.String _string) 
+        { 
+            this._string = _string; 
+        } 
         public System.Collections.Generic.List<byte> __encode() 
         { 
             var data = new System.Collections.Generic.List<byte>(); 
             data.AddRange(Proto4z.BaseProtoObject.encodeString(_string)); 
-            var ret = new System.Collections.Generic.List<byte>(); 
-            ret.AddRange(data); 
-            return ret; 
+            return data; 
         } 
         public int __decode(byte[] binData, ref int pos) 
         { 
-                _string = Proto4z.BaseProtoObject.decodeString(binData, ref pos); 
+            this._string = Proto4z.BaseProtoObject.decodeString(binData, ref pos); 
             return pos; 
         } 
     } 
  
-    class IntArray : System.Collections.Generic.List<System.UInt32>, Proto4z.IProtoObject  
+    public class IntArray : System.Collections.Generic.List<System.UInt32>, Proto4z.IProtoObject  
     { 
         public System.Collections.Generic.List<byte> __encode() 
         { 
@@ -138,7 +164,7 @@ namespace Proto4z
         } 
     } 
  
-    class TestIntegerDataArray : System.Collections.Generic.List<TestIntegerData>, Proto4z.IProtoObject  
+    public class TestIntegerDataArray : System.Collections.Generic.List<TestIntegerData>, Proto4z.IProtoObject  
     { 
         public System.Collections.Generic.List<byte> __encode() 
         { 
@@ -168,7 +194,7 @@ namespace Proto4z
         } 
     } 
  
-    class TestFloatDataArray : System.Collections.Generic.List<TestFloatData>, Proto4z.IProtoObject  
+    public class TestFloatDataArray : System.Collections.Generic.List<TestFloatData>, Proto4z.IProtoObject  
     { 
         public System.Collections.Generic.List<byte> __encode() 
         { 
@@ -198,7 +224,7 @@ namespace Proto4z
         } 
     } 
  
-    class TestStringDataArray : System.Collections.Generic.List<TestStringData>, Proto4z.IProtoObject  
+    public class TestStringDataArray : System.Collections.Generic.List<TestStringData>, Proto4z.IProtoObject  
     { 
         public System.Collections.Generic.List<byte> __encode() 
         { 
@@ -228,7 +254,7 @@ namespace Proto4z
         } 
     } 
  
-    class TestIntegerDataMap : System.Collections.Generic.Dictionary<System.String, TestIntegerData>, Proto4z.IProtoObject  
+    public class TestIntegerDataMap : System.Collections.Generic.Dictionary<System.String, TestIntegerData>, Proto4z.IProtoObject  
     { 
         public System.Collections.Generic.List<byte> __encode() 
         { 
@@ -260,7 +286,7 @@ namespace Proto4z
         } 
     } 
  
-    class TestFloatDataMap : System.Collections.Generic.Dictionary<System.String, TestFloatData>, Proto4z.IProtoObject  
+    public class TestFloatDataMap : System.Collections.Generic.Dictionary<System.String, TestFloatData>, Proto4z.IProtoObject  
     { 
         public System.Collections.Generic.List<byte> __encode() 
         { 
@@ -292,7 +318,7 @@ namespace Proto4z
         } 
     } 
  
-    class TestStringDataMap : System.Collections.Generic.Dictionary<System.String, TestStringData>, Proto4z.IProtoObject  
+    public class TestStringDataMap : System.Collections.Generic.Dictionary<System.String, TestStringData>, Proto4z.IProtoObject  
     { 
         public System.Collections.Generic.List<byte> __encode() 
         { 
@@ -324,57 +350,86 @@ namespace Proto4z
         } 
     } 
  
-    class EchoPack: Proto4z.IProtoObject 
+    public class EchoPack: Proto4z.IProtoObject 
     {     
+        //proto id   
+        public const System.UInt16 protoID = 30000;  
         static public System.UInt16 getProtoID() { return 30000; } 
         static public string getProtoName() { return "EchoPack"; } 
+        //members   
         public TestIntegerDataArray _iarray;  
         public TestFloatDataArray _farray;  
         public TestStringDataArray _sarray;  
         public TestIntegerDataMap _imap;  
         public TestFloatDataMap _fmap;  
         public TestStringDataMap _smap;  
+        public EchoPack()  
+        { 
+            _iarray = new TestIntegerDataArray();  
+            _farray = new TestFloatDataArray();  
+            _sarray = new TestStringDataArray();  
+            _imap = new TestIntegerDataMap();  
+            _fmap = new TestFloatDataMap();  
+            _smap = new TestStringDataMap();  
+        } 
+        public EchoPack(TestIntegerDataArray _iarray, TestFloatDataArray _farray, TestStringDataArray _sarray, TestIntegerDataMap _imap, TestFloatDataMap _fmap, TestStringDataMap _smap) 
+        { 
+            this._iarray = _iarray; 
+            this._farray = _farray; 
+            this._sarray = _sarray; 
+            this._imap = _imap; 
+            this._fmap = _fmap; 
+            this._smap = _smap; 
+        } 
         public System.Collections.Generic.List<byte> __encode() 
         { 
             var data = new System.Collections.Generic.List<byte>(); 
+            if (_iarray == null) _iarray = new TestIntegerDataArray(); 
             data.AddRange(_iarray.__encode()); 
+            if (_farray == null) _farray = new TestFloatDataArray(); 
             data.AddRange(_farray.__encode()); 
+            if (_sarray == null) _sarray = new TestStringDataArray(); 
             data.AddRange(_sarray.__encode()); 
+            if (_imap == null) _imap = new TestIntegerDataMap(); 
             data.AddRange(_imap.__encode()); 
+            if (_fmap == null) _fmap = new TestFloatDataMap(); 
             data.AddRange(_fmap.__encode()); 
+            if (_smap == null) _smap = new TestStringDataMap(); 
             data.AddRange(_smap.__encode()); 
-            var ret = new System.Collections.Generic.List<byte>(); 
-            ret.AddRange(data); 
-            return ret; 
+            return data; 
         } 
         public int __decode(byte[] binData, ref int pos) 
         { 
-            _iarray = new TestIntegerDataArray(); 
-                _iarray.__decode(binData, ref pos); 
-            _farray = new TestFloatDataArray(); 
-                _farray.__decode(binData, ref pos); 
-            _sarray = new TestStringDataArray(); 
-                _sarray.__decode(binData, ref pos); 
-            _imap = new TestIntegerDataMap(); 
-                _imap.__decode(binData, ref pos); 
-            _fmap = new TestFloatDataMap(); 
-                _fmap.__decode(binData, ref pos); 
-            _smap = new TestStringDataMap(); 
-                _smap.__decode(binData, ref pos); 
+            this._iarray = new TestIntegerDataArray(); 
+            this._iarray.__decode(binData, ref pos); 
+            this._farray = new TestFloatDataArray(); 
+            this._farray.__decode(binData, ref pos); 
+            this._sarray = new TestStringDataArray(); 
+            this._sarray.__decode(binData, ref pos); 
+            this._imap = new TestIntegerDataMap(); 
+            this._imap.__decode(binData, ref pos); 
+            this._fmap = new TestFloatDataMap(); 
+            this._fmap.__decode(binData, ref pos); 
+            this._smap = new TestStringDataMap(); 
+            this._smap.__decode(binData, ref pos); 
             return pos; 
         } 
     } 
  
-    class Pulse: Proto4z.IProtoObject 
+    public class Pulse: Proto4z.IProtoObject 
     {     
+        //proto id   
+        public const System.UInt16 protoID = 30001;  
         static public System.UInt16 getProtoID() { return 30001; } 
         static public string getProtoName() { return "Pulse"; } 
+        //members   
+        public Pulse()  
+        { 
+        } 
         public System.Collections.Generic.List<byte> __encode() 
         { 
             var data = new System.Collections.Generic.List<byte>(); 
-            var ret = new System.Collections.Generic.List<byte>(); 
-            ret.AddRange(data); 
-            return ret; 
+            return data; 
         } 
         public int __decode(byte[] binData, ref int pos) 
         { 
