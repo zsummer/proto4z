@@ -43,6 +43,11 @@ class GenCPP : public GenBase
 public:
     virtual std::string getRealType(const std::string & xmltype);
     virtual std::string genRealContent(const std::list<AnyData> & stores);
+    std::string genDataConst(const DataConstValue & dc);
+    std::string genDataEnum(const DataEnum & de);
+    std::string genDataArray(const DataArray & da);
+    std::string genDataMap(const DataMap & dm);
+    std::string genDataProto(const DataProto & dp, bool isProto = false);
 };
 
 #endif

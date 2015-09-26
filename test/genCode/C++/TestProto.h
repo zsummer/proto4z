@@ -2,11 +2,16 @@
 #ifndef _TESTPROTO_H_ 
 #define _TESTPROTO_H_ 
  
-/*--enum--[name=Anonymous, type=ui16]--*/ 
-const unsigned short EC_SUCCESS = 0; //success  
-const unsigned short EC_ERROR = 1; //error  
-const unsigned short EC_INVALID_PARAM = 1000; //invalid param  
-const unsigned short EC_UNKNOWN_ID = 1001; //unknwon id  
+ 
+const unsigned short MAX_SESSIONS = 5000; //max session count  
+ 
+enum GAME_TYPE : unsigned short 
+{ 
+    GTYPE_INVALID = 0, //无效  
+    GTYPE_WAITING = 1, //等待  
+    GTYPE_INGAME = 10, //游戏中  
+    GTYPE_LEAVE = 11, //离开  
+}; 
  
 struct TestIntegerData //测试  
 { 
@@ -121,23 +126,31 @@ inline zsummer::proto4z::ReadStream & operator >> (zsummer::proto4z::ReadStream 
     return rs; 
 } 
  
+ 
 typedef std::vector<unsigned int> IntArray;  
+ 
  
 typedef std::vector<TestIntegerData> TestIntegerDataArray;  
  
+ 
 typedef std::vector<TestFloatData> TestFloatDataArray;  
+ 
  
 typedef std::vector<TestStringData> TestStringDataArray;  
  
+ 
 typedef std::map<std::string, TestIntegerData> TestIntegerDataMap;  
+ 
  
 typedef std::map<std::string, TestFloatData> TestFloatDataMap;  
  
+ 
 typedef std::map<std::string, TestStringData> TestStringDataMap;  
  
-const unsigned short ID_EchoPack = 30000;  
 struct EchoPack 
 { 
+    static const unsigned short GetProtoID() { return 30000;} 
+    static const std::string GetProtoName() { return "ID_EchoPack";} 
     TestIntegerDataArray _iarray;  
     TestFloatDataArray _farray;  
     TestStringDataArray _sarray;  
@@ -156,8 +169,6 @@ struct EchoPack
         this->_fmap = _fmap; 
         this->_smap = _smap; 
     } 
-    static const unsigned short GetProtoID() { return 30000;} 
-    static const std::string GetProtoName() { return "ID_EchoPack";} 
 }; 
 inline zsummer::proto4z::WriteStream & operator << (zsummer::proto4z::WriteStream & ws, const EchoPack & data) 
 { 
@@ -180,7 +191,6 @@ inline zsummer::proto4z::ReadStream & operator >> (zsummer::proto4z::ReadStream 
     return rs; 
 } 
  
-const unsigned short ID_Pulse = 30001;  
 struct Pulse 
 { 
     static const unsigned short GetProtoID() { return 30001;} 

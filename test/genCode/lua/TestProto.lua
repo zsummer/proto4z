@@ -1,7 +1,9 @@
-Proto4z.EC_SUCCESS = 0--success 
-Proto4z.EC_ERROR = 1--error 
-Proto4z.EC_INVALID_PARAM = 1000--invalid param 
-Proto4z.EC_UNKNOWN_ID = 1001--unknwon id 
+ 
+Proto4z.MAX_SESSIONS = 5000--max session count 
+Proto4z.GTYPE_INVALID = 0--无效 
+Proto4z.GTYPE_WAITING = 1--等待 
+Proto4z.GTYPE_INGAME = 10--游戏中 
+Proto4z.GTYPE_LEAVE = 11--离开 
  
 Proto4z.TestIntegerData = {} --测试 
 Proto4z.TestIntegerData.__getName = "TestIntegerData" 

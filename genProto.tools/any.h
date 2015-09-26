@@ -64,7 +64,7 @@
 enum AnyType : short
 {
     GT_DataComment,
-    GT_DataInclude,
+    GT_DataEnum,
     GT_DataArray,
     GT_DataMap,
     GT_DataConstValue,
@@ -89,12 +89,6 @@ struct DataComment
 };
 
 
-//include file name, without suffix
-struct DataInclude
-{
-    std::string _filename;
-    std::string _desc;
-};
 
 //array type
 struct DataArray
@@ -120,6 +114,15 @@ struct DataConstValue
     std::string _name;
     std::string _value;
     std::string _desc;
+};
+
+//include file name, without suffix
+struct DataEnum
+{
+    std::string _type;
+    std::string _name;
+    std::string _desc;
+    std::vector<DataConstValue> _members;
 };
 
 //struct type
@@ -153,10 +156,10 @@ struct AnyData
 {
     AnyType _type;
     DataComment _comment;
-    DataInclude _include;
+    DataConstValue _const;
+    DataEnum _enum;
     DataArray _array;
     DataMap _map;
-    DataConstValue _const;
     DataProto _proto;
 };
 

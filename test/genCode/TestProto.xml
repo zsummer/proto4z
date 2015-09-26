@@ -24,15 +24,17 @@
 
 
 <Proto>
-    <!-- <include name="stdio" desc="stdio.h or stdio.lua" /> -->
+     <!-- 常量类型 -->
+    <const name="MAX_SESSIONS" value="5000" type="ui16" desc="max session count" />
 
-    <!-- 匿名枚举类型 -->
-    <enum type="ui16" >
-        <member name="EC_SUCCESS" desc="success" />
-        <member name="EC_ERROR" desc="error" />
-        <member name="EC_INVALID_PARAM" value="1000" desc="invalid param" />
-        <member name="EC_UNKNOWN_ID" desc="unknwon id" />
+    <!-- 枚举类型 -->
+    <enum type="ui16" name="GAME_TYPE" >
+        <member name="GTYPE_INVALID" desc="无效" />
+        <member name="GTYPE_WAITING" desc="等待" />
+        <member name="GTYPE_INGAME" value="10" desc="游戏中" />
+        <member name="GTYPE_LEAVE" desc="离开" />
     </enum>
+
 
     <!-- 整形-->
     <struct name="TestIntegerData" store="true" desc="测试">

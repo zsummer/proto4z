@@ -124,24 +124,7 @@ std::list<AnyData> parseProto(std::string fileName, ParseCache & cache)
                 break;
             }
             std::string stype = ele->Name();
-            if (stype == "include")
-            {
-                DataInclude dc;
-                if (!ele->Attribute("name"))
-                {
-                    E("Attribute Error. ");
-                }
-                dc._filename = ele->Attribute("name");
-                if (ele->Attribute("desc"))
-                {
-                    dc._desc = ele->Attribute("desc");
-                }
-                AnyData info;
-                info._include = dc;
-                info._type = GT_DataInclude;
-                anydata.push_back(info);
-            }
-            else if (stype == "const")
+            if (stype == "const")
             {
                 DataConstValue dc;
                 if (!ele->Attribute("type") || !ele->Attribute("name") || !ele->Attribute("value"))
@@ -163,38 +146,23 @@ std::list<AnyData> parseProto(std::string fileName, ParseCache & cache)
             }
             else if (stype == "enum")
             {
-                std::string enumType;
+                AnyData enumData;
+                enumData._type = GT_DataEnum;
                 int lastID = 0;
                 if (!ele->Attribute("type"))
                 {
                     E("Attribute Error. ");
                 }
-                enumType = ele->Attribute("type");
-
-                //comments
+                enumData._enum._type = ele->Attribute("type");
+                if (ele->Attribute("name"))
                 {
-                    AnyData comment;
-                    comment._type = GT_DataComment;
-                    comment._comment._desc += "--enum--[name=";
-                    if (ele->Attribute("name"))
-                    {
-                        comment._comment._desc += ele->Attribute("name");
-                    }
-                    else
-                    {
-                        comment._comment._desc += "Anonymous";
-                    }
-                    comment._comment._desc += ", type=";
-                    comment._comment._desc += ele->Attribute("type");
-                    if (ele->Attribute("desc"))
-                    {
-                        comment._comment._desc += ", desc=";
-                        comment._comment._desc += ele->Attribute("desc");
-                    }
-                    comment._comment._desc += "]--";
-                    anydata.push_back(comment);
+                    enumData._enum._name = ele->Attribute("name");
                 }
-
+                if (ele->Attribute("desc"))
+                {
+                    enumData._enum._desc = ele->Attribute("desc");
+                }
+                
                 XMLElement * member = ele->FirstChildElement("member");
                 do
                 {
@@ -207,7 +175,7 @@ std::list<AnyData> parseProto(std::string fileName, ParseCache & cache)
                     {
                         E("Attribute Error. ");
                     }
-                    dc._type = enumType;
+                    dc._type = enumData._enum._type;
                     dc._name = member->Attribute("name");
                     if (member->Attribute("value"))
                     {
@@ -224,14 +192,10 @@ std::list<AnyData> parseProto(std::string fileName, ParseCache & cache)
                     {
                         dc._desc = member->Attribute("desc");
                     }
-                    AnyData info;
-                    info._const = dc;
-                    info._type = GT_DataConstValue;
-                    anydata.push_back(info);
-
+                    enumData._enum._members.push_back(dc);
                     member = member->NextSiblingElement("member");
                 } while (true);
-
+                anydata.push_back(enumData);
             }
             //数组类型
             else if (stype == "array")

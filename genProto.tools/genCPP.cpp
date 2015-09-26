@@ -69,218 +69,33 @@ std::string GenCPP::genRealContent(const std::list<AnyData> & stores)
     {
         if (info._type == GT_DataComment)
         {
-            text += "/*" + info._comment._desc + "*/" + LFCR;
-        }
-        else if (info._type == GT_DataInclude)
-        {
-            text += "#include <" + info._include._filename + ".h> ";
-            if (!info._include._desc.empty())
-            {
-                text += "//" + info._include._desc + " ";
-            }
             text += LFCR;
+            text += "/*" + info._comment._desc + "*/" + LFCR;
         }
         else if (info._type == GT_DataConstValue)
         {
-            text += "const " + getRealType(info._const._type) + " " + info._const._name + " = " + info._const._value + "; ";
-            if (!info._const._desc.empty())
-            {
-                text += "//" + info._const._desc + " ";
-            }
             text += LFCR;
+            text += genDataConst(info._const);
+        }
+        else if (info._type == GT_DataEnum)
+        {
+            text += LFCR;
+            text += genDataEnum(info._enum);
         }
         else if (info._type == GT_DataArray)
         {
-            text += LFCR + "typedef std::vector<" + getRealType(info._array._type) + "> " + info._array._arrayName + "; ";
-            if (!info._array._desc.empty())
-            {
-                text += "//" + info._array._desc + " ";
-            }
             text += LFCR;
+            text += genDataArray(info._array);
         }
         else if (info._type == GT_DataMap)
         {
-            text += LFCR + "typedef std::map<"
-                + getRealType(info._map._typeKey) + ", " + getRealType(info._map._typeValue)
-                + "> " + info._map._mapName + "; ";
-            if (!info._map._desc.empty())
-            {
-                text += "//" + info._map._desc + " ";
-            }
             text += LFCR;
+            text += genDataMap(info._map);
         }
         else if (info._type == GT_DataStruct || info._type == GT_DataProto)
         {
             text += LFCR;
-            //write ProtoID
-            if (info._type == GT_DataProto)
-            {
-                text += "const " + getRealType(info._proto._const._type) + " " 
-                    + info._proto._const._name + " = " + info._proto._const._value + "; ";
-                if (!info._proto._const._desc.empty())
-                {
-                    text += "//" + info._proto._const._desc + " ";
-                }
-                text += LFCR;
-            }
-
-            //write struct
-            text += "struct " + info._proto._struct._name;
-            if (!info._proto._struct._desc.empty())
-            {
-                text += " //" + info._proto._struct._desc + " ";
-            }
-            text += LFCR;
-            text += "{" + LFCR;
-
-
-            for (const auto & m : info._proto._struct._members)
-            {
-                text += "    " + getRealType(m._type) + " " + m._name + "; ";
-                if (m._tag == MT_DELETE)
-                {
-                    text += "//[already deleted] ";
-                }
-                if (!m._desc.empty())
-                {
-                    text += "//" + m._desc + " ";
-                }
-                text += LFCR;
-            }
-
-            if (!info._proto._struct._members.empty())
-            {    //struct init
-                text += "    " + info._proto._struct._name + "()" + LFCR;
-                text += "    {" + LFCR;
-                for (const auto &m : info._proto._struct._members)
-                {
-                    std::string def = getTypeDefault(m._type);
-                    if (!def.empty())
-                    {
-                        text += "        " + m._name + " = " + def + ";" + LFCR;
-                    }
-                }
-                text += "    }" + LFCR;
-            }
-
-            if (!info._proto._struct._members.empty())
-            {    //struct init
-                text += "    " + info._proto._struct._name + "(";
-                for (size_t i = 0; i < info._proto._struct._members.size(); i++)
-                {
-                    const auto & m = info._proto._struct._members[i];
-                    if (i != 0) text += ", ";
-                    text += "const " + getRealType(m._type) + " & " + m._name;
-                }
-                text += ")" + LFCR;
-                text += "    {" + LFCR;
-                for (const auto &m : info._proto._struct._members)
-                {
-                    text += "        this->" + m._name + " = " + m._name + ";" + LFCR;  
-                }
-                text += "    }" + LFCR;
-            }
-
-            if (info._type == GT_DataProto)
-            {
-                text += std::string("    static const ") + getRealType(ProtoIDType) + " GetProtoID() { return " + info._proto._const._value + ";}" + LFCR;
-                text += std::string("    static const ") + getRealType("string") + " GetProtoName() { return \""
-                    + info._proto._const._name + "\";}" + LFCR;
-            }
-            text += "};" + LFCR;
-
-
-            //input stream operator
-            text += "inline zsummer::proto4z::WriteStream & operator << (zsummer::proto4z::WriteStream & ws, const " + info._proto._struct._name + " & data)" + LFCR;
-            text += "{" + LFCR;
-#ifdef __WITH_TAG
-            text += "    unsigned long long tag = " + boost::lexical_cast<std::string, unsigned long long>(info._proto._struct._tag) + "ULL;" + LFCR;
-            text += "    if (zsummer::proto4z::__localEndianType() != zsummer::proto4z::LittleEndian) tag = zsummer::proto4z::byteRevese(tag);" + LFCR;
-            text += "    ws << (zsummer::proto4z::Integer)0;" + LFCR;
-            text += "    zsummer::proto4z::Integer offset = ws.getStreamLen();" + LFCR;
-            text += "    ws << tag;" + LFCR;
-#endif
-            for (const auto &m : info._proto._struct._members)
-            {
-                if (m._tag == MT_DELETE)
-                {
-                    text += "//    ws << data." + m._name + "; //[already deleted] " + LFCR;
-                }
-                else
-                {
-                    text += "    ws << data." + m._name + "; " + LFCR;
-                }
-            }
-#ifdef __WITH_TAG
-            text += "    ws.fixOriginalData(offset - 4, ws.getStreamLen() - offset);" + LFCR;
-#endif
-            text += "    return ws;" + LFCR;
-            text += "}" + LFCR;
-
-
-            //output stream operator
-            text += "inline zsummer::proto4z::ReadStream & operator >> (zsummer::proto4z::ReadStream & rs, " + info._proto._struct._name + " & data)" + LFCR;
-            text += "{" + LFCR;
-#ifdef __WITH_TAG
-            text += "    zsummer::proto4z::Integer sttLen = 0;" + LFCR;
-            text += "    rs >> sttLen;" + LFCR;
-            text += "    zsummer::proto4z::Integer cursor = rs.getStreamUnreadLen();" + LFCR;
-            text += "    unsigned long long tag = 0;" + LFCR;
-            text += "    rs >> tag;" + LFCR;
-            text += "    if (zsummer::proto4z::__localEndianType() != zsummer::proto4z::LittleEndian) tag = zsummer::proto4z::byteRevese(tag);" + LFCR;
-#endif
-            int curTagIndex = 0;
-            for (const auto &m : info._proto._struct._members)
-            {
-#ifdef __WITH_TAG
-                text += "    if ( (1ULL << " + boost::lexical_cast<std::string, int>(curTagIndex)+") & tag)" + LFCR;
-                text += "    {" + LFCR;
-#endif
-
-#ifndef __WITH_TAG
-                if (m._tag == MT_DELETE)
-                    text += "//        rs >> data." + m._name + "; " + LFCR;
-                else
-#endif
-                    text += "        rs >> data." + m._name + "; " + LFCR;
-
-
-
-#ifdef __WITH_TAG
-                text += "    }" + LFCR;
-#endif
-                curTagIndex++;
-            }
-
-#ifdef __WITH_TAG
-            text += "    cursor = cursor - rs.getStreamUnreadLen();" + LFCR;
-            text += "    rs.skipOriginalData(sttLen - cursor);" + LFCR;
-#endif
-            text += "    return rs;" + LFCR;
-            text += "}" + LFCR;
-
-            //input log4z operator
-            if (false)
-            {
-                text += "inline zsummer::log4z::Log4zStream & operator << (zsummer::log4z::Log4zStream & stm, const " + info._proto._struct._name + " & info)" + LFCR;
-                text += "{" + LFCR;
-                bool bFirst = true;
-                for (const auto &m : info._proto._struct._members)
-                {
-                    if (bFirst)
-                    {
-                        bFirst = false;
-                        text += "    stm << \"" + m._name + "=\"" + " << info." + m._name;
-                    }
-                    else
-                    {
-                        text += " << \", " + m._name + "=\"" + " << info." + m._name;
-                    }
-                }
-                text += ";" + LFCR;
-                text += "    return stm;" + LFCR;
-                text += "}" + LFCR;
-            }
+            text += genDataProto(info._proto, info._type == GT_DataProto);
         }
 
     }
@@ -288,3 +103,188 @@ std::string GenCPP::genRealContent(const std::list<AnyData> & stores)
 
     return std::move(text);
 }
+
+
+std::string GenCPP::genDataConst(const DataConstValue & dc)
+{
+    std::string text;
+    text += "const " + getRealType(dc._type) + " " + dc._name + " = " + dc._value + "; ";
+    if (!dc._desc.empty())
+    {
+        text += "//" + dc._desc + " ";
+    }
+    text += LFCR;
+    return text;
+}
+std::string GenCPP::genDataEnum(const DataEnum & de)
+{
+    std::string text;
+    text += "enum " + de._name + " : " + getRealType(de._type) + LFCR;
+    text += "{" + LFCR;
+    for (auto m : de._members)
+    {
+        text += "    " + m._name + " = " + m._value + ", ";
+        if (!m._desc.empty())
+        {
+            text += "//" + m._desc + " ";
+        }
+        text += LFCR;
+    }
+    text += "};" + LFCR;
+    return text;
+}
+std::string GenCPP::genDataArray(const DataArray & da)
+{
+    std::string text;
+    text += LFCR + "typedef std::vector<" + getRealType(da._type) + "> " + da._arrayName + "; ";
+    if (!da._desc.empty())
+    {
+        text += "//" + da._desc + " ";
+    }
+    text += LFCR;
+    return text;
+}
+std::string GenCPP::genDataMap(const DataMap & dm)
+{
+    std::string text;
+    text += LFCR + "typedef std::map<"
+        + getRealType(dm._typeKey) + ", " + getRealType(dm._typeValue)
+        + "> " + dm._mapName + "; ";
+    if (!dm._desc.empty())
+    {
+        text += "//" + dm._desc + " ";
+    }
+    text += LFCR;
+    return text;
+}
+std::string GenCPP::genDataProto(const DataProto & dp, bool isProto)
+{
+    std::string text;
+
+    //write struct
+    text += "struct " + dp._struct._name;
+    if (!dp._struct._desc.empty())
+    {
+        text += " //" + dp._struct._desc + " ";
+    }
+    text += LFCR;
+    text += "{" + LFCR;
+
+    if (isProto)
+    {
+        text += std::string("    static const ") + getRealType(ProtoIDType) + " GetProtoID() { return " + dp._const._value + ";}" + LFCR;
+        text += std::string("    static const ") + getRealType("string") + " GetProtoName() { return \""
+            + dp._const._name + "\";}" + LFCR;
+    }
+    
+    for (const auto & m : dp._struct._members)
+    {
+        text += "    " + getRealType(m._type) + " " + m._name + "; ";
+        if (m._tag == MT_DELETE)
+        {
+            text += "//[already deleted] ";
+        }
+        if (!m._desc.empty())
+        {
+            text += "//" + m._desc + " ";
+        }
+        text += LFCR;
+    }
+
+    if (!dp._struct._members.empty())
+    {    //struct init
+        text += "    " + dp._struct._name + "()" + LFCR;
+        text += "    {" + LFCR;
+        for (const auto &m : dp._struct._members)
+        {
+            std::string def = getTypeDefault(m._type);
+            if (!def.empty())
+            {
+                text += "        " + m._name + " = " + def + ";" + LFCR;
+            }
+        }
+        text += "    }" + LFCR;
+    }
+
+    if (!dp._struct._members.empty())
+    {    //struct init
+        text += "    " + dp._struct._name + "(";
+        for (size_t i = 0; i < dp._struct._members.size(); i++)
+        {
+            const auto & m = dp._struct._members[i];
+            if (i != 0) text += ", ";
+            text += "const " + getRealType(m._type) + " & " + m._name;
+        }
+        text += ")" + LFCR;
+        text += "    {" + LFCR;
+        for (const auto &m : dp._struct._members)
+        {
+            text += "        this->" + m._name + " = " + m._name + ";" + LFCR;
+        }
+        text += "    }" + LFCR;
+    }
+    text += "};" + LFCR;
+
+
+
+    //input stream operator
+    text += "inline zsummer::proto4z::WriteStream & operator << (zsummer::proto4z::WriteStream & ws, const " + dp._struct._name + " & data)" + LFCR;
+    text += "{" + LFCR;
+    for (const auto &m : dp._struct._members)
+    {
+        if (m._tag == MT_DELETE)
+        {
+            text += "//    ws << data." + m._name + "; //[already deleted] " + LFCR;
+        }
+        else
+        {
+            text += "    ws << data." + m._name + "; " + LFCR;
+        }
+    }
+
+    text += "    return ws;" + LFCR;
+    text += "}" + LFCR;
+
+
+    //output stream operator
+    text += "inline zsummer::proto4z::ReadStream & operator >> (zsummer::proto4z::ReadStream & rs, " + dp._struct._name + " & data)" + LFCR;
+    text += "{" + LFCR;
+
+    for (const auto &m : dp._struct._members)
+    {
+        if (m._tag == MT_DELETE)
+            text += "//        rs >> data." + m._name + "; " + LFCR;
+        else
+            text += "        rs >> data." + m._name + "; " + LFCR;
+    }
+
+    text += "    return rs;" + LFCR;
+    text += "}" + LFCR;
+
+    //input log4z operator
+    if (false)
+    {
+        text += "inline zsummer::log4z::Log4zStream & operator << (zsummer::log4z::Log4zStream & stm, const " + dp._struct._name + " & info)" + LFCR;
+        text += "{" + LFCR;
+        bool bFirst = true;
+        for (const auto &m : dp._struct._members)
+        {
+            if (bFirst)
+            {
+                bFirst = false;
+                text += "    stm << \"" + m._name + "=\"" + " << info." + m._name;
+            }
+            else
+            {
+                text += " << \", " + m._name + "=\"" + " << info." + m._name;
+            }
+        }
+        text += ";" + LFCR;
+        text += "    return stm;" + LFCR;
+        text += "}" + LFCR;
+    }
+    return text;
+}
+
+
+

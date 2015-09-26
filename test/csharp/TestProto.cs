@@ -1,35 +1,32 @@
  
 namespace Proto4z  
 { 
-    public class EC_SUCCESS //success  
+ 
+    public class MAX_SESSIONS //max session count  
     { 
-        public const System.UInt16 value = 0;  
+        public const ushort value = 5000;  
     } 
-    public class EC_ERROR //error  
+ 
+    public enum GAME_TYPE : ushort 
     { 
-        public const System.UInt16 value = 1;  
-    } 
-    public class EC_INVALID_PARAM //invalid param  
-    { 
-        public const System.UInt16 value = 1000;  
-    } 
-    public class EC_UNKNOWN_ID //unknwon id  
-    { 
-        public const System.UInt16 value = 1001;  
-    } 
+        GTYPE_INVALID = 0, //无效  
+        GTYPE_WAITING = 1, //等待  
+        GTYPE_INGAME = 10, //游戏中  
+        GTYPE_LEAVE = 11, //离开  
+    }; 
  
     public class TestIntegerData: Proto4z.IProtoObject //测试  
     {     
         //members   
-        public System.Char _char;  
-        public System.Byte _uchar;  
-        public System.Int16 _short;  
-        public System.UInt16 _ushort;  
-        public System.Int32 _int;  
-        public System.UInt32 _uint;  
-        public System.Int64 _i64;  
-        public System.UInt64 _ui128;  
-        public System.UInt64 _ui64;  
+        public char _char;  
+        public byte _uchar;  
+        public short _short;  
+        public ushort _ushort;  
+        public int _int;  
+        public uint _uint;  
+        public long _i64;  
+        public ulong _ui128;  
+        public ulong _ui64;  
         public TestIntegerData()  
         { 
             _char = '\0';  
@@ -42,7 +39,7 @@ namespace Proto4z
             _ui128 = 0;  
             _ui64 = 0;  
         } 
-        public TestIntegerData(System.Char _char, System.Byte _uchar, System.Int16 _short, System.UInt16 _ushort, System.Int32 _int, System.UInt32 _uint, System.Int64 _i64, System.UInt64 _ui128, System.UInt64 _ui64) 
+        public TestIntegerData(char _char, byte _uchar, short _short, ushort _ushort, int _int, uint _uint, long _i64, ulong _ui128, ulong _ui64) 
         { 
             this._char = _char; 
             this._uchar = _uchar; 
@@ -84,14 +81,14 @@ namespace Proto4z
     public class TestFloatData: Proto4z.IProtoObject //测试  
     {     
         //members   
-        public System.Single _float;  
-        public System.Double _double;  
+        public float _float;  
+        public double _double;  
         public TestFloatData()  
         { 
             _float = 0.0f;  
             _double = 0.0;  
         } 
-        public TestFloatData(System.Single _float, System.Double _double) 
+        public TestFloatData(float _float, double _double) 
         { 
             this._float = _float; 
             this._double = _double; 
@@ -114,12 +111,12 @@ namespace Proto4z
     public class TestStringData: Proto4z.IProtoObject //测试  
     {     
         //members   
-        public System.String _string;  
+        public string _string;  
         public TestStringData()  
         { 
             _string = "";  
         } 
-        public TestStringData(System.String _string) 
+        public TestStringData(string _string) 
         { 
             this._string = _string; 
         } 
@@ -136,12 +133,13 @@ namespace Proto4z
         } 
     } 
  
-    public class IntArray : System.Collections.Generic.List<System.UInt32>, Proto4z.IProtoObject  
+ 
+    public class IntArray : System.Collections.Generic.List<uint>, Proto4z.IProtoObject  
     { 
         public System.Collections.Generic.List<byte> __encode() 
         { 
             var ret = new System.Collections.Generic.List<byte>(); 
-            System.Int32 len = (System.Int32)this.Count; 
+            int len = (int)this.Count; 
             ret.AddRange(Proto4z.BaseProtoObject.encodeI32(len)); 
             for (int i = 0; i < this.Count; i++ ) 
             { 
@@ -152,7 +150,7 @@ namespace Proto4z
  
         public int __decode(byte[] binData, ref int pos) 
         { 
-            System.Int32 len = Proto4z.BaseProtoObject.decodeI32(binData, ref pos); 
+            int len = Proto4z.BaseProtoObject.decodeI32(binData, ref pos); 
             if(len > 0) 
             { 
                 for (int i=0; i<len; i++) 
@@ -164,12 +162,13 @@ namespace Proto4z
         } 
     } 
  
+ 
     public class TestIntegerDataArray : System.Collections.Generic.List<TestIntegerData>, Proto4z.IProtoObject  
     { 
         public System.Collections.Generic.List<byte> __encode() 
         { 
             var ret = new System.Collections.Generic.List<byte>(); 
-            System.Int32 len = (System.Int32)this.Count; 
+            int len = (int)this.Count; 
             ret.AddRange(Proto4z.BaseProtoObject.encodeI32(len)); 
             for (int i = 0; i < this.Count; i++ ) 
             { 
@@ -180,7 +179,7 @@ namespace Proto4z
  
         public int __decode(byte[] binData, ref int pos) 
         { 
-            System.Int32 len = Proto4z.BaseProtoObject.decodeI32(binData, ref pos); 
+            int len = Proto4z.BaseProtoObject.decodeI32(binData, ref pos); 
             if(len > 0) 
             { 
                 for (int i=0; i<len; i++) 
@@ -194,12 +193,13 @@ namespace Proto4z
         } 
     } 
  
+ 
     public class TestFloatDataArray : System.Collections.Generic.List<TestFloatData>, Proto4z.IProtoObject  
     { 
         public System.Collections.Generic.List<byte> __encode() 
         { 
             var ret = new System.Collections.Generic.List<byte>(); 
-            System.Int32 len = (System.Int32)this.Count; 
+            int len = (int)this.Count; 
             ret.AddRange(Proto4z.BaseProtoObject.encodeI32(len)); 
             for (int i = 0; i < this.Count; i++ ) 
             { 
@@ -210,7 +210,7 @@ namespace Proto4z
  
         public int __decode(byte[] binData, ref int pos) 
         { 
-            System.Int32 len = Proto4z.BaseProtoObject.decodeI32(binData, ref pos); 
+            int len = Proto4z.BaseProtoObject.decodeI32(binData, ref pos); 
             if(len > 0) 
             { 
                 for (int i=0; i<len; i++) 
@@ -224,12 +224,13 @@ namespace Proto4z
         } 
     } 
  
+ 
     public class TestStringDataArray : System.Collections.Generic.List<TestStringData>, Proto4z.IProtoObject  
     { 
         public System.Collections.Generic.List<byte> __encode() 
         { 
             var ret = new System.Collections.Generic.List<byte>(); 
-            System.Int32 len = (System.Int32)this.Count; 
+            int len = (int)this.Count; 
             ret.AddRange(Proto4z.BaseProtoObject.encodeI32(len)); 
             for (int i = 0; i < this.Count; i++ ) 
             { 
@@ -240,7 +241,7 @@ namespace Proto4z
  
         public int __decode(byte[] binData, ref int pos) 
         { 
-            System.Int32 len = Proto4z.BaseProtoObject.decodeI32(binData, ref pos); 
+            int len = Proto4z.BaseProtoObject.decodeI32(binData, ref pos); 
             if(len > 0) 
             { 
                 for (int i=0; i<len; i++) 
@@ -254,12 +255,13 @@ namespace Proto4z
         } 
     } 
  
-    public class TestIntegerDataMap : System.Collections.Generic.Dictionary<System.String, TestIntegerData>, Proto4z.IProtoObject  
+ 
+    public class TestIntegerDataMap : System.Collections.Generic.Dictionary<string, TestIntegerData>, Proto4z.IProtoObject  
     { 
         public System.Collections.Generic.List<byte> __encode() 
         { 
             var ret = new System.Collections.Generic.List<byte>(); 
-            System.Int32 len = (System.Int32)this.Count; 
+            int len = (int)this.Count; 
             ret.AddRange(Proto4z.BaseProtoObject.encodeI32(len)); 
             foreach(var kv in this) 
             { 
@@ -271,7 +273,7 @@ namespace Proto4z
  
         public int __decode(byte[] binData, ref int pos) 
         { 
-            System.Int32 len = Proto4z.BaseProtoObject.decodeI32(binData, ref pos); 
+            int len = Proto4z.BaseProtoObject.decodeI32(binData, ref pos); 
             if(len > 0) 
             { 
                 for (int i=0; i<len; i++) 
@@ -286,12 +288,13 @@ namespace Proto4z
         } 
     } 
  
-    public class TestFloatDataMap : System.Collections.Generic.Dictionary<System.String, TestFloatData>, Proto4z.IProtoObject  
+ 
+    public class TestFloatDataMap : System.Collections.Generic.Dictionary<string, TestFloatData>, Proto4z.IProtoObject  
     { 
         public System.Collections.Generic.List<byte> __encode() 
         { 
             var ret = new System.Collections.Generic.List<byte>(); 
-            System.Int32 len = (System.Int32)this.Count; 
+            int len = (int)this.Count; 
             ret.AddRange(Proto4z.BaseProtoObject.encodeI32(len)); 
             foreach(var kv in this) 
             { 
@@ -303,7 +306,7 @@ namespace Proto4z
  
         public int __decode(byte[] binData, ref int pos) 
         { 
-            System.Int32 len = Proto4z.BaseProtoObject.decodeI32(binData, ref pos); 
+            int len = Proto4z.BaseProtoObject.decodeI32(binData, ref pos); 
             if(len > 0) 
             { 
                 for (int i=0; i<len; i++) 
@@ -318,12 +321,13 @@ namespace Proto4z
         } 
     } 
  
-    public class TestStringDataMap : System.Collections.Generic.Dictionary<System.String, TestStringData>, Proto4z.IProtoObject  
+ 
+    public class TestStringDataMap : System.Collections.Generic.Dictionary<string, TestStringData>, Proto4z.IProtoObject  
     { 
         public System.Collections.Generic.List<byte> __encode() 
         { 
             var ret = new System.Collections.Generic.List<byte>(); 
-            System.Int32 len = (System.Int32)this.Count; 
+            int len = (int)this.Count; 
             ret.AddRange(Proto4z.BaseProtoObject.encodeI32(len)); 
             foreach(var kv in this) 
             { 
@@ -335,7 +339,7 @@ namespace Proto4z
  
         public int __decode(byte[] binData, ref int pos) 
         { 
-            System.Int32 len = Proto4z.BaseProtoObject.decodeI32(binData, ref pos); 
+            int len = Proto4z.BaseProtoObject.decodeI32(binData, ref pos); 
             if(len > 0) 
             { 
                 for (int i=0; i<len; i++) 
@@ -353,8 +357,8 @@ namespace Proto4z
     public class EchoPack: Proto4z.IProtoObject 
     {     
         //proto id   
-        public const System.UInt16 protoID = 30000;  
-        static public System.UInt16 getProtoID() { return 30000; } 
+        public const ushort protoID = 30000;  
+        static public ushort getProtoID() { return 30000; } 
         static public string getProtoName() { return "EchoPack"; } 
         //members   
         public TestIntegerDataArray _iarray;  
@@ -419,8 +423,8 @@ namespace Proto4z
     public class Pulse: Proto4z.IProtoObject 
     {     
         //proto id   
-        public const System.UInt16 protoID = 30001;  
-        static public System.UInt16 getProtoID() { return 30001; } 
+        public const ushort protoID = 30001;  
+        static public ushort getProtoID() { return 30001; } 
         static public string getProtoName() { return "Pulse"; } 
         //members   
         public Pulse()  
