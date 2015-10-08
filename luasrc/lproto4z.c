@@ -404,7 +404,7 @@ static int makeULL(lua_State * L)
     {
         return 0;
     }
-    lua_pushlstring(L, &num, sizeof(num));
+    lua_pushlstring(L, (const char *)&num, sizeof(num));
     return 1;
 }
 
