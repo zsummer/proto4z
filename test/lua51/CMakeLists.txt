@@ -16,4 +16,4 @@ endif()
 set(CMAKE_CXX_FLAGS -std=c++11)
 
 add_executable(lua51 ${source} ${luasrc})
-target_link_libraries(lua51 m)
+target_link_libraries(lua51 rt m)
