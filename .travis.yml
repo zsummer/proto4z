@@ -5,17 +5,12 @@ compiler:
 os:
   - linux
   - osx
+before_install:
+  - source ./test/travis/env.sh
 
-matrix:
-  - os: linux
-    before_install:
-      - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
-      - sudo apt-get update -qq
-  - os: linux
-    install:
-      - sudo apt-get install -qq cmake
-      - sudo apt-get install -qq g++-4.8
-      - export CXX="g++-4.8"
+install:
+  - source ./test/travis/setup.sh
+
 script:
   - cmake --version
   - cmake .
