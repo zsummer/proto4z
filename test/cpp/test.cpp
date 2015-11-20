@@ -5,6 +5,7 @@
 #include <iostream>
 #include <time.h>
 #include <stdio.h>
+#include <chrono>
 
 #ifdef WIN32
 #include <windows.h>
@@ -127,26 +128,27 @@ int main()
     std::cout << "write and read stream used time: " << getSteadyTime() - now << std::endl;
 
   
-    cout << "press any key to continue." << endl;
-    getchar();
+//     cout << "press any key to continue." << endl;
+//     getchar();
     return 0;
 }
 
 
 unsigned int getSteadyTime()
 {
-#ifdef WIN32
-    return ::GetTickCount();
-#elif defined(__APPLE__)
-    const int64_t kOneMillion = 1000 * 1000;
-    mach_timebase_info_data_t timebase_info;
-    mach_timebase_info(&timebase_info);
-    return (unsigned int)((mach_absolute_time() * timebase_info.numer) / (kOneMillion * timebase_info.denom));
-#else
-    timespec ts;
-    if(clock_gettime(CLOCK_MONOTONIC_RAW, &ts) != 0)
-        return 0;
-    return ts.tv_sec * 1000 + (ts.tv_nsec / 1000/1000);
-#endif
+    return (unsigned int)std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+// #ifdef WIN32
+//     return ::GetTickCount();
+// #elif defined(__APPLE__)
+//     const int64_t kOneMillion = 1000 * 1000;
+//     mach_timebase_info_data_t timebase_info;
+//     mach_timebase_info(&timebase_info);
+//     return (unsigned int)((mach_absolute_time() * timebase_info.numer) / (kOneMillion * timebase_info.denom));
+// #else
+//     timespec ts;
+//     if(clock_gettime(CLOCK_MONOTONIC_RAW, &ts) != 0)
+//         return 0;
+//     return ts.tv_sec * 1000 + (ts.tv_nsec / 1000/1000);
+// #endif
 }
 
