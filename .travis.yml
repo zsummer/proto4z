@@ -1,18 +1,21 @@
 ## 
 ## Travis 
 language: cpp
-
-compiler:
-  - gcc
-
+os:
+  - linux
+  - osx
+addons:
+  apt:
+    packages:
+      - cmake
+      - gcc-4.8
+      - g++-4.8
 # Setup repos etc before installation
 before_install:
   - sudo apt-get update -qq
 
-install:
-  - sudo apt-get install cmake
-#  - sudo apt-get install make
-#  - sudo apt-get install g++
+#install:
+#  - sudo apt-get install cmake
 
 # command to run tests 
 script:
