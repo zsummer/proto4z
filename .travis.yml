@@ -2,7 +2,9 @@
 ## Travis 
 sudo: false
 language: cpp
-compiler: g++
+compiler: 
+  - g++ 
+  - clang
 os:
   - linux
   - osx
