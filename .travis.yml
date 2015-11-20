@@ -1,0 +1,27 @@
+## 
+## Travis 
+language: cpp
+
+compiler:
+  - gcc
+
+# Setup repos etc before installation
+before_install:
+  - sudo apt-get update -qq
+
+install:
+  - sudo apt-get install cmake
+#  - sudo apt-get install make
+#  - sudo apt-get install g++
+
+# command to run tests 
+script:
+  - cmake --version
+  - cmake .
+  - make
+  - ll test/bin/*
+  - ls bin/fenix_log4z_test*
+  - cd ./test/bin
+  - ./cpptest
+  - ./lua51
+  - ./lua53
