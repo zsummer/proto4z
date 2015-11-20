@@ -2,7 +2,8 @@
 if [ "${TRAVIS_OS_NAME}" = "osx" ]; then
   echo "osx system" 
 else
-  add-apt-repository -y ppa:ubuntu-toolchain-r/test
-  apt-get update -qq
+  echo "linux system"
+  sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+  sudo apt-get update -qq
 fi
 
