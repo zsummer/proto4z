@@ -8,7 +8,7 @@ os:
 
 # Setup repos etc before installation
 before_install:
-  - sh ./test/travis/env.sh
+  - source ./test/travis/env.sh
 
 install:
   - source ./test/travis/setup.sh
