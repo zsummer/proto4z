@@ -1,5 +1,6 @@
 ## 
 ## Travis 
+sudo: false
 language: cpp
 compiler: g++
 os:
@@ -17,8 +18,7 @@ script:
   - cmake --version
   - cmake .
   - make
-  - ll test/bin/*
-  - ls bin/fenix_log4z_test*
+  - ls test/bin/*
   - cd ./test/bin
   - ./cpptest
   - ./lua51
