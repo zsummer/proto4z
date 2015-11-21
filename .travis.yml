@@ -20,8 +20,12 @@ script:
   - make
   - ls test/bin/*
   - cd test/genCode
+  - if [ "${TRAVIS_OS_NAME}" = "linux" ]; then ./genCode; fi
+  - if [ "${TRAVIS_OS_NAME}" = "osx" ]; then ./genProtoMac; fi
+  - cd ../../
+  - cd test/genCode
   - ./genProto
-  - cd ../../test/bin
+  - cd test/bin
   - ./cpptest
   - ./lua51
   - ./lua53
