@@ -20,7 +20,7 @@ script:
   - make
   - ls test/bin/*
   - cd test/genCode
-  - ./genCode
+  - ./genProto
   - cd ../../test/bin
   - ./cpptest
   - ./lua51
