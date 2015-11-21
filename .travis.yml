@@ -19,12 +19,11 @@ script:
   - cmake .
   - make
   - ls test/bin/*
+  - ls test/genCode/*
   - cd test/genCode
   - if [ "${TRAVIS_OS_NAME}" = "linux" ]; then ./genProto; fi
   - if [ "${TRAVIS_OS_NAME}" = "osx" ]; then ./genProtoMac; fi
   - cd ../../
-  - cd test/genCode
-  - ./genProto
   - cd test/bin
   - ./cpptest
   - ./lua51
