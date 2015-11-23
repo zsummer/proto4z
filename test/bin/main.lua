@@ -56,7 +56,7 @@ local echo = {  _iarray = {{_char=1,_uchar=2,_short=3,_ushort=4,_int=5,_uint=6,_
 				_smap = {{k="523", v={_string="abcdefg"}},{k="523", v={_string="abcdefg"}}},
 				}
 
-function process(isDebug)
+function process(echo, isDebug)
 	local data = proto.encode(echo, "EchoPack")
 	local dr = proto.decode(data, proto.getName(proto.EchoPack.__getID))
 	if isDebug then
@@ -65,12 +65,13 @@ function process(isDebug)
 	end
 end
 
-process(true)
+process(nil, true)
+process({}, true)
+process({_iarray={{}}, _farray={{}}, _fmap={{}}}, true)
 local now = Proto4zUtil.now()
 for i=1, 1000 do
-	process()
+	process(echo)
 end
-
 print("used time=" .. (Proto4zUtil.now() - now))
 
 
