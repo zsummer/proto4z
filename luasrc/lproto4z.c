@@ -125,7 +125,7 @@ static int testTag(lua_State * L)
 
 static void printPackError(lua_State * L, const char *tp, const char * desc)
 {
-    char buf[100] = { 0 };
+    char buf[200] = { 0 };
     lua_getglobal(L, "print");
     sprintf(buf, "pack warning. the value is nil when pack [%s].[%s]. it's will replace by default value.", desc, tp);
     lua_pushstring(L, buf);
@@ -269,7 +269,7 @@ static int pack(lua_State * L)
 
 static void printUnpackError(lua_State * L, size_t pos, size_t dataLen, const char *tp)
 {
-    char buf[100] = { 0 };
+    char buf[200] = { 0 };
     lua_getglobal(L, "print");
     sprintf(buf, "unpack error. the current pos is invalid. cur pos=%u, type=%s, blockSize=%u", (unsigned int)pos, tp, (unsigned int)dataLen);
     lua_pushstring(L, buf);
