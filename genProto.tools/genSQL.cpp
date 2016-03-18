@@ -167,7 +167,7 @@ std::string GenSQL::genRealContent(const std::list<AnyData> & stores)
             text.pop_back();
             text += " desc limit ?, 1000 \");" + LFCR;
             text += "    q << curLoaded;" + LFCR;
-            text += "    return q.popSQL();" + LFCR;
+            text += "    return q.pickSQL();" + LFCR;
             text += "}" + LFCR;
 
             //select
@@ -220,7 +220,7 @@ std::string GenSQL::genRealContent(const std::list<AnyData> & stores)
                 text += "    q << " + m._name + ";" + LFCR;
             }
             
-            text += "    return q.popSQL();" + LFCR;
+            text += "    return q.pickSQL();" + LFCR;
             text += "}" + LFCR;
 
             //fetch
@@ -250,7 +250,7 @@ std::string GenSQL::genRealContent(const std::list<AnyData> & stores)
             text += "    " + fetchType + " ret;" + LFCR;
             text += "    if (ptr->getErrorCode() != zsummer::mysql::QEC_SUCCESS)" + LFCR;
             text += "    {" + LFCR;
-            text += "        "  "LOGE(\"fetch info from db found error. ErrorCode=\"  <<  ptr->getErrorCode() << \", Error=\" << ptr->getLastError());" + LFCR;
+            text += "        "  "LOGE(\"fetch info from db found error. ErrorCode=\"  <<  ptr->getErrorCode() << \", Error=\" << ptr->getErrorMsg());" + LFCR;
             text += "        "  "return ret;" + LFCR;
             text += "    }" + LFCR;
             text += "    try" + LFCR;
@@ -370,7 +370,7 @@ std::string GenSQL::genRealContent(const std::list<AnyData> & stores)
                 }
 
             }
-            text += "    return q.popSQL();" + LFCR;
+            text += "    return q.pickSQL();" + LFCR;
             text += "}" + LFCR;
             text += LFCR;
 
@@ -458,7 +458,7 @@ std::string GenSQL::genRealContent(const std::list<AnyData> & stores)
                 }
                 
             }
-            text += "    return q.popSQL();" + LFCR;
+            text += "    return q.pickSQL();" + LFCR;
             text += "}" + LFCR;
             text += LFCR;
         }
