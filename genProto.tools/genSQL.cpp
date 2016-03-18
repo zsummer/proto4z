@@ -225,7 +225,6 @@ std::string GenSQL::genRealContent(const std::list<AnyData> & stores)
 
             //fetch
             text += LFCR;
-            text += "inline ";
             std::string fetchType;
             for (auto& m : info._proto._struct._members)
             {
@@ -244,6 +243,10 @@ std::string GenSQL::genRealContent(const std::list<AnyData> & stores)
                 }
                 fetchType += "> ";
             }
+            text += "typedef " + fetchType + " MapDB" + info._proto._struct._name + ";";
+            fetchType = "MapDB" + info._proto._struct._name;
+            text += LFCR;
+            text += "inline ";
             text += fetchType + " ";
             text += info._proto._struct._name + "_FETCH(zsummer::mysql::DBResultPtr ptr)" + LFCR;
             text += "{" + LFCR;
@@ -313,6 +316,67 @@ std::string GenSQL::genRealContent(const std::list<AnyData> & stores)
             text += "    }" + LFCR;
 
             text += "    return std::move(ret);" + LFCR;
+            text += "}" + LFCR;
+            text += LFCR;
+            //fetch
+            text += LFCR;
+            text += "inline bool " + info._proto._struct._name + "_FETCH(zsummer::mysql::DBResultPtr ptr, " + info._proto._struct._name + " & info)" + LFCR;
+            text += "{" + LFCR;
+            text += "    if (ptr->getErrorCode() != zsummer::mysql::QEC_SUCCESS)" + LFCR;
+            text += "    {" + LFCR;
+            text += "        "  "LOGE(\"fetch info from db found error. ErrorCode=\"  <<  ptr->getErrorCode() << \", Error=\" << ptr->getErrorMsg());" + LFCR;
+            text += "        "  "return false;" + LFCR;
+            text += "    }" + LFCR;
+            text += "    try" + LFCR;
+            text += "    {" + LFCR;
+
+            text += "        "  "if (ptr->haveRow())" + LFCR;
+            text += "        {" + LFCR;
+            for (auto& m : info._proto._struct._members)
+            {
+                if (m._tag == MT_DB_IGNORE || m._tag == MT_DELETE)
+                {
+                    continue;
+                }
+                if (m._type == "ui8" || m._type == "ui16" || m._type == "ui32" || m._type == "ui64"
+                    || m._type == "i8" || m._type == "i16" || m._type == "i32" || m._type == "i64"
+                    || m._type == "double" || m._type == "float" || m._type == "string")
+                {
+                    text += "            *ptr >> info." + m._name + ";" + LFCR;
+                }
+                else
+                {
+                    text += "            try" + LFCR;
+                    text += "            {" + LFCR;
+
+                    text += "                "  "std::string blob;" + LFCR;
+                    text += "                "  "*ptr >> blob;" + LFCR;
+                    text += "                "  "if(!blob.empty())" + LFCR;
+                    text += "                "  "{" + LFCR;
+                    text += "                    "  "zsummer::proto4z::ReadStream rs(blob.c_str(), (zsummer::proto4z::Integer)blob.length(), false);" + LFCR;
+                    text += "                    "  "rs >> info." + m._name + ";" + LFCR;
+                    text += "                "  "}" + LFCR;
+
+                    text += "            }" + LFCR;
+                    text += "            catch(std::runtime_error e)" + LFCR;
+                    text += "            {" + LFCR;
+                    text += "                "  "LOGW(\"fetch blob catch one runtime warning. what=\" << e.what());" + LFCR;
+                    text += "            }" + LFCR;
+
+                }
+            }
+
+            text += "            return true; " + LFCR;
+            text += "        }" + LFCR;
+
+            text += "    }" + LFCR;
+            text += "    catch(std::runtime_error e)" + LFCR;
+            text += "    {" + LFCR;
+            text += "        "  "LOGE(\"fetch info catch one runtime error. what=\" << e.what());" + LFCR;
+            text += "        "  "return false;" + LFCR;
+            text += "    }" + LFCR;
+
+            text += "    return false;" + LFCR;
             text += "}" + LFCR;
             text += LFCR;
 
