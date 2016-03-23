@@ -51,6 +51,22 @@ std::string GenSQL::getRealType(const std::string & xmltype)
     return xmltype;
 }
 
+std::string getMysqlType(const std::string & tp)
+{
+    if (tp == "string")
+    {
+        return " varchar(255) NOT NULL DEFAULT '' ";
+    }
+    else if (tp == "i8" || tp == "i16" || tp == "i32" || tp == "i64")
+    {
+        return " bigint(20) NOT NULL DEFAULT '0' ";
+    }
+    else if (tp == "ui8" || tp == "ui16" || tp == "ui32" || tp == "ui64")
+    {
+        return " bigint(20) unsigned NOT NULL DEFAULT '0' ";
+    }
+    return " blob ";
+}
 
 std::string GenSQL::genRealContent(const std::list<AnyData> & stores)
 {
@@ -79,19 +95,7 @@ std::string GenSQL::genRealContent(const std::list<AnyData> & stores)
                 {
                     continue;
                 }
-                text +="        `" + m._name + "`";
-                if (m._type == "string")
-                {
-                    text += " varchar(255) NOT NULL DEFAULT '' , ";
-                }
-                else if (m._type == "i8" || m._type == "i16" || m._type == "i32" || m._type == "i64")
-                {
-                    text += " bigint(20) NOT NULL DEFAULT '0' ,  ";
-                }
-                else if (m._type == "ui8" || m._type == "ui16" || m._type == "ui32" || m._type == "ui64")
-                {
-                    text += " bigint(20) unsigned NOT NULL DEFAULT '0' , ";
-                }
+                text += "        `" + m._name + "`" + getMysqlType(m._type) + ",";
             }
             text += "        PRIMARY KEY("; 
             for (auto& m : info._proto._struct._members)
@@ -113,26 +117,8 @@ std::string GenSQL::genRealContent(const std::list<AnyData> & stores)
                 {
                     continue;
                 }
-
-
-                text += "    ret.push_back(\"alter table `tb_" + info._proto._struct._name + "` add `" + m._name + "` ";
-                if (m._type == "string")
-                {
-                    text += " varchar(255) NOT NULL DEFAULT '' ";
-                }
-                else if (m._type == "i8" || m._type == "i16" || m._type == "i32" || m._type == "i64")
-                {
-                    text += " bigint(20) NOT NULL DEFAULT '0' ";
-                }
-                else if (m._type == "ui8" || m._type == "ui16" || m._type == "ui32" || m._type == "ui64")
-                {
-                    text += " bigint(20) unsigned NOT NULL DEFAULT '0' ";
-                }
-                else
-                {
-                    text += " blob ";
-                }
-                text += "\");" + LFCR;
+                text += "    ret.push_back(\"alter table `tb_" + info._proto._struct._name + "` add `" + m._name + "` " + getMysqlType(m._type) + "\");" + LFCR;
+                text += "    ret.push_back(\"alter table `tb_" + info._proto._struct._name + "` change `" + m._name + "` " + " `" + m._name + "` " + getMysqlType(m._type) + "\");" + LFCR;
             }
         
             text += "    return std::move(ret);" + LFCR;
