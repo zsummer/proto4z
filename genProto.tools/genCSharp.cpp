@@ -354,11 +354,6 @@ std::string GenCSharp::genDataProto(const DataProto & dp, bool isProto)
     text += "            "   "var data = new System.Collections.Generic.List<byte>();" + LFCR;
     for (const auto &m : dp._struct._members)
     {
-        if (m._tag == MT_DELETE)
-        {
-            continue;
-        }
-
         //null
         if (!getCSharpType(m._type).isBase)
         {
@@ -384,10 +379,6 @@ std::string GenCSharp::genDataProto(const DataProto & dp, bool isProto)
     text += "        {" + LFCR;
     for (const auto &m : dp._struct._members)
     {
-        if (m._tag == MT_DELETE)
-        {
-            continue;
-        }
         if (getCSharpType(m._type).isBase)
         {
             text += "            this." + m._name + " = " + getCSharpType(m._type).baseDecode + "(binData, ref pos);" + LFCR;

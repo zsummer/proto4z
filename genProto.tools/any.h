@@ -77,9 +77,8 @@ enum MemberTag : short
 {
     MT_NORMAL,
     MT_DB_KEY,
+    MT_DB_AUTO,
     MT_DB_IGNORE,
-    MT_DELETE,
-    //MT_OPTION,
 };
 
 //comment

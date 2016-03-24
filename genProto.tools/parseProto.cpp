@@ -281,7 +281,7 @@ std::list<AnyData> parseProto(std::string fileName, ParseCache & cache)
                     {
                         if (strcmp(member->Attribute("tag"), "del") == 0)
                         {
-                            dm._tag = MT_DELETE;
+                            dm._tag = MT_DB_IGNORE;
                         }
                         else if (strcmp(member->Attribute("tag"), "key") == 0)
                         {
@@ -291,7 +291,10 @@ std::list<AnyData> parseProto(std::string fileName, ParseCache & cache)
                         {
                             dm._tag = MT_DB_IGNORE;
                         }
-
+                        else if (strcmp(member->Attribute("tag"), "auto") == 0)
+                        {
+                            dm._tag = MT_DB_AUTO;
+                        }
                     }
 
                     if (member->Attribute("desc"))
@@ -328,14 +331,10 @@ std::list<AnyData> parseProto(std::string fileName, ParseCache & cache)
         info._proto._struct._tag = 0;
         for (const auto & m : info._proto._struct._members)
         {
-            if (m._tag != MT_DELETE)
-            {
-                info._proto._struct._tag |= (1ULL << curTagIndex);
-            }
+            info._proto._struct._tag |= (1ULL << curTagIndex);
             curTagIndex++;
         }
     }
-
     return std::move(anydata);
 }
 

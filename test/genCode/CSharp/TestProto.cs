@@ -54,14 +54,15 @@ namespace Proto4z
         public System.Collections.Generic.List<byte> __encode() 
         { 
             var data = new System.Collections.Generic.List<byte>(); 
-            data.AddRange(Proto4z.BaseProtoObject.encodeI8(_char)); 
-            data.AddRange(Proto4z.BaseProtoObject.encodeUI8(_uchar)); 
-            data.AddRange(Proto4z.BaseProtoObject.encodeI16(_short)); 
-            data.AddRange(Proto4z.BaseProtoObject.encodeUI16(_ushort)); 
-            data.AddRange(Proto4z.BaseProtoObject.encodeI32(_int)); 
-            data.AddRange(Proto4z.BaseProtoObject.encodeUI32(_uint)); 
-            data.AddRange(Proto4z.BaseProtoObject.encodeI64(_i64)); 
-            data.AddRange(Proto4z.BaseProtoObject.encodeUI64(_ui64)); 
+            data.AddRange(Proto4z.BaseProtoObject.encodeI8(this._char)); 
+            data.AddRange(Proto4z.BaseProtoObject.encodeUI8(this._uchar)); 
+            data.AddRange(Proto4z.BaseProtoObject.encodeI16(this._short)); 
+            data.AddRange(Proto4z.BaseProtoObject.encodeUI16(this._ushort)); 
+            data.AddRange(Proto4z.BaseProtoObject.encodeI32(this._int)); 
+            data.AddRange(Proto4z.BaseProtoObject.encodeUI32(this._uint)); 
+            data.AddRange(Proto4z.BaseProtoObject.encodeI64(this._i64)); 
+            data.AddRange(Proto4z.BaseProtoObject.encodeUI64(this._ui128)); 
+            data.AddRange(Proto4z.BaseProtoObject.encodeUI64(this._ui64)); 
             return data; 
         } 
         public int __decode(byte[] binData, ref int pos) 
@@ -73,6 +74,7 @@ namespace Proto4z
             this._int = Proto4z.BaseProtoObject.decodeI32(binData, ref pos); 
             this._uint = Proto4z.BaseProtoObject.decodeUI32(binData, ref pos); 
             this._i64 = Proto4z.BaseProtoObject.decodeI64(binData, ref pos); 
+            this._ui128 = Proto4z.BaseProtoObject.decodeUI64(binData, ref pos); 
             this._ui64 = Proto4z.BaseProtoObject.decodeUI64(binData, ref pos); 
             return pos; 
         } 
@@ -96,8 +98,8 @@ namespace Proto4z
         public System.Collections.Generic.List<byte> __encode() 
         { 
             var data = new System.Collections.Generic.List<byte>(); 
-            data.AddRange(Proto4z.BaseProtoObject.encodeSingle(_float)); 
-            data.AddRange(Proto4z.BaseProtoObject.encodeDouble(_double)); 
+            data.AddRange(Proto4z.BaseProtoObject.encodeSingle(this._float)); 
+            data.AddRange(Proto4z.BaseProtoObject.encodeDouble(this._double)); 
             return data; 
         } 
         public int __decode(byte[] binData, ref int pos) 
@@ -123,7 +125,7 @@ namespace Proto4z
         public System.Collections.Generic.List<byte> __encode() 
         { 
             var data = new System.Collections.Generic.List<byte>(); 
-            data.AddRange(Proto4z.BaseProtoObject.encodeString(_string)); 
+            data.AddRange(Proto4z.BaseProtoObject.encodeString(this._string)); 
             return data; 
         } 
         public int __decode(byte[] binData, ref int pos) 
@@ -388,18 +390,18 @@ namespace Proto4z
         public System.Collections.Generic.List<byte> __encode() 
         { 
             var data = new System.Collections.Generic.List<byte>(); 
-            if (_iarray == null) _iarray = new TestIntegerDataArray(); 
-            data.AddRange(_iarray.__encode()); 
-            if (_farray == null) _farray = new TestFloatDataArray(); 
-            data.AddRange(_farray.__encode()); 
-            if (_sarray == null) _sarray = new TestStringDataArray(); 
-            data.AddRange(_sarray.__encode()); 
-            if (_imap == null) _imap = new TestIntegerDataMap(); 
-            data.AddRange(_imap.__encode()); 
-            if (_fmap == null) _fmap = new TestFloatDataMap(); 
-            data.AddRange(_fmap.__encode()); 
-            if (_smap == null) _smap = new TestStringDataMap(); 
-            data.AddRange(_smap.__encode()); 
+            if (this._iarray == null) this._iarray = new TestIntegerDataArray(); 
+            data.AddRange(this._iarray.__encode()); 
+            if (this._farray == null) this._farray = new TestFloatDataArray(); 
+            data.AddRange(this._farray.__encode()); 
+            if (this._sarray == null) this._sarray = new TestStringDataArray(); 
+            data.AddRange(this._sarray.__encode()); 
+            if (this._imap == null) this._imap = new TestIntegerDataMap(); 
+            data.AddRange(this._imap.__encode()); 
+            if (this._fmap == null) this._fmap = new TestFloatDataMap(); 
+            data.AddRange(this._fmap.__encode()); 
+            if (this._smap == null) this._smap = new TestStringDataMap(); 
+            data.AddRange(this._smap.__encode()); 
             return data; 
         } 
         public int __decode(byte[] binData, ref int pos) 

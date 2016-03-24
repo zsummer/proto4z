@@ -180,10 +180,6 @@ std::string GenCPP::genDataProto(const DataProto & dp, bool isProto)
     for (const auto & m : dp._struct._members)
     {
         text += "    " + getRealType(m._type) + " " + m._name + "; ";
-        if (m._tag == MT_DELETE)
-        {
-            text += "//[already deleted] ";
-        }
         if (!m._desc.empty())
         {
             text += "//" + m._desc + " ";
@@ -232,14 +228,7 @@ std::string GenCPP::genDataProto(const DataProto & dp, bool isProto)
     text += "{" + LFCR;
     for (const auto &m : dp._struct._members)
     {
-        if (m._tag == MT_DELETE)
-        {
-            text += "//    ws << data." + m._name + "; //[already deleted] " + LFCR;
-        }
-        else
-        {
-            text += "    ws << data." + m._name + "; " + LFCR;
-        }
+        text += "    ws << data." + m._name + "; " + LFCR;
     }
 
     text += "    return ws;" + LFCR;
@@ -252,10 +241,7 @@ std::string GenCPP::genDataProto(const DataProto & dp, bool isProto)
 
     for (const auto &m : dp._struct._members)
     {
-        if (m._tag == MT_DELETE)
-            text += "//        rs >> data." + m._name + "; " + LFCR;
-        else
-            text += "        rs >> data." + m._name + "; " + LFCR;
+        text += "        rs >> data." + m._name + "; " + LFCR;
     }
 
     text += "    return rs;" + LFCR;

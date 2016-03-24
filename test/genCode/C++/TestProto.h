@@ -22,7 +22,7 @@ struct TestIntegerData //测试
     int _int;  
     unsigned int _uint;  
     long long _i64;  
-    unsigned long long _ui128; //[already deleted]  
+    unsigned long long _ui128;  
     unsigned long long _ui64;  
     TestIntegerData() 
     { 
@@ -58,7 +58,7 @@ inline zsummer::proto4z::WriteStream & operator << (zsummer::proto4z::WriteStrea
     ws << data._int;  
     ws << data._uint;  
     ws << data._i64;  
-//    ws << data._ui128; //[already deleted]  
+    ws << data._ui128;  
     ws << data._ui64;  
     return ws; 
 } 
@@ -71,7 +71,7 @@ inline zsummer::proto4z::ReadStream & operator >> (zsummer::proto4z::ReadStream 
         rs >> data._int;  
         rs >> data._uint;  
         rs >> data._i64;  
-//        rs >> data._ui128;  
+        rs >> data._ui128;  
         rs >> data._ui64;  
     return rs; 
 } 

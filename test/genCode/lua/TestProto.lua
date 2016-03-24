@@ -14,7 +14,7 @@ Proto4z.TestIntegerData[4] = {name="_ushort", type="ui16" }
 Proto4z.TestIntegerData[5] = {name="_int", type="i32" }  
 Proto4z.TestIntegerData[6] = {name="_uint", type="ui32" }  
 Proto4z.TestIntegerData[7] = {name="_i64", type="i64" }  
-Proto4z.TestIntegerData[8] = {name="_ui128", type="ui64", del = true }  
+Proto4z.TestIntegerData[8] = {name="_ui128", type="ui64" }  
 Proto4z.TestIntegerData[9] = {name="_ui64", type="ui64" }  
  
 Proto4z.TestFloatData = {} --测试 

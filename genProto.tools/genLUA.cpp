@@ -155,10 +155,6 @@ std::string GenLUA::genDataProto(const DataProto & dp, bool isProto)
     {
         text += "Proto4z." + dp._struct._name + "[" + boost::lexical_cast<std::string>(i + 1)
             + "] = {name=\"" + dp._struct._members[i]._name + "\", type=\"" + dp._struct._members[i]._type + "\"";
-        if (dp._struct._members[i]._tag == MT_DELETE)
-        {
-            text += ", del = true";
-        }
         text += " } ";
         if (!dp._struct._members[i]._desc.empty())
         {
