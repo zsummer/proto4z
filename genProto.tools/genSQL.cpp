@@ -99,7 +99,9 @@ std::string GenSQL::genRealContent(const std::list<AnyData> & stores)
             text += LFCR;
             text += "inline std::vector<std::string> " + info._proto._struct._name + "_DCL()" + LFCR;
             text += "{" + LFCR;
+            text += "    std::vector<std::string> ret;" + LFCR;
             //select
+
             text += "    ret.push_back(\"select ";
             for (auto& m : info._proto._struct._members)
             {
@@ -208,7 +210,7 @@ std::string GenSQL::genRealContent(const std::list<AnyData> & stores)
             text += "{" + LFCR;
             text += "    if (ptr->getErrorCode() != zsummer::mysql::QEC_SUCCESS)" + LFCR;
             text += "    {" + LFCR;
-            text += "        "  "LOGE(\"fetch info from db found error. ErrorCode=\"  <<  ptr->getErrorCode() << \", Error=\" << ptr->getErrorMsg());" + LFCR;
+            text += "        "  "LOGE(\"error fetch " + info._proto._struct._name + " from table " + dbtable + " . ErrorCode=\"  <<  ptr->getErrorCode() << \", Error=\" << ptr->getErrorMsg() << \", sql=\" << ptr->peekSQL());" + LFCR;
             text += "        "  "return false;" + LFCR;
             text += "    }" + LFCR;
             text += "    try" + LFCR;
@@ -244,7 +246,7 @@ std::string GenSQL::genRealContent(const std::list<AnyData> & stores)
                     text += "            }" + LFCR;
                     text += "            catch(std::runtime_error e)" + LFCR;
                     text += "            {" + LFCR;
-                    text += "                "  "LOGW(\"fetch blob catch one runtime warning. what=\" << e.what());" + LFCR;
+                    text += "                "  "LOGW(\"catch one except error when fetch " + info._proto._struct._name + "." + m._name + "  from table " + dbtable + " . what=\" << e.what() << \"  ErrorCode=\"  <<  ptr->getErrorCode() << \", Error=\" << ptr->getErrorMsg() << \", sql=\" << ptr->peekSQL());" + LFCR;
                     text += "            }" + LFCR;
 
                 }
@@ -256,7 +258,7 @@ std::string GenSQL::genRealContent(const std::list<AnyData> & stores)
             text += "    }" + LFCR;
             text += "    catch(std::runtime_error e)" + LFCR;
             text += "    {" + LFCR;
-            text += "        "  "LOGE(\"fetch info catch one runtime error. what=\" << e.what());" + LFCR;
+            text += "        "  "LOGE(\"catch one except error when fetch " + info._proto._struct._name + " from table " + dbtable + " . what=\" << e.what() << \"  ErrorCode=\"  <<  ptr->getErrorCode() << \", Error=\" << ptr->getErrorMsg() << \", sql=\" << ptr->peekSQL());" + LFCR;
             text += "        "  "return false;" + LFCR;
             text += "    }" + LFCR;
 
