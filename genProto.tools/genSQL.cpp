@@ -68,7 +68,7 @@ std::string GenSQL::genRealContent(const std::list<AnyData> & stores)
             {
                 if (m._tag != MT_DB_IGNORE) text += "        `" + m._name + "`" + getMysqlType(m) + ",";
             });
-            if (text.back() == ',') text.pop_back();
+
 
             text += "        PRIMARY KEY(";
             std::for_each(info._proto._struct._members.begin(), info._proto._struct._members.end(), [&text](const DataStruct::DataMember & m)
