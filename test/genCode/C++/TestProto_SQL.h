@@ -7,7 +7,7 @@ inline std::vector<std::string> TestIntegerData_BUILD()
 { 
     std::vector<std::string> ret; 
     ret.push_back("desc `tb_TestIntegerData`"); 
-    ret.push_back("CREATE TABLE `tb_TestIntegerData` (        `_char` bigint(20) NOT NULL DEFAULT '0' ,        `_uchar` bigint(20) unsigned NOT NULL DEFAULT '0' ,        `_short` bigint(20) NOT NULL DEFAULT '0' ,        `_ushort` bigint(20) unsigned NOT NULL DEFAULT '0' ,        `_int` bigint(20) NOT NULL DEFAULT '0' ,        `_uint` bigint(20) unsigned NOT NULL DEFAULT '0' ,        `_i64` bigint(20) NOT NULL DEFAULT '0'         PRIMARY KEY(`_uint`,`_i64`)  ) ENGINE = MyISAM DEFAULT CHARSET = utf8"); 
+    ret.push_back("CREATE TABLE `tb_TestIntegerData` (        `_char` bigint(20) NOT NULL DEFAULT '0' ,        `_uchar` bigint(20) unsigned NOT NULL DEFAULT '0' ,        `_short` bigint(20) NOT NULL DEFAULT '0' ,        `_ushort` bigint(20) unsigned NOT NULL DEFAULT '0' ,        `_int` bigint(20) NOT NULL DEFAULT '0' ,        `_uint` bigint(20) unsigned NOT NULL DEFAULT '0' ,        `_i64` bigint(20) NOT NULL DEFAULT '0' ,        `_ui128` bigint(20) unsigned NOT NULL DEFAULT '0'         PRIMARY KEY(`_uint`,`_i64`)  ) ENGINE = MyISAM DEFAULT CHARSET = utf8"); 
     ret.push_back("alter table `tb_TestIntegerData` add `_char`  bigint(20) NOT NULL DEFAULT '0' "); 
     ret.push_back("alter table `tb_TestIntegerData` change `_char`  `_char`  bigint(20) NOT NULL DEFAULT '0' "); 
     ret.push_back("alter table `tb_TestIntegerData` add `_uchar`  bigint(20) unsigned NOT NULL DEFAULT '0' "); 
@@ -22,15 +22,17 @@ inline std::vector<std::string> TestIntegerData_BUILD()
     ret.push_back("alter table `tb_TestIntegerData` change `_uint`  `_uint`  bigint(20) unsigned NOT NULL DEFAULT '0' "); 
     ret.push_back("alter table `tb_TestIntegerData` add `_i64`  bigint(20) NOT NULL DEFAULT '0' "); 
     ret.push_back("alter table `tb_TestIntegerData` change `_i64`  `_i64`  bigint(20) NOT NULL DEFAULT '0' "); 
+    ret.push_back("alter table `tb_TestIntegerData` add `_ui128`  bigint(20) unsigned NOT NULL DEFAULT '0' "); 
+    ret.push_back("alter table `tb_TestIntegerData` change `_ui128`  `_ui128`  bigint(20) unsigned NOT NULL DEFAULT '0' "); 
     return std::move(ret); 
 } 
  
 inline std::vector<std::string> TestIntegerData_DCL() 
 { 
-    ret.push_back("select `_char`,`_uchar`,`_short`,`_ushort`,`_int`,`_uint`,`_i64` from `tb_TestIntegerData` where `_uint` = ? and `_i64` = ? "); 
-    ret.push_back("insert into `tb_TestIntegerData`(`_char`,`_uchar`,`_short`,`_ushort`,`_int`,`_uint`,`_i64`) values(?,?,?,?,?,?,?)"); 
+    ret.push_back("select `_char`,`_uchar`,`_short`,`_ushort`,`_int`,`_uint`,`_i64`,`_ui128` from `tb_TestIntegerData` where `_uint` = ? and `_i64` = ? "); 
+    ret.push_back("insert into `tb_TestIntegerData`(`_char`,`_uchar`,`_short`,`_ushort`,`_int`,`_uint`,`_i64`,`_ui128`) values(?,?,?,?,?,?,?,?)"); 
     ret.push_back("delete from `tb_TestIntegerData` where `_uint` = ?,`_i64` = ? "); 
-    ret.push_back("insert into `tb_TestIntegerData`(_uint,_i64) values(?,? ) on duplicate key update `_char` = ?,`_uchar` = ?,`_short` = ?,`_ushort` = ?,`_int` = ? "); 
+    ret.push_back("insert into `tb_TestIntegerData`(_uint,_i64) values(?,? ) on duplicate key update `_char` = ?,`_uchar` = ?,`_short` = ?,`_ushort` = ?,`_int` = ?,`_ui128` = ? "); 
     return std::move(ret); 
 } 
  
@@ -52,6 +54,7 @@ inline bool TestIntegerData_FETCH(zsummer::mysql::DBResultPtr ptr, TestIntegerDa
             *ptr >> info._int; 
             *ptr >> info._uint; 
             *ptr >> info._i64; 
+            *ptr >> info._ui128; 
             return true;  
         } 
     } 

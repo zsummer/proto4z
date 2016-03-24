@@ -9,7 +9,7 @@
  * 
  * ===============================================================================
  * 
- * Copyright (C) 2014-2015 YaweiZhang <yawei.zhang@foxmail.com>.
+ * Copyright (C) 2014-2016 YaweiZhang <yawei.zhang@foxmail.com>.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -53,16 +53,16 @@
 #include <list>
 #include <time.h>
 #include <algorithm>
-#include "utility.h"
-#include "log4z.h"
-#include "tinyxml2.h"
-#include "md5.h"
+#include "./depends/utls.h"
+#include "./depends/log4z.h"
+#include "./depends/tinyxml2.h"
+#include "./depends/md5/md5.h"
 #ifndef WIN32
 #include <sys/stat.h>
 #else
 #include <direct.h>
 #endif
-#include "log4z.h"
+
 
 //proto id type
 const std::string ProtoIDType = "ui16";

@@ -5,36 +5,24 @@
     <ClCompile Include="genCSharp.cpp" />
     <ClCompile Include="genLUA.cpp" />
     <ClCompile Include="genSQL.cpp" />
-    <ClCompile Include="log4z.cpp">
-      <Filter>depends</Filter>
-    </ClCompile>
-    <ClCompile Include="md5.cpp">
-      <Filter>depends</Filter>
-    </ClCompile>
-    <ClCompile Include="tinyxml2.cpp">
-      <Filter>depends</Filter>
-    </ClCompile>
-    <ClCompile Include="utility.cpp">
-      <Filter>depends</Filter>
-    </ClCompile>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="parseProto.cpp" />
     <ClCompile Include="parseCache.cpp" />
     <ClCompile Include="genBase.cpp" />
+    <ClCompile Include="depends\log4z.cpp">
+      <Filter>depends</Filter>
+    </ClCompile>
+    <ClCompile Include="depends\tinyxml2.cpp">
+      <Filter>depends</Filter>
+    </ClCompile>
+    <ClCompile Include="depends\utls.cpp">
+      <Filter>depends</Filter>
+    </ClCompile>
+    <ClCompile Include="depends\md5\md5.cpp">
+      <Filter>depends\md5</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="utility.h">
-      <Filter>depends</Filter>
-    </ClInclude>
-    <ClInclude Include="log4z.h">
-      <Filter>depends</Filter>
-    </ClInclude>
-    <ClInclude Include="md5.h">
-      <Filter>depends</Filter>
-    </ClInclude>
-    <ClInclude Include="tinyxml2.h">
-      <Filter>depends</Filter>
-    </ClInclude>
     <ClInclude Include="any.h" />
     <ClInclude Include="parseProto.h" />
     <ClInclude Include="genBase.h" />
@@ -44,10 +32,28 @@
     <ClInclude Include="genCSharp.h" />
     <ClInclude Include="genLUA.h" />
     <ClInclude Include="genSQL.h" />
+    <ClInclude Include="depends\log4z.h">
+      <Filter>depends</Filter>
+    </ClInclude>
+    <ClInclude Include="depends\tinyxml2.h">
+      <Filter>depends</Filter>
+    </ClInclude>
+    <ClInclude Include="depends\utls.h">
+      <Filter>depends</Filter>
+    </ClInclude>
+    <ClInclude Include="depends\utlsImpl.h">
+      <Filter>depends</Filter>
+    </ClInclude>
+    <ClInclude Include="depends\md5\md5.h">
+      <Filter>depends\md5</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="depends">
       <UniqueIdentifier>{f1d9dc7f-22b7-4cf2-a5be-5904911bfa38}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="depends\md5">
+      <UniqueIdentifier>{12df6003-3bb6-45de-8f58-5ad2efbb987b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

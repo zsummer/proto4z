@@ -9,7 +9,7 @@
  * 
  * ===============================================================================
  * 
- * Copyright (C) 2014-2015 YaweiZhang <yawei.zhang@foxmail.com>.
+ * Copyright (C) 2014-2016 YaweiZhang <yawei.zhang@foxmail.com>.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -70,7 +70,7 @@ std::list<AnyData> parseProto(std::string fileName, ParseCache & cache)
 
     std::string filename = fileName + ".xml";
 
-    if (!zsummer::utility::GetFileStatus(filename, 6))
+    if (!hadFile(filename))
     {
         E(filename << " not found.");
     }
@@ -186,7 +186,7 @@ std::list<AnyData> parseProto(std::string fileName, ParseCache & cache)
                         }
                         lastID = v;
                     }
-                    dc._value = boost::lexical_cast<std::string>(lastID);
+                    dc._value = toString(lastID);
                     lastID++;
                     if (member->Attribute("desc"))
                     {
@@ -259,7 +259,7 @@ std::list<AnyData> parseProto(std::string fileName, ParseCache & cache)
                     dp._const._type = ProtoIDType;
                     dp._const._name = "ID_"  + dp._struct._name;
                     dp._const._desc = dp._struct._desc;
-                    dp._const._value = boost::lexical_cast<std::string>(cache.genProtoID(dp._const._name, minProtoID, maxProtoID));
+                    dp._const._value = toString(cache.genProtoID(dp._const._name, minProtoID, maxProtoID));
                 }
 
                 XMLElement * member = ele->FirstChildElement("member");
