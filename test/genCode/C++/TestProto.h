@@ -17,12 +17,6 @@ struct TestIntegerData //测试
 { 
     static const unsigned short getProtoID() { return 30002;} 
     static const std::string getProtoName() { return "ID_TestIntegerData";} 
-    inline const std::vector<std::string>  getDBBuild(); 
-    inline std::string  getDBInsert(); 
-    inline std::string  getDBDelete(); 
-    inline std::string  getDBUpdate(); 
-    inline std::string  getDBSelect(); 
-    inline bool fetchFromDBResult(zsummer::mysql::DBResult &result); 
     char _char;  
     unsigned char _uchar;  
     short _short;  
@@ -57,101 +51,6 @@ struct TestIntegerData //测试
         this->_ui64 = _ui64; 
     } 
 }; 
- 
-const std::vector<std::string>  TestIntegerData::getDBBuild() 
-{ 
-    std::vector<std::string> ret; 
-    ret.push_back("desc `tb_TestIntegerData`"); 
-    ret.push_back("CREATE TABLE `tb_TestIntegerData` (        `_char` bigint(20) NOT NULL DEFAULT '0' ,        `_uchar` bigint(20) unsigned NOT NULL DEFAULT '0' ,        `_short` bigint(20) NOT NULL DEFAULT '0' ,        `_ushort` bigint(20) unsigned NOT NULL DEFAULT '0' ,        `_int` bigint(20) NOT NULL DEFAULT '0' ,        `_uint` bigint(20) unsigned NOT NULL DEFAULT '0' ,        `_i64` bigint(20) NOT NULL DEFAULT '0' ,        `_ui128` bigint(20) unsigned NOT NULL DEFAULT '0' ,        PRIMARY KEY(`_uint`,`_i64`)  ) ENGINE = MyISAM DEFAULT CHARSET = utf8"); 
-    ret.push_back("alter table `tb_TestIntegerData` add `_char`  bigint(20) NOT NULL DEFAULT '0' "); 
-    ret.push_back("alter table `tb_TestIntegerData` change `_char`  `_char`  bigint(20) NOT NULL DEFAULT '0' "); 
-    ret.push_back("alter table `tb_TestIntegerData` add `_uchar`  bigint(20) unsigned NOT NULL DEFAULT '0' "); 
-    ret.push_back("alter table `tb_TestIntegerData` change `_uchar`  `_uchar`  bigint(20) unsigned NOT NULL DEFAULT '0' "); 
-    ret.push_back("alter table `tb_TestIntegerData` add `_short`  bigint(20) NOT NULL DEFAULT '0' "); 
-    ret.push_back("alter table `tb_TestIntegerData` change `_short`  `_short`  bigint(20) NOT NULL DEFAULT '0' "); 
-    ret.push_back("alter table `tb_TestIntegerData` add `_ushort`  bigint(20) unsigned NOT NULL DEFAULT '0' "); 
-    ret.push_back("alter table `tb_TestIntegerData` change `_ushort`  `_ushort`  bigint(20) unsigned NOT NULL DEFAULT '0' "); 
-    ret.push_back("alter table `tb_TestIntegerData` add `_int`  bigint(20) NOT NULL DEFAULT '0' "); 
-    ret.push_back("alter table `tb_TestIntegerData` change `_int`  `_int`  bigint(20) NOT NULL DEFAULT '0' "); 
-    ret.push_back("alter table `tb_TestIntegerData` add `_uint`  bigint(20) unsigned NOT NULL DEFAULT '0' "); 
-    ret.push_back("alter table `tb_TestIntegerData` change `_uint`  `_uint`  bigint(20) unsigned NOT NULL DEFAULT '0' "); 
-    ret.push_back("alter table `tb_TestIntegerData` add `_i64`  bigint(20) NOT NULL DEFAULT '0' "); 
-    ret.push_back("alter table `tb_TestIntegerData` change `_i64`  `_i64`  bigint(20) NOT NULL DEFAULT '0' "); 
-    ret.push_back("alter table `tb_TestIntegerData` add `_ui128`  bigint(20) unsigned NOT NULL DEFAULT '0' "); 
-    ret.push_back("alter table `tb_TestIntegerData` change `_ui128`  `_ui128`  bigint(20) unsigned NOT NULL DEFAULT '0' "); 
-    return std::move(ret); 
-} 
-std::string  TestIntegerData::getDBSelect() 
-{ 
-    zsummer::mysql::DBQuery q; 
-    q.init("select `_char`,`_uchar`,`_short`,`_ushort`,`_int`,`_uint`,`_i64`,`_ui128` from `tb_TestIntegerData` where `_uint` = ? and `_i64` = ? "); 
-    q << this->_uint; 
-    q << this->_i64; 
-    return q.pickSQL(); 
-} 
-std::string  TestIntegerData::getDBInsert() 
-{ 
-    zsummer::mysql::DBQuery q; 
-    q.init("insert into `tb_TestIntegerData`(`_char`,`_uchar`,`_short`,`_ushort`,`_int`,`_uint`,`_i64`,`_ui128`) values(?,?,?,?,?,?,?,?)"); 
-    q << this->_char; 
-    q << this->_uchar; 
-    q << this->_short; 
-    q << this->_ushort; 
-    q << this->_int; 
-    q << this->_uint; 
-    q << this->_i64; 
-    q << this->_ui128; 
-    return q.pickSQL(); 
-} 
-std::string  TestIntegerData::getDBDelete() 
-{ 
-    zsummer::mysql::DBQuery q; 
-    q.init("delete from `tb_TestIntegerData` where `_uint` = ?,`_i64` = ? "); 
-    q << this->_uint; 
-    q << this->_i64; 
-    return q.pickSQL(); 
-} 
-std::string  TestIntegerData::getDBUpdate() 
-{ 
-    zsummer::mysql::DBQuery q; 
-    q.init("insert into `tb_TestIntegerData`(_uint,_i64) values(?,? ) on duplicate key update `_char` = ?,`_uchar` = ?,`_short` = ?,`_ushort` = ?,`_int` = ?,`_ui128` = ? "); 
-    q << this->_char; 
-    q << this->_uchar; 
-    q << this->_short; 
-    q << this->_ushort; 
-    q << this->_int; 
-    q << this->_ui128; 
-    return q.pickSQL(); 
-} 
-bool TestIntegerData::fetchFromDBResult(zsummer::mysql::DBResult &result) 
-{ 
-    if (result.getErrorCode() != zsummer::mysql::QEC_SUCCESS) 
-    { 
-        LOGE("error fetch TestIntegerData from table `tb_TestIntegerData` . ErrorCode="  <<  result.getErrorCode() << ", Error=" << result.getErrorMsg() << ", sql=" << result.peekSQL()); 
-        return false; 
-    } 
-    try 
-    { 
-        if (result.haveRow()) 
-        { 
-            result >> this->_char; 
-            result >> this->_uchar; 
-            result >> this->_short; 
-            result >> this->_ushort; 
-            result >> this->_int; 
-            result >> this->_uint; 
-            result >> this->_i64; 
-            result >> this->_ui128; 
-            return true;  
-        } 
-    } 
-    catch(std::runtime_error e) 
-    { 
-        LOGE("catch one except error when fetch TestIntegerData from table `tb_TestIntegerData` . what=" << e.what() << "  ErrorCode="  <<  result.getErrorCode() << ", Error=" << result.getErrorMsg() << ", sql=" << result.peekSQL()); 
-        return false; 
-    } 
-    return false; 
-} 
 inline zsummer::proto4z::WriteStream & operator << (zsummer::proto4z::WriteStream & ws, const TestIntegerData & data) 
 { 
     ws << data._char;  

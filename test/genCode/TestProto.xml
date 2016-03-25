@@ -37,7 +37,7 @@
 
 
     <!-- 整形-->
-    <struct name="TestIntegerData" store="true" desc="测试">
+    <struct name="TestIntegerData" desc="测试">
         <member name="_char"    type="i8"    desc=""/>
         <member name="_uchar"    type="ui8"    desc=""/>
         <member name="_short"    type="i16"    desc=""/>
