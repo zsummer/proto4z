@@ -51,6 +51,7 @@ std::list<AnyData> parseProto(std::string fileName, ParseCache & cache)
 {
     unsigned short minProtoID = 0;
     unsigned short maxProtoID = 0;
+    bool hadLog4z = false;
     std::list<AnyData> anydata;
     std::string filename = fileName + ".xml";
 
@@ -76,10 +77,16 @@ std::list<AnyData> parseProto(std::string fileName, ParseCache & cache)
         }
         auto minNo = ele->FirstChildElement("MinNo");
         auto maxNo = ele->FirstChildElement("MaxNo");
+        auto lgz = ele->FirstChildElement("UseLog4z");
         if (!minNo || !minNo->GetText() || !maxNo || !maxNo->GetText())
         {
             E("FirstChildElement(\"MinNo\") || FirstChildElement(\"MaxNo\")  Error");
         }
+        if (lgz && strcmp(lgz->GetText(), "1") == 0 || strcmp(lgz->GetText(), "true") == 0)
+        {
+            hadLog4z = true;
+        }
+        
         minProtoID = atoi(minNo->GetText());
         maxProtoID = atoi(maxNo->GetText());
         if (cache.getCurrentProtoID() < minProtoID)
@@ -241,6 +248,7 @@ std::list<AnyData> parseProto(std::string fileName, ParseCache & cache)
                 {
                     dp._struct._hadStore = strcmp("true", ele->Attribute("store")) == 0;
                 }
+                dp._struct._hadLog4z = hadLog4z;
 
                 dp._const._type = ProtoIDType;
                 dp._const._name = "ID_" + dp._struct._name;

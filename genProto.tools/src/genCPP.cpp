@@ -471,7 +471,7 @@ std::string GenCPP::genDataPacket(const DataPacket & dp)
 
     for (const auto &m : dp._struct._members)
     {
-        text += "        rs >> data." + m._name + "; " + LFCR;
+        text += "    rs >> data." + m._name + "; " + LFCR;
     }
 
     text += "    return rs;" + LFCR;
@@ -482,11 +482,12 @@ std::string GenCPP::genDataPacket(const DataPacket & dp)
     {
         text += "inline zsummer::log4z::Log4zStream & operator << (zsummer::log4z::Log4zStream & stm, const " + dp._struct._name + " & info)" + LFCR;
         text += "{" + LFCR;
-        text += "    stm << \"[\\n\";";
+        text += "    stm << \"[\\n\";" + LFCR;
         for (const auto &m : dp._struct._members)
         {
-            text += " stm << \"" + m._name + "=\"" + " << info." + m._name + " << \"\\n\";";
+            text += "    stm << \"" + m._name + "=\"" + " << info." + m._name + " << \"\\n\";" + LFCR;
         }
+        text += "    stm << \"]\\n\";" + LFCR;
         text += "    return stm;" + LFCR;
         text += "}" + LFCR;
     }
