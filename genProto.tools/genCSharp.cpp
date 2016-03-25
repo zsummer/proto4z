@@ -67,10 +67,10 @@ std::string GenCSharp::genRealContent(const std::list<AnyData> & stores)
             text += LFCR;
             text += genDataMap(info._map);
         }
-        else if (info._type == GT_DataStruct || info._type == GT_DataProto)
+        else if (info._type == GT_DataPacket)
         {
             text += LFCR;
-            text += genDataProto(info._proto, info._type == GT_DataProto);
+            text += genDataPacket(info._proto);
         }
 
     }
@@ -244,7 +244,7 @@ std::string GenCSharp::genDataMap(const DataMap & dm)
 }
 
 
-std::string GenCSharp::genDataProto(const DataProto & dp, bool isProto)
+std::string GenCSharp::genDataPacket(const DataPacket & dp)
 {
     std::string text;
     text += "    public class " + dp._struct._name + ": Proto4z.IProtoObject";
@@ -256,13 +256,12 @@ std::string GenCSharp::genDataProto(const DataProto & dp, bool isProto)
     text += "    {    " + LFCR;
 
     //write ProtoID
-    if (isProto)
-    {
-        text += "        " "//proto id  " + LFCR;
-        text += "        " "public const ushort protoID = " + dp._const._value + "; " + LFCR;
-        text += "        " "static public ushort getProtoID() { return " + dp._const._value + "; }" + LFCR;
-        text += "        " "static public string getProtoName() { return \"" + dp._struct._name + "\"; }" + LFCR;
-    }
+
+    text += "        " "//proto id  " + LFCR;
+    text += "        " "public const ushort protoID = " + dp._const._value + "; " + LFCR;
+    text += "        " "static public ushort getProtoID() { return " + dp._const._value + "; }" + LFCR;
+    text += "        " "static public string getProtoName() { return \"" + dp._struct._name + "\"; }" + LFCR;
+
 
     //members
     text += "        " "//members  " + LFCR;

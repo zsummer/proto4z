@@ -42,23 +42,9 @@
 #include <algorithm>
 #include "genCPP.h"
 #include "genCSharp.h"
-#include "genSQL.h"
 #include "genLUA.h"
 
 
-void processTag(std::list<AnyData> & data)
-{
-    for (auto &info : data)
-    {
-        if (info._type != GT_DataStruct && info._type != GT_DataProto)
-        {
-            continue;
-        }
-
-        info._proto._struct._tag = 0;
-
-    }
-}
 
 
 std::list<AnyData> parseProto(std::string fileName, ParseCache & cache)
@@ -66,8 +52,6 @@ std::list<AnyData> parseProto(std::string fileName, ParseCache & cache)
     unsigned short minProtoID = 0;
     unsigned short maxProtoID = 0;
     std::list<AnyData> anydata;
-
-
     std::string filename = fileName + ".xml";
 
     if (!hadFile(filename))
@@ -105,6 +89,10 @@ std::list<AnyData> parseProto(std::string fileName, ParseCache & cache)
         if (cache.getCurrentProtoID() > maxProtoID)
         {
             E("Current cache Proto No Error. NextNumber=" << cache.getCurrentProtoID() << ", minNo=" << minProtoID << ", maxNo=" << maxProtoID);
+        }
+        if (minProtoID >= maxProtoID)
+        {
+            E("must set valid MinNo and MaxNo. cur min=" << minProtoID << ", cur max=" << maxProtoID);
         }
     } while (0);
     LOGI("parseConfig [" << filename << "] NextNumber=" << cache.getCurrentProtoID() << ", minProtoNo=" << minProtoID << ", maxProtoNo=" << maxProtoID);
@@ -237,9 +225,9 @@ std::list<AnyData> parseProto(std::string fileName, ParseCache & cache)
                 anydata.push_back(info);
             }
             //结构体类型
-            else if (stype == "struct" || stype == "proto")
+            else if (stype == "struct" || stype == "proto" || stype == "packet")
             {
-                DataProto dp;
+                DataPacket dp;
                 if (!ele->Attribute("name"))
                 {
                     E("Attribute Error. ");
@@ -251,16 +239,13 @@ std::list<AnyData> parseProto(std::string fileName, ParseCache & cache)
                 }
                 if (ele->Attribute("store"))
                 {
-                    dp._struct._isStore = strcmp("true", ele->Attribute("store")) == 0;
+                    dp._struct._hadStore = strcmp("true", ele->Attribute("store")) == 0;
                 }
-                if (stype == "proto")
-                {
 
-                    dp._const._type = ProtoIDType;
-                    dp._const._name = "ID_"  + dp._struct._name;
-                    dp._const._desc = dp._struct._desc;
-                    dp._const._value = toString(cache.genProtoID(dp._const._name, minProtoID, maxProtoID));
-                }
+                dp._const._type = ProtoIDType;
+                dp._const._name = "ID_" + dp._struct._name;
+                dp._const._desc = dp._struct._desc;
+                dp._const._value = toString(cache.genProtoID(dp._const._name, minProtoID, maxProtoID));
 
                 XMLElement * member = ele->FirstChildElement("member");
                 do
@@ -279,11 +264,7 @@ std::list<AnyData> parseProto(std::string fileName, ParseCache & cache)
                     dm._tag = MT_NORMAL;
                     if (member->Attribute("tag"))
                     {
-                        if (strcmp(member->Attribute("tag"), "del") == 0)
-                        {
-                            dm._tag = MT_DB_IGNORE;
-                        }
-                        else if (strcmp(member->Attribute("tag"), "key") == 0)
+                        if (strcmp(member->Attribute("tag"), "key") == 0)
                         {
                             dm._tag = MT_DB_KEY;
                         }
@@ -294,6 +275,10 @@ std::list<AnyData> parseProto(std::string fileName, ParseCache & cache)
                         else if (strcmp(member->Attribute("tag"), "auto") == 0)
                         {
                             dm._tag = MT_DB_AUTO;
+                        }
+                        else
+                        {
+                            E("Attribute Error. unknown tag");
                         }
                     }
 
@@ -307,12 +292,8 @@ std::list<AnyData> parseProto(std::string fileName, ParseCache & cache)
                 } while (true);
 
                 AnyData info;
-                info._type = GT_DataStruct;
+                info._type = GT_DataPacket;
                 info._proto = dp;
-                if (stype == "proto")
-                {
-                    info._type = GT_DataProto;
-                }
                 anydata.push_back(info);
             }
             
@@ -323,15 +304,15 @@ std::list<AnyData> parseProto(std::string fileName, ParseCache & cache)
 
     for (auto &info : anydata)
     {
-        if (info._type != GT_DataStruct && info._type != GT_DataProto)
+        if (info._type != GT_DataPacket)
         {
             continue;
         }
         int curTagIndex = 0;
-        info._proto._struct._tag = 0;
+//        info._proto._struct._tag = 0;
         for (const auto & m : info._proto._struct._members)
         {
-            info._proto._struct._tag |= (1ULL << curTagIndex);
+//            info._proto._struct._tag |= (1ULL << curTagIndex);
             curTagIndex++;
         }
     }
@@ -347,10 +328,6 @@ GenBase * createGenerate(SupportLanguageType t)
     else if (t == SL_CSHARP)
     {
         return new GenCSharp();
-    }
-    else if (t == SL_SQL)
-    {
-        return new GenSQL();
     }
     else if (t == SL_LUA)
     {

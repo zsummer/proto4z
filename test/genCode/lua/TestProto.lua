@@ -5,7 +5,9 @@ Proto4z.GTYPE_WAITING = 1--等待
 Proto4z.GTYPE_INGAME = 10--游戏中 
 Proto4z.GTYPE_LEAVE = 11--离开 
  
+Proto4z.register(30002,"TestIntegerData") 
 Proto4z.TestIntegerData = {} --测试 
+Proto4z.TestIntegerData.__getID = 30002 
 Proto4z.TestIntegerData.__getName = "TestIntegerData" 
 Proto4z.TestIntegerData[1] = {name="_char", type="i8" }  
 Proto4z.TestIntegerData[2] = {name="_uchar", type="ui8" }  
@@ -17,12 +19,16 @@ Proto4z.TestIntegerData[7] = {name="_i64", type="i64" }
 Proto4z.TestIntegerData[8] = {name="_ui128", type="ui64" }  
 Proto4z.TestIntegerData[9] = {name="_ui64", type="ui64" }  
  
+Proto4z.register(30003,"TestFloatData") 
 Proto4z.TestFloatData = {} --测试 
+Proto4z.TestFloatData.__getID = 30003 
 Proto4z.TestFloatData.__getName = "TestFloatData" 
 Proto4z.TestFloatData[1] = {name="_float", type="float" }  
 Proto4z.TestFloatData[2] = {name="_double", type="double" }  
  
+Proto4z.register(30004,"TestStringData") 
 Proto4z.TestStringData = {} --测试 
+Proto4z.TestStringData.__getID = 30004 
 Proto4z.TestStringData.__getName = "TestStringData" 
 Proto4z.TestStringData[1] = {name="_string", type="string" }  
  

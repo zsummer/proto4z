@@ -45,7 +45,7 @@ public:
     std::string genDataEnum(const DataEnum & de);
     std::string genDataArray(const DataArray & da);
     std::string genDataMap(const DataMap & dm);
-    std::string genDataProto(const DataProto & dp, bool isProto = false);
+    std::string genDataPacket(const DataPacket & dp);
 };
 
 #endif

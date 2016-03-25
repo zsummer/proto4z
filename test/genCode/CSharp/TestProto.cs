@@ -17,6 +17,10 @@ namespace Proto4z
  
     public class TestIntegerData: Proto4z.IProtoObject //测试  
     {     
+        //proto id   
+        public const ushort protoID = 30002;  
+        static public ushort getProtoID() { return 30002; } 
+        static public string getProtoName() { return "TestIntegerData"; } 
         //members   
         public char _char;  
         public byte _uchar;  
@@ -82,6 +86,10 @@ namespace Proto4z
  
     public class TestFloatData: Proto4z.IProtoObject //测试  
     {     
+        //proto id   
+        public const ushort protoID = 30003;  
+        static public ushort getProtoID() { return 30003; } 
+        static public string getProtoName() { return "TestFloatData"; } 
         //members   
         public float _float;  
         public double _double;  
@@ -112,6 +120,10 @@ namespace Proto4z
  
     public class TestStringData: Proto4z.IProtoObject //测试  
     {     
+        //proto id   
+        public const ushort protoID = 30004;  
+        static public ushort getProtoID() { return 30004; } 
+        static public string getProtoName() { return "TestStringData"; } 
         //members   
         public string _string;  
         public TestStringData()  

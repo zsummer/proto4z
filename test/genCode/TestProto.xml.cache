@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="UTF - 8"?>
 
-<cppmd5>129e39e82524b5ae5a2e2e80b73c9bb2</cppmd5> 
-<luamd5>61f732c4fa4163ec14d4921b33c5e614</luamd5> 
-<csharpmd5>f7de935bf7bed54f7eb323b223f3b7c3</csharpmd5> 
-<sqlmd5>40b33416310e7ba4699362e9c40afd4a</sqlmd5> 
-<xmlmd5>7192e6f3338be77bbde1e6398cd81806</xmlmd5> 
+<cppmd5>826fea86a44e9433567394a24719a3d0</cppmd5> 
+<luamd5>15dc3447d8e2b0ab7678ef2e506ee259</luamd5> 
+<csharpmd5>89221e0e27669e09b83c43306feb8a95</csharpmd5> 
+<xmlmd5>d41d8cd98f00b204e9800998ecf8427e</xmlmd5> 
 <cacheNumber>
     <cache key = "ID_EchoPack" Number = "30000" /> 
     <cache key = "ID_Pulse" Number = "30001" /> 
+    <cache key = "ID_TestFloatData" Number = "30003" /> 
+    <cache key = "ID_TestIntegerData" Number = "30002" /> 
+    <cache key = "ID_TestStringData" Number = "30004" /> 
 </cacheNumber>

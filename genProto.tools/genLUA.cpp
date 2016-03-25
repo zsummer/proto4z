@@ -28,10 +28,10 @@ std::string GenLUA::genRealContent(const std::list<AnyData> & stores)
             text += LFCR;
             text += genDataMap(info._map);
         }
-        else if (info._type == GT_DataStruct || info._type == GT_DataProto)
+        else if (info._type == GT_DataPacket)
         {
             text += LFCR;
-            text += genDataProto(info._proto, info._type == GT_DataProto);
+            text += genDataPacket(info._proto);
         }
     }
 
@@ -96,13 +96,12 @@ std::string GenLUA::genDataMap(const DataMap & dm)
     text += "Proto4z." + dm._mapName + ".__getTypeV = \"" + dm._typeValue + "\"" + LFCR;
     return text;
 }
-std::string GenLUA::genDataProto(const DataProto & dp, bool isProto)
+std::string GenLUA::genDataPacket(const DataPacket & dp)
 {
     std::string text;
-    if (isProto)
-    {
-        text += "Proto4z.register(" + dp._const._value + ",\"" + dp._struct._name + "\")" + LFCR;
-    }
+
+    text += "Proto4z.register(" + dp._const._value + ",\"" + dp._struct._name + "\")" + LFCR;
+
 
     text += "Proto4z." + dp._struct._name + " = {} ";
     if (!dp._struct._desc.empty())
@@ -111,10 +110,8 @@ std::string GenLUA::genDataProto(const DataProto & dp, bool isProto)
     }
     text += LFCR;
 
-    if (isProto)
-    {
-        text += "Proto4z." + dp._struct._name + ".__getID = " + dp._const._value + "" + LFCR;
-    }
+
+    text += "Proto4z." + dp._struct._name + ".__getID = " + dp._const._value + "" + LFCR;
     text += "Proto4z." + dp._struct._name + ".__getName = \"" + dp._struct._name + "\"" + LFCR;
 
     for (size_t i = 0; i < dp._struct._members.size(); ++i)

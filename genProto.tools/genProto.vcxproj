@@ -27,7 +27,6 @@
     <ClCompile Include="genCPP.cpp" />
     <ClCompile Include="genCSharp.cpp" />
     <ClCompile Include="genLUA.cpp" />
-    <ClCompile Include="genSQL.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="parseCache.cpp" />
     <ClCompile Include="parseProto.cpp" />
@@ -44,7 +43,6 @@
     <ClInclude Include="genCPP.h" />
     <ClInclude Include="genCSharp.h" />
     <ClInclude Include="genLUA.h" />
-    <ClInclude Include="genSQL.h" />
     <ClInclude Include="parseCache.h" />
     <ClInclude Include="parseProto.h" />
   </ItemGroup>

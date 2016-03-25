@@ -84,7 +84,6 @@ enum SupportLanguageType
     SL_CPP,
     SL_LUA,
     SL_CSHARP,
-    SL_SQL,
     SL_XML,
     SL_END,
 };
@@ -95,7 +94,6 @@ const char * const SupportLanguageString[] =
     "cppmd5",
     "luamd5",
     "csharpmd5",
-    "sqlmd5",
     "xmlmd5",
     ""
 };
@@ -106,7 +104,6 @@ const char * const SupportLanguageFileSuffix[] =
     ".h",
     ".lua",
     ".cs",
-    "_SQL.h",
     ".xml",
     ""
 };

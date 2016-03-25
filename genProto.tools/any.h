@@ -65,8 +65,7 @@ enum AnyType : short
     GT_DataArray,
     GT_DataMap,
     GT_DataConstValue,
-    GT_DataStruct,
-    GT_DataProto,
+    GT_DataPacket,
 };
 
 //tag
@@ -126,8 +125,8 @@ struct DataStruct
 {
     std::string _name;
     std::string _desc;
-    unsigned long long _tag;
-    bool _isStore = false;
+    bool _hadStore = false;
+    bool _hadLog4z = false;
     struct DataMember
     {
         std::string _type;
@@ -139,7 +138,7 @@ struct DataStruct
 };
 
 //proto type
-struct DataProto
+struct DataPacket
 {
     DataConstValue _const;
     DataStruct _struct;
@@ -156,7 +155,7 @@ struct AnyData
     DataEnum _enum;
     DataArray _array;
     DataMap _map;
-    DataProto _proto;
+    DataPacket _proto;
 };
 
 

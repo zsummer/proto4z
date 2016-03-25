@@ -20,6 +20,31 @@ std::string GenCPP::getRealType(const std::string & xmltype)
     return xmltype;
 }
 
+std::string getMysqlType(const DataStruct::DataMember & m)
+{
+    if (m._type == "string")
+    {
+        return " varchar(255) NOT NULL DEFAULT '' ";
+    }
+    else if (m._type == "i8" || m._type == "i16" || m._type == "i32" || m._type == "i64")
+    {
+        if (m._tag == MT_DB_AUTO)
+        {
+            return " bigint(20) NOT NULL AUTO_INCREMENT ";
+        }
+        return " bigint(20) NOT NULL DEFAULT '0' ";
+    }
+    else if (m._type == "ui8" || m._type == "ui16" || m._type == "ui32" || m._type == "ui64")
+    {
+        if (m._tag == MT_DB_AUTO)
+        {
+            return " bigint(20) unsigned NOT NULL AUTO_INCREMENT ";
+        }
+        return " bigint(20) unsigned NOT NULL DEFAULT '0' ";
+    }
+    return " blob ";
+}
+
 
 std::string GenCPP::genRealContent(const std::list<AnyData> & stores)
 {
@@ -57,10 +82,10 @@ std::string GenCPP::genRealContent(const std::list<AnyData> & stores)
             text += LFCR;
             text += genDataMap(info._map);
         }
-        else if (info._type == GT_DataStruct || info._type == GT_DataProto)
+        else if (info._type == GT_DataPacket)
         {
             text += LFCR;
-            text += genDataProto(info._proto, info._type == GT_DataProto);
+            text += genDataPacket(info._proto);
         }
 
     }
@@ -122,7 +147,7 @@ std::string GenCPP::genDataMap(const DataMap & dm)
     text += LFCR;
     return text;
 }
-std::string GenCPP::genDataProto(const DataProto & dp, bool isProto)
+std::string GenCPP::genDataPacket(const DataPacket & dp)
 {
     std::string text;
 
@@ -135,13 +160,19 @@ std::string GenCPP::genDataProto(const DataProto & dp, bool isProto)
     text += LFCR;
     text += "{" + LFCR;
 
-    if (isProto)
+    std::string dbtable = "`tb_" + dp._struct._name + "`";
+    text += std::string("    static const ") + getRealType(ProtoIDType) + " getProtoID() { return " + dp._const._value + ";}" + LFCR;
+    text += std::string("    static const ") + getRealType("string") + " getProtoName() { return \"" + dp._const._name + "\";}" + LFCR;
+    if (dp._struct._hadStore)
     {
-        text += std::string("    static const ") + getRealType(ProtoIDType) + " GetProtoID() { return " + dp._const._value + ";}" + LFCR;
-        text += std::string("    static const ") + getRealType("string") + " GetProtoName() { return \""
-            + dp._const._name + "\";}" + LFCR;
+        text += "    inline const std::vector<std::string>  getDBBuild();" + LFCR;
+        text += "    inline std::string  getDBInsert();" + LFCR;
+        text += "    inline std::string  getDBDelete();" + LFCR;
+        text += "    inline std::string  getDBUpdate();" + LFCR;
+        text += "    inline std::string  getDBSelect();" + LFCR;
+        text += "    inline bool fetchFromDBResult(zsummer::mysql::DBResult &result);" + LFCR;
     }
-    
+
     for (const auto & m : dp._struct._members)
     {
         text += "    " + getRealType(m._type) + " " + m._name + "; ";
@@ -186,6 +217,240 @@ std::string GenCPP::genDataProto(const DataProto & dp, bool isProto)
     }
     text += "};" + LFCR;
 
+    if (dp._struct._hadStore)
+    {
+        //build
+        text += LFCR;
+        text += "const std::vector<std::string>  " + dp._struct._name + "::getDBBuild()" + LFCR;
+        text += "{" + LFCR;
+        text += "    std::vector<std::string> ret;" + LFCR;
+        text += "    ret.push_back(\"desc " + dbtable + "\");" + LFCR;
+        text += "    ret.push_back(\"CREATE TABLE " + dbtable + " (";
+        std::for_each(dp._struct._members.begin(), dp._struct._members.end(), [&text](const DataStruct::DataMember & m)
+        {
+            if (m._tag != MT_DB_IGNORE) text += "        `" + m._name + "`" + getMysqlType(m) + ",";
+        });
+        text += "        PRIMARY KEY(";
+        std::for_each(dp._struct._members.begin(), dp._struct._members.end(), [&text](const DataStruct::DataMember & m)
+        {
+            if (m._tag == MT_DB_KEY || m._tag == MT_DB_AUTO) text += "`" + m._name + "`,";
+        });
+        if (text.back() == ',') text.pop_back();
+        text += ") ";
+        text += " ) ENGINE = MyISAM DEFAULT CHARSET = utf8\");" + LFCR;
+
+        for (auto& m : dp._struct._members)
+        {
+            if (m._tag != MT_DB_IGNORE)
+            {
+                text += "    ret.push_back(\"alter table `tb_" + dp._struct._name + "` add `" + m._name + "` " + getMysqlType(m) + "\");" + LFCR;
+                text += "    ret.push_back(\"alter table `tb_" + dp._struct._name + "` change `" + m._name + "` " + " `" + m._name + "` " + getMysqlType(m) + "\");" + LFCR;
+            }
+        }
+        text += "    return std::move(ret);" + LFCR;
+        text += "}" + LFCR;
+
+        //select
+        text += "std::string  " + dp._struct._name + "::getDBSelect()" + LFCR;
+        text += "{" + LFCR;
+        text += "    zsummer::mysql::DBQuery q;" + LFCR;
+        text += "    q.init(\"select ";
+        for (auto& m : dp._struct._members)
+        {
+            if (m._tag != MT_DB_IGNORE)
+            {
+                text += "`" + m._name + "`";
+                text += ",";
+            }
+        }
+        if (text.back() == ',') text.pop_back();
+        text += " from " + dbtable + " where ";
+        for (auto& m : dp._struct._members)
+        {
+            if (m._tag == MT_DB_KEY || m._tag == MT_DB_AUTO)
+            {
+                text += "`" + m._name + "` = ? and ";
+            }
+        }
+        if (text.back() == ' ' && text.at(text.length() - 2) == 'd' && text.at(text.length() - 3) == 'n' && text.at(text.length() - 4) == 'a')
+        {
+            text.pop_back();
+            text.pop_back();
+            text.pop_back();
+            text.pop_back();
+        }
+        text += "\");" + LFCR;
+        for (auto& m : dp._struct._members)
+        {
+            if (m._tag == MT_DB_KEY || m._tag == MT_DB_AUTO)
+            {
+                text += "    q << this->" + m._name + ";" + LFCR;
+            }
+        }
+        text += "    return q.pickSQL();" + LFCR;
+        text += "}" + LFCR;
+
+        //insert
+        text += "std::string  " + dp._struct._name + "::getDBInsert()" + LFCR;
+        text += "{" + LFCR;
+        text += "    zsummer::mysql::DBQuery q;" + LFCR;
+        text += "    q.init(\"insert into " + dbtable + "(";
+        for (auto& m : dp._struct._members)
+        {
+            if (m._tag != MT_DB_IGNORE  && m._tag != MT_DB_AUTO)
+            {
+                text += "`" + m._name + "`";
+                text += ",";
+            }
+        }
+        if (text.back() == ',') text.pop_back();
+        text += ") values(";
+        for (auto& m : dp._struct._members)
+        {
+            if (m._tag != MT_DB_IGNORE  && m._tag != MT_DB_AUTO)
+            {
+                text += "?,";
+            }
+        }
+        if (text.back() == ',') text.pop_back();
+        text += ")\");" + LFCR;
+        for (auto& m : dp._struct._members)
+        {
+            if (m._tag != MT_DB_IGNORE  && m._tag != MT_DB_AUTO)
+            {
+                text += "    q << this->" + m._name + ";" + LFCR;
+            }
+        }
+        text += "    return q.pickSQL();" + LFCR;
+        text += "}" + LFCR;
+
+        //delete
+        text += "std::string  " + dp._struct._name + "::getDBDelete()" + LFCR;
+        text += "{" + LFCR;
+        text += "    zsummer::mysql::DBQuery q;" + LFCR;
+        text += "    q.init(\"delete from " + dbtable + " where ";
+        for (auto& m : dp._struct._members)
+        {
+            if (m._tag == MT_DB_KEY || m._tag == MT_DB_AUTO)
+            {
+                text += "`" + m._name + "` = ?,";
+            }
+        }
+        if (text.back() == ',') text.pop_back();
+        text += " \");" + LFCR;
+        for (auto& m : dp._struct._members)
+        {
+            if (m._tag == MT_DB_KEY || m._tag == MT_DB_AUTO)
+            {
+                text += "    q << this->" + m._name + ";" + LFCR;
+            }
+        }
+        text += "    return q.pickSQL();" + LFCR;
+        text += "}" + LFCR;
+
+        //update
+        text += "std::string  " + dp._struct._name + "::getDBUpdate()" + LFCR;
+        text += "{" + LFCR;
+        text += "    zsummer::mysql::DBQuery q;" + LFCR;
+        text += "    q.init(\"insert into " + dbtable + "(";
+        for (auto& m : dp._struct._members)
+        {
+            if (m._tag == MT_DB_KEY || m._tag == MT_DB_AUTO)
+            {
+                text += m._name;
+                text += ",";
+            }
+        }
+        if (text.back() == ',') text.pop_back();
+        text += ") values(";
+        for (auto& m : dp._struct._members)
+        {
+            if (m._tag == MT_DB_KEY || m._tag == MT_DB_AUTO)
+            {
+                text += "?,";
+            }
+        }
+        if (text.back() == ',') text.pop_back();
+        text += " ) on duplicate key update ";
+        for (auto& m : dp._struct._members)
+        {
+            if (m._tag == MT_NORMAL)
+            {
+                text += "`" + m._name + "` = ?,";
+            }
+        }
+        if (text.back() == ',') text.pop_back();
+        text += " \");" + LFCR;
+
+        for (auto& m : dp._struct._members)
+        {
+            if (m._tag == MT_NORMAL)
+            {
+                text += "    q << this->" + m._name + ";" + LFCR;
+            }
+        }
+        text += "    return q.pickSQL();" + LFCR;
+        text += "}" + LFCR;
+
+        //fetch
+        text += "bool " + dp._struct._name + "::fetchFromDBResult(zsummer::mysql::DBResult &result)" + LFCR;
+        text += "{" + LFCR;
+        text += "    if (result.getErrorCode() != zsummer::mysql::QEC_SUCCESS)" + LFCR;
+        text += "    {" + LFCR;
+        text += "        "  "LOGE(\"error fetch " + dp._struct._name + " from table " + dbtable + " . ErrorCode=\"  <<  result.getErrorCode() << \", Error=\" << result.getErrorMsg() << \", sql=\" << result.peekSQL());" + LFCR;
+        text += "        "  "return false;" + LFCR;
+        text += "    }" + LFCR;
+        text += "    try" + LFCR;
+        text += "    {" + LFCR;
+
+        text += "        "  "if (result.haveRow())" + LFCR;
+        text += "        {" + LFCR;
+        for (auto& m : dp._struct._members)
+        {
+            if (m._tag == MT_DB_IGNORE)
+            {
+                continue;
+            }
+            if (m._type == "ui8" || m._type == "ui16" || m._type == "ui32" || m._type == "ui64"
+                || m._type == "i8" || m._type == "i16" || m._type == "i32" || m._type == "i64"
+                || m._type == "double" || m._type == "float" || m._type == "string")
+            {
+                text += "            result >> this->" + m._name + ";" + LFCR;
+            }
+            else
+            {
+                text += "            try" + LFCR;
+                text += "            {" + LFCR;
+                text += "                "  "std::string blob;" + LFCR;
+                text += "                "  "result >> blob;" + LFCR;
+                text += "                "  "if(!blob.empty())" + LFCR;
+                text += "                "  "{" + LFCR;
+                text += "                    "  "zsummer::proto4z::ReadStream rs(blob.c_str(), (zsummer::proto4z::Integer)blob.length(), false);" + LFCR;
+                text += "                    "  "rs >> this->" + m._name + ";" + LFCR;
+                text += "                "  "}" + LFCR;
+                text += "            }" + LFCR;
+                text += "            catch(std::runtime_error e)" + LFCR;
+                text += "            {" + LFCR;
+                text += "                "  "LOGW(\"catch one except error when fetch " + dp._struct._name + "." + m._name + "  from table " + dbtable + " . what=\" << e.what() << \"  ErrorCode=\"  <<  result.getErrorCode() << \", Error=\" << result.getErrorMsg() << \", sql=\" << result.peekSQL());" + LFCR;
+                text += "            }" + LFCR;
+            }
+        }
+
+        text += "            return true; " + LFCR;
+        text += "        }" + LFCR;
+
+        text += "    }" + LFCR;
+        text += "    catch(std::runtime_error e)" + LFCR;
+        text += "    {" + LFCR;
+        text += "        "  "LOGE(\"catch one except error when fetch " + dp._struct._name + " from table " + dbtable + " . what=\" << e.what() << \"  ErrorCode=\"  <<  result.getErrorCode() << \", Error=\" << result.getErrorMsg() << \", sql=\" << result.peekSQL());" + LFCR;
+        text += "        "  "return false;" + LFCR;
+        text += "    }" + LFCR;
+
+        text += "    return false;" + LFCR;
+        text += "}" + LFCR;
+    }
+
+
 
 
     //input stream operator
@@ -213,24 +478,15 @@ std::string GenCPP::genDataProto(const DataProto & dp, bool isProto)
     text += "}" + LFCR;
 
     //input log4z operator
-    if (false)
+    if (dp._struct._hadLog4z)
     {
         text += "inline zsummer::log4z::Log4zStream & operator << (zsummer::log4z::Log4zStream & stm, const " + dp._struct._name + " & info)" + LFCR;
         text += "{" + LFCR;
-        bool bFirst = true;
+        text += "    stm << \"[\\n\";";
         for (const auto &m : dp._struct._members)
         {
-            if (bFirst)
-            {
-                bFirst = false;
-                text += "    stm << \"" + m._name + "=\"" + " << info." + m._name;
-            }
-            else
-            {
-                text += " << \", " + m._name + "=\"" + " << info." + m._name;
-            }
+            text += " stm << \"" + m._name + "=\"" + " << info." + m._name + " << \"\\n\";";
         }
-        text += ";" + LFCR;
         text += "    return stm;" + LFCR;
         text += "}" + LFCR;
     }
