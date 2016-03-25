@@ -53,10 +53,10 @@
 #include <list>
 #include <time.h>
 #include <algorithm>
-#include "./depends/utls.h"
-#include "./depends/log4z.h"
-#include "./depends/tinyxml2.h"
-#include "./depends/md5/md5.h"
+#include "../depends/utls.h"
+#include "../depends/log4z.h"
+#include "../depends/tinyxml2.h"
+#include "../depends/md5/md5.h"
 #ifndef WIN32
 #include <sys/stat.h>
 #else

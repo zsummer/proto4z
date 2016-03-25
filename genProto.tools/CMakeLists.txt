@@ -6,7 +6,7 @@ add_definitions(-Wall  -O0 -g -ggdb  -DNDEBUG -std=c++11 -D_GLIBCXX_USE_NANOSLEE
 
 set(EXECUTABLE_OUTPUT_PATH ${PROTO4Z_GEN_CODE_PATH})
 
-aux_source_directory(./ source)
+aux_source_directory(./src source)
 aux_source_directory(./depends depends)
 aux_source_directory(./depends/md5 md5)
 

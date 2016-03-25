@@ -23,28 +23,28 @@
     <ClCompile Include="depends\md5\md5.cpp" />
     <ClCompile Include="depends\tinyxml2.cpp" />
     <ClCompile Include="depends\utls.cpp" />
-    <ClCompile Include="genBase.cpp" />
-    <ClCompile Include="genCPP.cpp" />
-    <ClCompile Include="genCSharp.cpp" />
-    <ClCompile Include="genLUA.cpp" />
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="parseCache.cpp" />
-    <ClCompile Include="parseProto.cpp" />
+    <ClCompile Include="src\genBase.cpp" />
+    <ClCompile Include="src\genCPP.cpp" />
+    <ClCompile Include="src\genCSharp.cpp" />
+    <ClCompile Include="src\genLUA.cpp" />
+    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\parseCache.cpp" />
+    <ClCompile Include="src\parseProto.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="any.h" />
-    <ClInclude Include="common.h" />
     <ClInclude Include="depends\log4z.h" />
     <ClInclude Include="depends\md5\md5.h" />
     <ClInclude Include="depends\tinyxml2.h" />
     <ClInclude Include="depends\utls.h" />
     <ClInclude Include="depends\utlsImpl.h" />
-    <ClInclude Include="genBase.h" />
-    <ClInclude Include="genCPP.h" />
-    <ClInclude Include="genCSharp.h" />
-    <ClInclude Include="genLUA.h" />
-    <ClInclude Include="parseCache.h" />
-    <ClInclude Include="parseProto.h" />
+    <ClInclude Include="src\any.h" />
+    <ClInclude Include="src\common.h" />
+    <ClInclude Include="src\genBase.h" />
+    <ClInclude Include="src\genCPP.h" />
+    <ClInclude Include="src\genCSharp.h" />
+    <ClInclude Include="src\genLUA.h" />
+    <ClInclude Include="src\parseCache.h" />
+    <ClInclude Include="src\parseProto.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{AD368D24-8C2B-4848-822F-0827E725CAD7}</ProjectGuid>
