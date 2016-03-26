@@ -23,18 +23,7 @@ int main(int argc, char *argv[])
     {
         for (auto & file : files)
         {
-            std::string filename = file.filename;
-            if (filename.size() <= 4)
-            {
-                continue;
-            }
-            std::string xmlattr = filename.substr(filename.length() - 4, 4);
-            if (xmlattr != ".xml")
-            {
-                continue;
-            }
-            filename = filename.substr(0, filename.size() - 4);
-
+            std::string filename = subStringWithoutBack(file.filename, ".");
             ParseCache cache;
             cache.parse(filename);
             if (!cache.isNeedUpdate())

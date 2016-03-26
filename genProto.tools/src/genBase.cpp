@@ -63,13 +63,9 @@ void GenBase::write(const std::string & content)
     filename += "/";
     filename += _filename;
     filename += SupportLanguageFileSuffix[_type];
-    std::ofstream os;
-    os.open(filename, std::ios::binary);
-    if (!os.is_open())
+    if (writeFileContent(filename, content.c_str(), content.length(), false) != content.length())
     {
         E("genCppFile open file Error. : " << filename);
     }
-    os.write(content.c_str(), content.length());
-    os.close();
 }
 

@@ -73,12 +73,6 @@ bool   ParseCache::write()
 {
     std::string filename = _fileName + ".xml.cache";
     LOGI("writeCache [" << filename );
-    std::ofstream os;
-    os.open(filename, std::ios::binary);
-    if (!os.is_open())
-    {
-        E(filename << " can not open!.");
-    }
     std::string text = "<?xml version=\"1.0\" encoding=\"UTF - 8\"?>\n\n";
     for (int i = SL_NORMAL + 1; i < SL_END; i++)
     {
@@ -95,8 +89,10 @@ bool   ParseCache::write()
         text += "    <cache key = \"" + pr.first +"\" Number = \"" + toString(pr.second) + "\" /> \n";
     }
     text += "</cacheNumber>\n";
-    os.write(text.c_str(), text.length());
-    os.close();
+    if (writeFileContent(filename, text.c_str(), text.length(), false) != text.length())
+    {
+        LOGE("write cache file error. filename=" << filename);
+    }
     return true;
 }
 
