@@ -14,7 +14,7 @@ int main(int argc, char *argv[])
     zsummer::log4z::ILog4zManager::getRef().setLoggerOutFile(LOG4Z_MAIN_LOGGER_ID, false);
     zsummer::log4z::ILog4zManager::getRef().start();
     std::vector<SearchFileInfo> files;
-    if (!searchFiles("./", files))
+    if (!searchFiles("./*.xml", files, false))
     {
         LOGE("searchFiles error.");
         return 0;

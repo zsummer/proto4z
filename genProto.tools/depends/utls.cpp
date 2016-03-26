@@ -173,17 +173,26 @@ std::string fixPathString(const std::string &path)
     if (path.empty()) return path;
     auto ret = path;
     std::for_each(ret.begin(), ret.end(), [](char &ch){ if (ch == '\\') ch = '/'; });
-    if (ret.back() != '/') ret += "/";
+    if (isDirectory(path))
+    {
+        if (ret.back() != '/') ret += "/";
+    }
     return ret;
 }
 
-static bool tmpSearchPath(std::string  path, std::vector<SearchFileInfo> & files)
+static bool tmpSearchPath(std::string  path, std::vector<SearchFileInfo> & files, bool recursion)
 {
     if (path.length() == 0)
     {
         return false;
     }
     path = fixPathString(path);
+    std::string wildcard = subStringBack(path, "/");
+    if (!wildcard.empty())
+    {
+        path = subStringWithoutBack(path, "/") + "/";
+    }
+    
 
 #ifdef WIN32
     WIN32_FIND_DATAA fd;
@@ -205,8 +214,15 @@ static bool tmpSearchPath(std::string  path, std::vector<SearchFileInfo> & files
                 file.bDir = true;
                 strcpy_s(file.filename, sizeof(file.filename), fd.cFileName);
                 sprintf(file.fullpath, "%s%s", path.c_str(), fd.cFileName);
-                files.push_back(file);
-                tmpSearchPath(file.fullpath, files);
+                if (wildcard.empty())
+                {
+                    files.push_back(file);
+                }
+                if (recursion)
+                {
+                    tmpSearchPath(fixPathString(file.fullpath) + wildcard, files, recursion);
+                }
+                
             }
         }
         else
@@ -218,7 +234,10 @@ static bool tmpSearchPath(std::string  path, std::vector<SearchFileInfo> & files
             file.filesize += fd.nFileSizeLow;
             strcpy_s(file.filename, sizeof(file.filename), fd.cFileName);
             sprintf(file.fullpath, "%s%s", path.c_str(), fd.cFileName);
-            files.push_back(file);
+            if (wildcard.empty() || compareStringWildcard(file.filename, wildcard))
+            {
+                files.push_back(file);
+            }
         }
     } while (FindNextFileA(hFile, &fd));
     FindClose(hFile);
@@ -246,8 +265,14 @@ static bool tmpSearchPath(std::string  path, std::vector<SearchFileInfo> & files
             file.filesize = statbuf.st_size;
             strcpy(file.filename, entry->d_name);
             sprintf(file.fullpath, "%s%s", path.c_str(), entry->d_name);
-            files.push_back(file);
-            tmpSearchPath(file.fullpath, files);
+            if (wildcard.empty())
+            {
+                files.push_back(file);
+            }
+            if (recursion)
+            {
+                tmpSearchPath(fixPathString(file.fullpath)+wildcard, files, recursion);
+            }
         }
         else
         {
@@ -256,7 +281,10 @@ static bool tmpSearchPath(std::string  path, std::vector<SearchFileInfo> & files
             file.filesize = statbuf.st_size;
             strcpy(file.filename, entry->d_name);
             file.fullpath[0] = '\0';
-            files.push_back(file);
+            if (wildcard.empty() || compareStringWildcard(file.filename, wildcard))
+            {
+                files.push_back(file);
+            }
         }
     }
     closedir(dp);
@@ -264,13 +292,13 @@ static bool tmpSearchPath(std::string  path, std::vector<SearchFileInfo> & files
     return true;
 }
 
-bool searchFiles(std::string path, std::vector<SearchFileInfo> & files)
+bool searchFiles(std::string path, std::vector<SearchFileInfo> & files, bool recursion)
 {
     if (files.capacity() < 100)
     {
         files.reserve(100);
     }
-    return tmpSearchPath(path, files);
+    return tmpSearchPath(path, files, recursion);
 }
 
 
@@ -387,6 +415,44 @@ std::vector<std::string> splitString(std::string text, std::string deli, std::st
     return std::move(ret);
 }
 
+std::string subStringFront(const std::string & text, const std::string & deli)
+{
+    auto pos = text.find(deli);
+    if (pos == std::string::npos)
+    {
+        return text;
+    }
+    return text.substr(0, pos - 0);
+}
+std::string subStringBack(const std::string & text, const std::string & deli)
+{
+    auto pos = text.rfind(deli);
+    if (pos == std::string::npos)
+    {
+        return text;
+    }
+    return text.substr(pos+deli.length());
+}
+
+std::string subStringWithoutFront(const std::string & text, const std::string & deli)
+{
+    auto pos = text.find(deli);
+    if (pos == std::string::npos)
+    {
+        return text;
+    }
+    return text.substr(pos+deli.length());
+}
+
+std::string subStringWithoutBack(const std::string & text, const std::string & deli)
+{
+    auto pos = text.rfind(deli);
+    if (pos == std::string::npos)
+    {
+        return text;
+    }
+    return text.substr(0, pos - 0);
+}
 std::string toUpperString(std::string  org)
 {
     std::for_each(org.begin(), org.end(), [](char &ch){ch = toupper(ch); });
@@ -420,6 +486,74 @@ bool compareStringIgnCase(const std::string & left, const std::string & right, b
     
 }
 
+bool compareStringWildcard(std::string source, std::string mod, bool isGreedy)
+{
+    while (!source.empty() || !mod.empty())
+    {
+        //clean wildcard
+        if (mod.size() >= 2 && mod.at(0) == '*' && mod.at(1) == mod.at(0))
+        {
+            mod.erase(mod.begin());
+            continue;
+        }
+
+        if (mod.empty())
+        {
+            if (source.empty())
+            {
+                return true;
+            }
+            return false;
+        }
+        if (mod.size() == 1 && mod.front() == '*')
+        {
+            return true;
+        }
+        auto posBegin = mod.front() == '*' ? 1 : 0; //skip *
+        auto posEnd = mod.find('*', posBegin);
+        std::string cleanmod = mod.substr(posBegin, posEnd - posBegin);
+        if (cleanmod.length() > source.length())
+        {
+            return false;
+        }
+        //greedy
+        auto posMatching = std::string::npos;
+        for (size_t i = 0; i < source.length(); i++)
+        {
+            if (source.length() - i < cleanmod.length())
+            {
+                break;
+            }
+            if (cleanmod.compare(0, cleanmod.length(), &source[i], 0, cleanmod.length()) == 0)
+            {
+                posMatching = i;
+            }
+            if (!isGreedy)
+            {
+                break;
+            }
+        }
+        if (posMatching != std::string::npos)
+        {
+            if (posEnd == std::string::npos)
+            {
+                mod.clear();
+            }
+            else
+            {
+                mod = mod.substr(posEnd);
+            }
+            source = source.substr(posMatching + cleanmod.length());
+            continue;
+        }
+        if (source.empty())
+        {
+            return false;
+        }
+        source.erase(source.begin());
+    }
+    return true;
+}
 
 
 time_t getUTCTimeFromLocalString(const std::string & str)
