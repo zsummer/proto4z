@@ -82,7 +82,7 @@ std::list<AnyData> parseProto(std::string fileName, ParseCache & cache)
         {
             E("FirstChildElement(\"MinNo\") || FirstChildElement(\"MaxNo\")  Error");
         }
-        if (lgz && strcmp(lgz->GetText(), "1") == 0 || strcmp(lgz->GetText(), "true") == 0)
+        if (lgz && (strcmp(lgz->GetText(), "1") == 0 || strcmp(lgz->GetText(), "true") == 0))
         {
             hadLog4z = true;
         }

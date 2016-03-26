@@ -29,7 +29,6 @@ namespace Proto4z
         public int _int;  
         public uint _uint;  
         public long _i64;  
-        public ulong _ui128;  
         public ulong _ui64;  
         public TestIntegerData()  
         { 
@@ -40,10 +39,9 @@ namespace Proto4z
             _int = 0;  
             _uint = 0;  
             _i64 = 0;  
-            _ui128 = 0;  
             _ui64 = 0;  
         } 
-        public TestIntegerData(char _char, byte _uchar, short _short, ushort _ushort, int _int, uint _uint, long _i64, ulong _ui128, ulong _ui64) 
+        public TestIntegerData(char _char, byte _uchar, short _short, ushort _ushort, int _int, uint _uint, long _i64, ulong _ui64) 
         { 
             this._char = _char; 
             this._uchar = _uchar; 
@@ -52,7 +50,6 @@ namespace Proto4z
             this._int = _int; 
             this._uint = _uint; 
             this._i64 = _i64; 
-            this._ui128 = _ui128; 
             this._ui64 = _ui64; 
         } 
         public System.Collections.Generic.List<byte> __encode() 
@@ -65,7 +62,6 @@ namespace Proto4z
             data.AddRange(Proto4z.BaseProtoObject.encodeI32(this._int)); 
             data.AddRange(Proto4z.BaseProtoObject.encodeUI32(this._uint)); 
             data.AddRange(Proto4z.BaseProtoObject.encodeI64(this._i64)); 
-            data.AddRange(Proto4z.BaseProtoObject.encodeUI64(this._ui128)); 
             data.AddRange(Proto4z.BaseProtoObject.encodeUI64(this._ui64)); 
             return data; 
         } 
@@ -78,7 +74,6 @@ namespace Proto4z
             this._int = Proto4z.BaseProtoObject.decodeI32(binData, ref pos); 
             this._uint = Proto4z.BaseProtoObject.decodeUI32(binData, ref pos); 
             this._i64 = Proto4z.BaseProtoObject.decodeI64(binData, ref pos); 
-            this._ui128 = Proto4z.BaseProtoObject.decodeUI64(binData, ref pos); 
             this._ui64 = Proto4z.BaseProtoObject.decodeUI64(binData, ref pos); 
             return pos; 
         } 
