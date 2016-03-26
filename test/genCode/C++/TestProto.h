@@ -15,7 +15,7 @@ enum GAME_TYPE : unsigned short
  
 struct TestIntegerData //测试  
 { 
-    static const unsigned short getProtoID() { return 30002;} 
+    static const unsigned short getProtoID() { return 30000;} 
     static const std::string getProtoName() { return "ID_TestIntegerData";} 
     char _char;  
     unsigned char _uchar;  
@@ -75,7 +75,7 @@ inline zsummer::proto4z::ReadStream & operator >> (zsummer::proto4z::ReadStream 
  
 struct TestFloatData //测试  
 { 
-    static const unsigned short getProtoID() { return 30003;} 
+    static const unsigned short getProtoID() { return 30001;} 
     static const std::string getProtoName() { return "ID_TestFloatData";} 
     float _float;  
     double _double;  
@@ -105,7 +105,7 @@ inline zsummer::proto4z::ReadStream & operator >> (zsummer::proto4z::ReadStream 
  
 struct TestStringData //测试  
 { 
-    static const unsigned short getProtoID() { return 30004;} 
+    static const unsigned short getProtoID() { return 30002;} 
     static const std::string getProtoName() { return "ID_TestStringData";} 
     std::string _string;  
     TestStringData() 
@@ -150,7 +150,7 @@ typedef std::map<std::string, TestStringData> TestStringDataMap;
  
 struct EchoPack 
 { 
-    static const unsigned short getProtoID() { return 30000;} 
+    static const unsigned short getProtoID() { return 30003;} 
     static const std::string getProtoName() { return "ID_EchoPack";} 
     TestIntegerDataArray _iarray;  
     TestFloatDataArray _farray;  
@@ -194,7 +194,7 @@ inline zsummer::proto4z::ReadStream & operator >> (zsummer::proto4z::ReadStream 
  
 struct Pulse 
 { 
-    static const unsigned short getProtoID() { return 30001;} 
+    static const unsigned short getProtoID() { return 30004;} 
     static const std::string getProtoName() { return "ID_Pulse";} 
 }; 
 inline zsummer::proto4z::WriteStream & operator << (zsummer::proto4z::WriteStream & ws, const Pulse & data) 

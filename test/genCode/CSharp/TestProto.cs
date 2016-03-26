@@ -18,8 +18,8 @@ namespace Proto4z
     public class TestIntegerData: Proto4z.IProtoObject //测试  
     {     
         //proto id   
-        public const ushort protoID = 30002;  
-        static public ushort getProtoID() { return 30002; } 
+        public const ushort protoID = 30000;  
+        static public ushort getProtoID() { return 30000; } 
         static public string getProtoName() { return "TestIntegerData"; } 
         //members   
         public char _char;  
@@ -82,8 +82,8 @@ namespace Proto4z
     public class TestFloatData: Proto4z.IProtoObject //测试  
     {     
         //proto id   
-        public const ushort protoID = 30003;  
-        static public ushort getProtoID() { return 30003; } 
+        public const ushort protoID = 30001;  
+        static public ushort getProtoID() { return 30001; } 
         static public string getProtoName() { return "TestFloatData"; } 
         //members   
         public float _float;  
@@ -116,8 +116,8 @@ namespace Proto4z
     public class TestStringData: Proto4z.IProtoObject //测试  
     {     
         //proto id   
-        public const ushort protoID = 30004;  
-        static public ushort getProtoID() { return 30004; } 
+        public const ushort protoID = 30002;  
+        static public ushort getProtoID() { return 30002; } 
         static public string getProtoName() { return "TestStringData"; } 
         //members   
         public string _string;  
@@ -366,8 +366,8 @@ namespace Proto4z
     public class EchoPack: Proto4z.IProtoObject 
     {     
         //proto id   
-        public const ushort protoID = 30000;  
-        static public ushort getProtoID() { return 30000; } 
+        public const ushort protoID = 30003;  
+        static public ushort getProtoID() { return 30003; } 
         static public string getProtoName() { return "EchoPack"; } 
         //members   
         public TestIntegerDataArray _iarray;  
@@ -432,8 +432,8 @@ namespace Proto4z
     public class Pulse: Proto4z.IProtoObject 
     {     
         //proto id   
-        public const ushort protoID = 30001;  
-        static public ushort getProtoID() { return 30001; } 
+        public const ushort protoID = 30004;  
+        static public ushort getProtoID() { return 30004; } 
         static public string getProtoName() { return "Pulse"; } 
         //members   
         public Pulse()  
