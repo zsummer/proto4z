@@ -75,7 +75,10 @@
 #endif
 #include <exception>
 #include <windows.h>
+#pragma warning(push)
+#pragma warning(disable : 4091)
 #include <DbgHelp.h>
+#pragma warning(pop)
 #pragma comment(lib, "Dbghelp")
 #endif
 #ifndef _ZSUMMER_BEGIN
