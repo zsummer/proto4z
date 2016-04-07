@@ -92,7 +92,7 @@ int main()
         fillOnePack(echo);
         ws << echo;
         ReadStream rs(ws.getStream(), ws.getStreamLen());
-        rs >> echo;
+        rs >> echo >> echo;
         cout << "success" << endl;
     }
     catch (std::runtime_error & e)
