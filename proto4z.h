@@ -1407,7 +1407,7 @@ inline std::string proto4z_traceback()
 {
     std::stringstream ss;
 #ifdef WIN32
-
+    ss << "\r\n";
     SymSetOptions(SYMOPT_UNDNAME | SYMOPT_DEFERRED_LOADS);
     if (!SymInitialize(GetCurrentProcess(), NULL, TRUE))
     {
@@ -1472,9 +1472,12 @@ inline std::string proto4z_traceback()
         ss << stack[i] << "  ";
     }
     ss << "\r\n";
-    for (size_t i = 1; i < size && stackSymbol != NULL; i++)
+    for (size_t i = 1; i < size && stackSymbol ; i++)
     {
-        ss << "bt[" << i - 1 << "] " << stackSymbol[i] << "\r\n";
+        if (stackSymbol[i] && strlen(stackSymbol[i]) > 0)
+        {
+            ss << "bt[" << i - 1 << "] " << stackSymbol[i] << "\r\n";
+        }
     }
     free(stackSymbol);
 #endif
