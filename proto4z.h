@@ -621,7 +621,10 @@ inline std::pair<INTEGRITY_RET_TYPE, Integer> checkBuffIntegrity(const char * bu
     }
 
     Integer packLen = streamToBaseType<Integer>(buff);
-
+    if (packLen < headLen)
+    {
+        return std::make_pair(IRT_SHORTAGE, curBuffLen);
+    }
     if (packLen > boundLen)
     {
         if (packLen > maxBuffLen)
