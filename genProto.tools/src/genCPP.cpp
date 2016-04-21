@@ -162,7 +162,7 @@ std::string GenCPP::genDataPacket(const DataPacket & dp)
 
     std::string dbtable = "`tb_" + dp._struct._name + "`";
     text += std::string("    static const ") + getRealType(ProtoIDType) + " getProtoID() { return " + dp._const._value + ";}" + LFCR;
-    text += std::string("    static const ") + getRealType("string") + " getProtoName() { return \"" + dp._const._name + "\";}" + LFCR;
+    text += std::string("    static const ") + getRealType("string") + " getProtoName() { return \"" + dp._struct._name + "\";}" + LFCR;
     if (dp._struct._hadStore)
     {
         text += "    inline const std::vector<std::string>  getDBBuild();" + LFCR;
