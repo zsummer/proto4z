@@ -104,7 +104,7 @@ bool ParseCache::isNeedUpdate()
         {
             return true;
         }
-        std::string md5 = genFileMD5(std::string("./") + SupportLanguageFilePath[i] + _fileName + SupportLanguageFileSuffix[i]);
+        std::string md5 = genFileMD5(std::string("./") + SupportLanguageFilePath[i] + "/" + _fileName + SupportLanguageFileSuffix[i]);
         if (md5 != _md5Cache[i])
         {
             return true;

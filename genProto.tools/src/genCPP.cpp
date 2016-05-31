@@ -224,11 +224,11 @@ std::string GenCPP::genDataPacket(const DataPacket & dp)
         text += "const std::vector<std::string>  " + dp._struct._name + "::getDBBuild()" + LFCR;
         text += "{" + LFCR;
         text += "    std::vector<std::string> ret;" + LFCR;
-        text += "    ret.push_back(\"desc " + dbtable + "\");" + LFCR;
-        text += "    ret.push_back(\"CREATE TABLE " + dbtable + " (";
+//        text += "    ret.push_back(\"desc " + dbtable + "\");" + LFCR;
+        text += "    ret.push_back(\"CREATE TABLE IF NOT EXISTS " + dbtable + " (";
         std::for_each(dp._struct._members.begin(), dp._struct._members.end(), [&text](const DataStruct::DataMember & m)
         {
-            if (m._tag != MT_DB_IGNORE) text += "        `" + m._name + "`" + getMysqlType(m) + ",";
+            if (m._tag != MT_DB_IGNORE && m._tag != MT_NORMAL) text += "        `" + m._name + "`" + getMysqlType(m) + ",";
         });
         text += "        PRIMARY KEY(";
         std::for_each(dp._struct._members.begin(), dp._struct._members.end(), [&text](const DataStruct::DataMember & m)
