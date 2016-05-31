@@ -76,7 +76,15 @@ bool   ParseCache::write()
     std::string text = "<?xml version=\"1.0\" encoding=\"UTF - 8\"?>\n\n";
     for (int i = SL_NORMAL + 1; i < SL_END; i++)
     {
-        std::string md5 = genFileMD5(std::string("./") + SupportLanguageFilePath[i] + "/" + _fileName + SupportLanguageFileSuffix[i]);
+        std::string md5;
+        if (i != SL_XML)
+        {
+            md5 = genFileMD5(std::string("./") + SupportLanguageFilePath[i] + "/" + _fileName + SupportLanguageFileSuffix[i]);
+        }
+        else
+        {
+            md5 = genFileMD5(std::string("./") + _fileName + SupportLanguageFileSuffix[i]);
+        }
         text += std::string() + "<" + SupportLanguageString[i] + ">";
         text += md5;
         text += std::string() + "</" + SupportLanguageString[i] + ">" + LFCR;
@@ -104,7 +112,16 @@ bool ParseCache::isNeedUpdate()
         {
             return true;
         }
-        std::string md5 = genFileMD5(std::string("./") + SupportLanguageFilePath[i] + "/" + _fileName + SupportLanguageFileSuffix[i]);
+        std::string md5;
+        if (i != SL_XML)
+        {
+            md5 = genFileMD5(std::string("./") + SupportLanguageFilePath[i] + "/" + _fileName + SupportLanguageFileSuffix[i]);
+        }
+        else
+        {
+            md5 = genFileMD5(std::string("./") + _fileName + SupportLanguageFileSuffix[i]);
+        }
+        
         if (md5 != _md5Cache[i])
         {
             return true;
