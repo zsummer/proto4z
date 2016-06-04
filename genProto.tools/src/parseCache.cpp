@@ -12,7 +12,7 @@ void ParseCache::parse(std::string filename)
 {
     _fileName = filename;
     std::string configFile = filename + ".xml.cache";
-    if (!hadFile(configFile))
+    if (!accessFile(configFile))
     {
         LOGW("ParseCache::parse [" << configFile << " not found.");
         return;

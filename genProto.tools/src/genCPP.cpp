@@ -28,7 +28,7 @@ std::string getMysqlType(const DataStruct::DataMember & m)
     }
     else if (m._type == "i8" || m._type == "i16" || m._type == "i32" || m._type == "i64")
     {
-        if (m._tag == MT_DB_AUTO)
+        if (getBitFlag(m._tag, MT_DB_AUTO))
         {
             return " bigint(20) NOT NULL AUTO_INCREMENT ";
         }
@@ -36,7 +36,7 @@ std::string getMysqlType(const DataStruct::DataMember & m)
     }
     else if (m._type == "ui8" || m._type == "ui16" || m._type == "ui32" || m._type == "ui64")
     {
-        if (m._tag == MT_DB_AUTO)
+        if (getBitFlag(m._tag, MT_DB_AUTO))
         {
             return " bigint(20) unsigned NOT NULL AUTO_INCREMENT ";
         }
@@ -163,13 +163,14 @@ std::string GenCPP::genDataPacket(const DataPacket & dp)
     std::string dbtable = "`tb_" + dp._struct._name + "`";
     text += std::string("    static const ") + getRealType(ProtoIDType) + " getProtoID() { return " + dp._const._value + ";}" + LFCR;
     text += std::string("    static const ") + getRealType("string") + " getProtoName() { return \"" + dp._struct._name + "\";}" + LFCR;
-    if (dp._struct._hadStore)
+    if (!dp._struct._store.empty())
     {
         text += "    inline const std::vector<std::string>  getDBBuild();" + LFCR;
         text += "    inline std::string  getDBInsert();" + LFCR;
         text += "    inline std::string  getDBDelete();" + LFCR;
         text += "    inline std::string  getDBUpdate();" + LFCR;
         text += "    inline std::string  getDBSelect();" + LFCR;
+        text += "    inline std::string  getDBSelectPure();" + LFCR;
         text += "    inline bool fetchFromDBResult(zsummer::mysql::DBResult &result);" + LFCR;
     }
 
@@ -217,7 +218,7 @@ std::string GenCPP::genDataPacket(const DataPacket & dp)
     }
     text += "};" + LFCR;
 
-    if (dp._struct._hadStore)
+    if (!dp._struct._store.empty())
     {
         //build
         text += LFCR;
@@ -226,22 +227,42 @@ std::string GenCPP::genDataPacket(const DataPacket & dp)
         text += "    std::vector<std::string> ret;" + LFCR;
 //        text += "    ret.push_back(\"desc " + dbtable + "\");" + LFCR;
         text += "    ret.push_back(\"CREATE TABLE IF NOT EXISTS " + dbtable + " (";
-        std::for_each(dp._struct._members.begin(), dp._struct._members.end(), [&text](const DataStruct::DataMember & m)
+        for (const auto &m : dp._struct._members)
         {
-            if (m._tag != MT_DB_IGNORE && m._tag != MT_NORMAL) text += "        `" + m._name + "`" + getMysqlType(m) + ",";
-        });
-        text += "        PRIMARY KEY(";
-        std::for_each(dp._struct._members.begin(), dp._struct._members.end(), [&text](const DataStruct::DataMember & m)
+            if (m._tag != 0 && !getBitFlag(m._tag, MT_DB_IGNORE)) text += "        `" + m._name + "`" + getMysqlType(m) + ",";
+        }
+        if (true)
         {
-            if (m._tag == MT_DB_KEY || m._tag == MT_DB_AUTO) text += "`" + m._name + "`,";
-        });
+            std::string primaryKey;
+            for(const auto &m : dp._struct._members)
+            {
+                if (getBitFlag(m._tag, MT_DB_KEY)) mergeToString(primaryKey, ",", std::string("`") + m._name + "`");
+            }
+            if (!primaryKey.empty())
+            {
+                text += "        PRIMARY KEY(";
+                text += primaryKey + "),";
+            }
+            for (const auto &m : dp._struct._members)
+            {
+                if (getBitFlag(m._tag, MT_DB_UNI))
+                {
+                    text += "        UNIQUE KEY `";
+                    text += m._name + "` (`" + m._name + "`),";
+                }
+                else if (getBitFlag(m._tag, MT_DB_IDX))
+                {
+                    text += "        KEY `";
+                    text += m._name + "` (`" + m._name + "`),";
+                }
+            }
+        }
         if (text.back() == ',') text.pop_back();
-        text += ") ";
-        text += " ) ENGINE = MyISAM DEFAULT CHARSET = utf8\");" + LFCR;
+        text += " ) ENGINE = " + dp._struct._store + " DEFAULT CHARSET = utf8\");" + LFCR;
 
         for (auto& m : dp._struct._members)
         {
-            if (m._tag != MT_DB_IGNORE)
+            if (m._tag == 0 || !getBitFlag(m._tag, MT_DB_IGNORE))
             {
                 text += "    ret.push_back(\"alter table `tb_" + dp._struct._name + "` add `" + m._name + "` " + getMysqlType(m) + "\");" + LFCR;
                 text += "    ret.push_back(\"alter table `tb_" + dp._struct._name + "` change `" + m._name + "` " + " `" + m._name + "` " + getMysqlType(m) + "\");" + LFCR;
@@ -257,7 +278,7 @@ std::string GenCPP::genDataPacket(const DataPacket & dp)
         text += "    q.init(\"select ";
         for (auto& m : dp._struct._members)
         {
-            if (m._tag != MT_DB_IGNORE)
+            if (!getBitFlag(m._tag, MT_DB_IGNORE))
             {
                 text += "`" + m._name + "`";
                 text += ",";
@@ -267,7 +288,7 @@ std::string GenCPP::genDataPacket(const DataPacket & dp)
         text += " from " + dbtable + " where ";
         for (auto& m : dp._struct._members)
         {
-            if (m._tag == MT_DB_KEY || m._tag == MT_DB_AUTO)
+            if (getBitFlag(m._tag, MT_DB_KEY))
             {
                 text += "`" + m._name + "` = ? and ";
             }
@@ -282,13 +303,30 @@ std::string GenCPP::genDataPacket(const DataPacket & dp)
         text += "\");" + LFCR;
         for (auto& m : dp._struct._members)
         {
-            if (m._tag == MT_DB_KEY || m._tag == MT_DB_AUTO)
+            if (getBitFlag(m._tag, MT_DB_KEY))
             {
                 text += "    q << this->" + m._name + ";" + LFCR;
             }
         }
         text += "    return q.pickSQL();" + LFCR;
         text += "}" + LFCR;
+
+        //select pure
+        text += "std::string  " + dp._struct._name + "::getDBSelectPure()" + LFCR;
+        text += "{" + LFCR;
+        text += "    return \"select ";
+        for (auto& m : dp._struct._members)
+        {
+            if (!getBitFlag(m._tag, MT_DB_IGNORE))
+            {
+                text += "`" + m._name + "`";
+                text += ",";
+            }
+        }
+        if (text.back() == ',') text.pop_back();
+        text += " from " + dbtable + " \";" + LFCR;
+        text += "}" + LFCR;
+
 
         //insert
         text += "std::string  " + dp._struct._name + "::getDBInsert()" + LFCR;
@@ -297,7 +335,7 @@ std::string GenCPP::genDataPacket(const DataPacket & dp)
         text += "    q.init(\"insert into " + dbtable + "(";
         for (auto& m : dp._struct._members)
         {
-            if (m._tag != MT_DB_IGNORE  && m._tag != MT_DB_AUTO)
+            if (!getBitFlag(m._tag, MT_DB_IGNORE)  && getBitFlag(m._tag, MT_DB_AUTO))
             {
                 text += "`" + m._name + "`";
                 text += ",";
@@ -307,7 +345,7 @@ std::string GenCPP::genDataPacket(const DataPacket & dp)
         text += ") values(";
         for (auto& m : dp._struct._members)
         {
-            if (m._tag != MT_DB_IGNORE  && m._tag != MT_DB_AUTO)
+            if (!getBitFlag(m._tag, MT_DB_IGNORE) && getBitFlag(m._tag, MT_DB_AUTO))
             {
                 text += "?,";
             }
@@ -316,7 +354,7 @@ std::string GenCPP::genDataPacket(const DataPacket & dp)
         text += ")\");" + LFCR;
         for (auto& m : dp._struct._members)
         {
-            if (m._tag != MT_DB_IGNORE  && m._tag != MT_DB_AUTO)
+            if (!getBitFlag(m._tag, MT_DB_IGNORE) && getBitFlag(m._tag, MT_DB_AUTO))
             {
                 text += "    q << this->" + m._name + ";" + LFCR;
             }
@@ -331,7 +369,7 @@ std::string GenCPP::genDataPacket(const DataPacket & dp)
         text += "    q.init(\"delete from " + dbtable + " where ";
         for (auto& m : dp._struct._members)
         {
-            if (m._tag == MT_DB_KEY || m._tag == MT_DB_AUTO)
+            if (getBitFlag(m._tag, MT_DB_KEY))
             {
                 text += "`" + m._name + "` = ?,";
             }
@@ -340,7 +378,7 @@ std::string GenCPP::genDataPacket(const DataPacket & dp)
         text += " \");" + LFCR;
         for (auto& m : dp._struct._members)
         {
-            if (m._tag == MT_DB_KEY || m._tag == MT_DB_AUTO)
+            if (getBitFlag(m._tag, MT_DB_KEY))
             {
                 text += "    q << this->" + m._name + ";" + LFCR;
             }
@@ -355,7 +393,7 @@ std::string GenCPP::genDataPacket(const DataPacket & dp)
         text += "    q.init(\"insert into " + dbtable + "(";
         for (auto& m : dp._struct._members)
         {
-            if (m._tag == MT_DB_KEY || m._tag == MT_DB_AUTO)
+            if (getBitFlag(m._tag, MT_DB_KEY))
             {
                 text += m._name;
                 text += ",";
@@ -365,7 +403,7 @@ std::string GenCPP::genDataPacket(const DataPacket & dp)
         text += ") values(";
         for (auto& m : dp._struct._members)
         {
-            if (m._tag == MT_DB_KEY || m._tag == MT_DB_AUTO)
+            if (getBitFlag(m._tag, MT_DB_KEY))
             {
                 text += "?,";
             }
@@ -374,7 +412,7 @@ std::string GenCPP::genDataPacket(const DataPacket & dp)
         text += " ) on duplicate key update ";
         for (auto& m : dp._struct._members)
         {
-            if (m._tag == MT_NORMAL)
+            if (!getBitFlag(m._tag, MT_DB_KEY) && !getBitFlag(m._tag, MT_DB_IGNORE) && !getBitFlag(m._tag, MT_DB_AUTO))
             {
                 text += "`" + m._name + "` = ?,";
             }
@@ -384,7 +422,7 @@ std::string GenCPP::genDataPacket(const DataPacket & dp)
 
         for (auto& m : dp._struct._members)
         {
-            if (m._tag == MT_NORMAL)
+            if (!getBitFlag(m._tag, MT_DB_KEY) && !getBitFlag(m._tag, MT_DB_IGNORE) && !getBitFlag(m._tag, MT_DB_AUTO))
             {
                 text += "    q << this->" + m._name + ";" + LFCR;
             }
@@ -407,7 +445,7 @@ std::string GenCPP::genDataPacket(const DataPacket & dp)
         text += "        {" + LFCR;
         for (auto& m : dp._struct._members)
         {
-            if (m._tag == MT_DB_IGNORE)
+            if (getBitFlag(m._tag, MT_DB_IGNORE))
             {
                 continue;
             }

@@ -55,7 +55,7 @@ std::list<AnyData> parseProto(std::string fileName, ParseCache & cache)
     std::list<AnyData> anydata;
     std::string filename = fileName + ".xml";
 
-    if (!hadFile(filename))
+    if (!accessFile(filename))
     {
         E(filename << " not found.");
     }
@@ -246,7 +246,15 @@ std::list<AnyData> parseProto(std::string fileName, ParseCache & cache)
                 }
                 if (ele->Attribute("store"))
                 {
-                    dp._struct._hadStore = strcmp("true", ele->Attribute("store")) == 0;
+                    if (compareStringIgnCase(ele->Attribute("store"), "InnoDB"))
+                    {
+                        dp._struct._store = "InnoDB";
+                    }
+                    else
+                    {
+                        dp._struct._store = "MyISAM";
+                    }
+                    
                 }
                 dp._struct._hadLog4z = hadLog4z;
 
@@ -272,21 +280,34 @@ std::list<AnyData> parseProto(std::string fileName, ParseCache & cache)
                     dm._tag = MT_NORMAL;
                     if (member->Attribute("tag"))
                     {
-                        if (strcmp(member->Attribute("tag"), "key") == 0)
+                        std::string tagText = member->Attribute("tag");
+                        auto spt = splitString(tagText, ",", " ");
+                        for (auto tag : spt)
                         {
-                            dm._tag = MT_DB_KEY;
-                        }
-                        else if (strcmp(member->Attribute("tag"), "ignore") == 0)
-                        {
-                            dm._tag = MT_DB_IGNORE;
-                        }
-                        else if (strcmp(member->Attribute("tag"), "auto") == 0)
-                        {
-                            dm._tag = MT_DB_AUTO;
-                        }
-                        else
-                        {
-                            E("Attribute Error. unknown tag");
+                            if (compareStringIgnCase(tag, "key"))
+                            {
+                                dm._tag = setBitFlag(dm._tag, MT_DB_KEY);
+                            }
+                            else if (compareStringIgnCase(tag, "uni"))
+                            {
+                                dm._tag = setBitFlag(dm._tag, MT_DB_UNI);
+                            }
+                            else if (compareStringIgnCase(tag, "idx"))
+                            {
+                                dm._tag = setBitFlag(dm._tag, MT_DB_IDX);
+                            }
+                            else if (compareStringIgnCase(tag, "auto"))
+                            {
+                                dm._tag = setBitFlag(dm._tag, MT_DB_AUTO);
+                            }
+                            else if (compareStringIgnCase(tag, "ignore"))
+                            {
+                                dm._tag = setBitFlag(dm._tag, MT_DB_IGNORE);
+                            }
+                            else
+                            {
+                                E("Attribute Error. unknown tag");
+                            }
                         }
                     }
 

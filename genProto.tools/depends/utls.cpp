@@ -124,7 +124,7 @@ bool removeDir(const std::string &path)
 {
     return ::rmdir(path.c_str()) == 0;
 }
-bool hadFile(const std::string &pathfile)
+bool accessFile(const std::string &pathfile)
 {
 #ifdef WIN32
     return ::_access(pathfile.c_str(), 0) == 0;
@@ -336,9 +336,9 @@ void sleepMillisecond(unsigned int ms)
 #endif
 }
 
-void trim(std::string &str, std::string ign, int both)
+std::string trim(const std::string &str, const std::string & ign, int both)
 {
-    if (str.empty() || ign.empty()){ return; }
+    if (str.empty() || ign.empty()){ return ""; }
     size_t length = str.length();
     size_t posBegin = 0;
     size_t posEnd = 0;
@@ -349,7 +349,7 @@ void trim(std::string &str, std::string ign, int both)
         bool bCheck = false;
         for (size_t j = 0; j < ign.length(); j++)
         {
-            if (str[i] == ign[j])
+            if (str.at(i) == ign.at(j))
             {
                 bCheck = true;
             }
@@ -377,21 +377,19 @@ void trim(std::string &str, std::string ign, int both)
     
     if (posBegin < posEnd)
     {
-        str = str.substr(posBegin, posEnd - posBegin);
+        return str.substr(posBegin, posEnd - posBegin);
     }
-    else
-    {
-        str.clear();
-    }
+
+    return "";
 }
-std::vector<std::string> splitString(std::string text, std::string deli, std::string ign)
+std::vector<std::string> splitString(std::string text, const std::string & deli, const std::string & ign)
 {
-    trim(text, ign);
+    text = trim(text, ign);
     std::vector<std::string> ret;
     if (deli.empty())
     {
         ret.push_back(text);
-        trim(ret.back(), ign);
+        ret.back() = trim(ret.back(), ign);
         return std::move(ret);
     }
     size_t beginPos = 0;
@@ -405,13 +403,13 @@ std::vector<std::string> splitString(std::string text, std::string deli, std::st
         if (matched == deli)
         {
             ret.push_back(text.substr(beginPos, i + 1 - deli.length() - beginPos));
-            trim(ret.back(), ign);
+            ret.back() = trim(ret.back(), ign);
             beginPos = i + 1;
             matched.clear();
         }
     }
     ret.push_back(text.substr(beginPos, text.length() - beginPos));
-    trim(ret.back(), ign);
+    ret.back() = trim(ret.back(), ign);
     return std::move(ret);
 }
 
@@ -486,75 +484,168 @@ bool compareStringIgnCase(const std::string & left, const std::string & right, b
     
 }
 
-bool compareStringWildcard(std::string source, std::string mod, bool isGreedy)
+
+static int compareStringWildcard(std::vector<std::pair<std::string::size_type, std::string::size_type>> & stk, const std::string &src, const std::string & md)
 {
-    while (!source.empty() || !mod.empty())
+    int searchCount = 1;
+    while (!stk.empty())
     {
-        //clean wildcard
-        if (mod.size() >= 2 && mod.at(0) == '*' && mod.at(1) == mod.at(0))
+        std::string::size_type srcBeginPos = stk.back().first;
+        std::string::size_type mdBeginPos = stk.back().second;
+        stk.pop_back();
+
+        while (true)
         {
-            mod.erase(mod.begin());
+            searchCount++;
+            if (mdBeginPos >= md.length() )
+            {
+                if (srcBeginPos >= src.length())
+                {
+                    return searchCount;
+                }
+                else
+                {
+                    break;
+                }
+            }
+            auto wcFirstPos = md.find('*', mdBeginPos);
+            if (wcFirstPos == std::string::npos)
+            {
+                if (srcBeginPos >= src.length() 
+                    || md.length() - mdBeginPos != src.length() - srcBeginPos
+                    || md.compare(mdBeginPos, md.length() - mdBeginPos, src.c_str(), src.length() - srcBeginPos) != 0)
+                {
+                    break;
+                }
+                return searchCount;
+            }
+            //pre char matching
+            if (wcFirstPos != mdBeginPos)
+            {
+                if (srcBeginPos >= src.length() || src.length() - srcBeginPos < wcFirstPos - mdBeginPos)
+                {
+                    break;
+                }
+                if (md.compare(mdBeginPos, wcFirstPos - mdBeginPos, src.c_str(), srcBeginPos, wcFirstPos - mdBeginPos) != 0)
+                {
+                    break;
+                }
+                mdBeginPos = wcFirstPos;
+                srcBeginPos = srcBeginPos + (wcFirstPos - mdBeginPos);
+                continue;
+            }
+            //next segment matching
+            else
+            {
+                if (md.length() == wcFirstPos + 1)
+                {
+                    return searchCount;
+                }
+                auto wcSecondPos = md.find('*', mdBeginPos+1);
+                if (wcSecondPos == std::string::npos)
+                {
+                    wcSecondPos = md.length();
+                }
+                auto foundPos = src.find(md.c_str() + mdBeginPos + 1, srcBeginPos,  wcSecondPos - mdBeginPos - 1);
+                if (foundPos == std::string::npos)
+                {
+                    break;
+                }
+                stk.push_back(std::make_pair(foundPos + 1, mdBeginPos));
+                
+                srcBeginPos = foundPos + (wcSecondPos - mdBeginPos - 1);
+                mdBeginPos = wcSecondPos;
+            }
+        }
+    }
+    return 0;
+}
+
+bool compareStringWildcard(std::string source, std::string mod, bool ignCase)
+{
+    for (auto iter = mod.begin(); iter != mod.end();)
+    {
+        auto next = iter + 1;
+        if (*iter == '*' && next != mod.end() && *next == '*')
+        {
+            iter = mod.erase(iter);
             continue;
         }
+        iter++;
+    }
+    if (ignCase)
+    {
+        mod = toLowerString(mod);
+        source = toLowerString(source);
+    }
+    std::vector<std::pair<std::string::size_type, std::string::size_type>> stk;
+    stk.reserve(10);
+    stk.push_back(std::make_pair(0, 0));
+    return compareStringWildcard(stk, source, mod) != 0;
+}
+/*
+Char. number range  |        UTF-8 octet sequence
+(hexadecimal)    |              (binary)
+--------------------+---------------------------------------------
+0000 0000-0000 007F | 0xxxxxxx
+0000 0080-0000 07FF | 110xxxxx 10xxxxxx
+0000 0800-0000 FFFF | 1110xxxx 10xxxxxx 10xxxxxx
+0001 0000-0010 FFFF | 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
+*/
+int getCharUTF8Count(const std::string & str)
+{
+    //0x7f == 0111 1111
+    //0xc0 == 1100 0000
+    int count = 0;
+    std::for_each(str.begin(), str.end(), [&count](char ch){ if ((unsigned char)ch <= 0x7f || (unsigned char)ch >= 0xc0) count++; });
+    return count;
+}
+int getCharASCIICount(const std::string & str)
+{
+    int count = 0;
+    std::for_each(str.begin(), str.end(), [&count](char ch){ if ((unsigned char)ch <= 0x7f) count++; });
+    return count;
+}
+int getCharNoASCIICount(const std::string & str)
+{
+    int count = 0;
+    std::for_each(str.begin(), str.end(), [&count](char ch){ if ((unsigned char)ch >= 0xc0) count++; });
+    return count;
+}
 
-        if (mod.empty())
-        {
-            if (source.empty())
-            {
-                return true;
-            }
-            return false;
-        }
-        if (mod.size() == 1 && mod.front() == '*')
+bool hadIllegalChar(const std::string & str) // return true when have invisible char, mysql unsupport char, mysql escape char.
+{
+    //0x7f == 0111 1111
+    //0xc0 == 1100 0000
+    //0xe0 == 1110 0000
+    //0xef == 1110 1111
+    int cur = 0;
+    for (auto ch : str)
+    {
+        unsigned char b = (unsigned char)ch;
+        if (b > 0xef)
         {
             return true;
         }
-        auto posBegin = mod.front() == '*' ? 1 : 0; //skip *
-        auto posEnd = mod.find('*', posBegin);
-        std::string cleanmod = mod.substr(posBegin, posEnd - posBegin);
-        if (cleanmod.length() > source.length())
+        if (b < ' ' || b == 0x7f) //invisible
         {
-            return false;
+            return true;
         }
-        //greedy
-        auto posMatching = std::string::npos;
-        for (size_t i = 0; i < source.length(); i++)
+        if (ch == ' ' || ch == '\"' || ch == '\'' || ch == '\\') //unsafe 
         {
-            if (source.length() - i < cleanmod.length())
-            {
-                break;
-            }
-            if (cleanmod.compare(0, cleanmod.length(), &source[i], 0, cleanmod.length()) == 0)
-            {
-                posMatching = i;
-            }
-            if (!isGreedy)
-            {
-                break;
-            }
+            return true;
         }
-        if (posMatching != std::string::npos)
+        if (b >= 0xc0 && b < 0xe0 && (str.length() - cur < 2))
         {
-            if (posEnd == std::string::npos)
-            {
-                mod.clear();
-            }
-            else
-            {
-                mod = mod.substr(posEnd);
-            }
-            source = source.substr(posMatching + cleanmod.length());
-            continue;
+            return true;
         }
-        if (source.empty())
+        if (b >= 0xe0 && b < 0xf0 && (str.length() - cur < 3))
         {
-            return false;
+            return true;
         }
-        source.erase(source.begin());
     }
-    return true;
+    return false;
 }
-
 
 time_t getUTCTimeFromLocalString(const std::string & str)
 {
@@ -574,13 +665,11 @@ time_t getUTCTimeFromLocalString(const std::string & str)
     {
         if (str.find(':') != std::string::npos)
         {
-            stime = str;
-            trim(stime, " ");
+            stime = trim(str, " ");
         }
         else
         {
-            sdate = str;
-            trim(sdate, " ");
+            sdate = trim(str, " ");
         }
     }
     struct tm st;
@@ -756,8 +845,9 @@ thread_local std::mt19937 __genRandom; //vs2015 support
 //==========================================================================
 unsigned int realRand()
 {
+    return (rand() & 0xffff) << 16 | (rand() & 0xffff);
 #ifdef WIN32
-    return (rand() << 20) | (rand() << 8) | rand();
+    return (rand() << 20) | (rand() << 8) | (rand() &0xff);
 //    if (!__genRandomInited)
 //    {
 //        __genRandom = new(__genRandomBacking)std::mt19937();

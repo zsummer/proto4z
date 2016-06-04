@@ -73,6 +73,8 @@ enum MemberTag : short
 {
     MT_NORMAL,
     MT_DB_KEY,
+    MT_DB_UNI,
+    MT_DB_IDX,
     MT_DB_AUTO,
     MT_DB_IGNORE,
 };
@@ -125,14 +127,14 @@ struct DataStruct
 {
     std::string _name;
     std::string _desc;
-    bool _hadStore = false;
+    std::string _store;
     bool _hadLog4z = false;
     struct DataMember
     {
         std::string _type;
         std::string _name;
         std::string _desc;
-        MemberTag _tag;
+        short _tag; //MemberTag
     };
     std::vector<DataMember> _members;
 };

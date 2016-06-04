@@ -47,13 +47,6 @@ RET fromString(const std::string & t, RET def)
 
         char *cursor = nullptr;
         return (RET)strtoull(t.c_str(), &cursor, 10);
-//        unsigned long long ull = 0;
-//#ifndef WIN32
-//        sscanf(t.c_str(), "%llu", &ull);
-//#else
-//        int count = sscanf(t.c_str(), "%I64u", &ull);
-//#endif
-//        return (RET)ull;
     }
     return (RET)atoll(t.c_str());
 }
@@ -248,23 +241,22 @@ inline std::tuple<double, double> rotatePoint(double orgx, double orgy, double o
 
 
 
-template<class Integer, class Number>
-inline bool checkBitFlag(Integer n, Number f)
+template<class Integer, class Pos>
+inline bool getBitFlag(Integer bin, Pos pos)
 {
-    return (n & ((Integer)1 << (f - 1))) != 0;
+    return (bin & ((Integer)1 << (pos - 1))) != 0;
 }
 
-template<class Integer, class Number>
-inline Integer appendBitFlag(Integer n, Number f)
+template<class Integer, class Pos>
+inline Integer setBitFlag(Integer bin, Pos pos, bool flag)
 {
-    return n | ((Integer)1 << (f - 1));
+    if (flag)
+    {
+        return bin | ((Integer)1 << (pos - 1));
+    }
+    return bin & ~((Integer)1 << (pos - 1));
 }
 
-template<class Integer, class Number>
-inline Integer removeBitFlag(Integer n, Number f)
-{
-    return n & ~((Integer)1 << (f - 1));
-}
 
 
 
@@ -349,8 +341,42 @@ inline std::vector<RandIt> raffle(RandIt first, RandIt end, int takeCount, GetWe
 }
 
 
+inline double calcELORatingUpper(double ownerScore, double dstScore, int winFlag)
+{
+    double base = winFlag == 0 ? 0.5 : (winFlag > 0 ? 1.0 : 0);
+    double winRate = 1.0 / (1.0 + pow(10.0, (dstScore - ownerScore) / 400.0));
+    return 32.0 * (base - winRate);
+}
 
 
 
+template<class Container>
+std::string mergeToString(const Container & contariner, const std::string& deli)
+{
+    std::string ret;
+    for (const auto &t : contariner)
+    {
+        ret += toString(t);
+        ret += deli;
+    }
+    if (!deli.empty())
+    {
+        for (size_t i = 0; i < deli.size(); i++)
+        {
+            ret.pop_back();
+        }
+    }
+    return std::move(ret);
+}
+
+template<class T>  //example: Container = std::vector<int>
+void mergeToString(std::string & dstString, const std::string& deli, const T & t)
+{
+    if (!dstString.empty())
+    {
+        dstString += deli;
+    }
+    dstString += toString(t);
+}
 
 #endif
