@@ -335,7 +335,7 @@ std::string GenCPP::genDataPacket(const DataPacket & dp)
         text += "    q.init(\"insert into " + dbtable + "(";
         for (auto& m : dp._struct._members)
         {
-            if (!getBitFlag(m._tag, MT_DB_IGNORE)  && getBitFlag(m._tag, MT_DB_AUTO))
+            if (!getBitFlag(m._tag, MT_DB_IGNORE)  && !getBitFlag(m._tag, MT_DB_AUTO))
             {
                 text += "`" + m._name + "`";
                 text += ",";
@@ -345,7 +345,7 @@ std::string GenCPP::genDataPacket(const DataPacket & dp)
         text += ") values(";
         for (auto& m : dp._struct._members)
         {
-            if (!getBitFlag(m._tag, MT_DB_IGNORE) && getBitFlag(m._tag, MT_DB_AUTO))
+            if (!getBitFlag(m._tag, MT_DB_IGNORE) && !getBitFlag(m._tag, MT_DB_AUTO))
             {
                 text += "?,";
             }
@@ -354,7 +354,7 @@ std::string GenCPP::genDataPacket(const DataPacket & dp)
         text += ")\");" + LFCR;
         for (auto& m : dp._struct._members)
         {
-            if (!getBitFlag(m._tag, MT_DB_IGNORE) && getBitFlag(m._tag, MT_DB_AUTO))
+            if (!getBitFlag(m._tag, MT_DB_IGNORE) && !getBitFlag(m._tag, MT_DB_AUTO))
             {
                 text += "    q << this->" + m._name + ";" + LFCR;
             }
