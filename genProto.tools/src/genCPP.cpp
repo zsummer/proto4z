@@ -422,6 +422,14 @@ std::string GenCPP::genDataPacket(const DataPacket & dp)
 
         for (auto& m : dp._struct._members)
         {
+            if (getBitFlag(m._tag, MT_DB_KEY))
+            {
+                text += "    q << this->" + m._name + ";" + LFCR;
+            }
+        }
+
+        for (auto& m : dp._struct._members)
+        {
             if (!getBitFlag(m._tag, MT_DB_KEY) && !getBitFlag(m._tag, MT_DB_IGNORE) && !getBitFlag(m._tag, MT_DB_AUTO))
             {
                 text += "    q << this->" + m._name + ";" + LFCR;
