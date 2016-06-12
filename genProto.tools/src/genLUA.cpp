@@ -75,9 +75,9 @@ std::string GenLUA::genDataArray(const DataArray & da)
     }
     text += LFCR;
 
-    text += "Proto4z." + da._arrayName + ".__getName = \"" + da._arrayName + "\"" + LFCR;
-    text += "Proto4z." + da._arrayName + ".__getDesc = \"array\"" + LFCR;
-    text += "Proto4z." + da._arrayName + ".__getTypeV = \"" + da._type + "\"" + LFCR;
+    text += "Proto4z." + da._arrayName + ".__protoName = \"" + da._arrayName + "\"" + LFCR;
+    text += "Proto4z." + da._arrayName + ".__protoDesc = \"array\"" + LFCR;
+    text += "Proto4z." + da._arrayName + ".__protoTypeV = \"" + da._type + "\"" + LFCR;
     return text;
 }
 std::string GenLUA::genDataMap(const DataMap & dm)
@@ -90,10 +90,10 @@ std::string GenLUA::genDataMap(const DataMap & dm)
     }
     text += LFCR;
 
-    text += "Proto4z." + dm._mapName + ".__getName = \"" + dm._mapName + "\"" + LFCR;
-    text += "Proto4z." + dm._mapName + ".__getDesc = \"map\"" + LFCR;
-    text += "Proto4z." + dm._mapName + ".__getTypeK = \"" + dm._typeKey + "\"" + LFCR;
-    text += "Proto4z." + dm._mapName + ".__getTypeV = \"" + dm._typeValue + "\"" + LFCR;
+    text += "Proto4z." + dm._mapName + ".__protoName = \"" + dm._mapName + "\"" + LFCR;
+    text += "Proto4z." + dm._mapName + ".__protoDesc = \"map\"" + LFCR;
+    text += "Proto4z." + dm._mapName + ".__protoTypeK = \"" + dm._typeKey + "\"" + LFCR;
+    text += "Proto4z." + dm._mapName + ".__protoTypeV = \"" + dm._typeValue + "\"" + LFCR;
     return text;
 }
 std::string GenLUA::genDataPacket(const DataPacket & dp)
@@ -111,8 +111,8 @@ std::string GenLUA::genDataPacket(const DataPacket & dp)
     text += LFCR;
 
 
-    text += "Proto4z." + dp._struct._name + ".__getID = " + dp._const._value + "" + LFCR;
-    text += "Proto4z." + dp._struct._name + ".__getName = \"" + dp._struct._name + "\"" + LFCR;
+    text += "Proto4z." + dp._struct._name + ".__protoID = " + dp._const._value + "" + LFCR;
+    text += "Proto4z." + dp._struct._name + ".__protoName = \"" + dp._struct._name + "\"" + LFCR;
 
     for (size_t i = 0; i < dp._struct._members.size(); ++i)
     {
