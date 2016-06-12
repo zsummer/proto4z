@@ -27,7 +27,7 @@ public:
         if (checkHTTPBuffIntegrity(wh.getStream(), wh.getStreamLen(), 1024, isChunked, method, methodLine, head, body).first == IRT_SUCCESS)
         {
             if (head.find("Host") != head.end()
-                && (method == "GET" || method == "POST" || method == "200"))
+                && (method == "GET" || method == "POST" || methodLine == "200"))
             {
                 cout << "Check checkHTTPBuffIntegrity Success" << endl;
             }
