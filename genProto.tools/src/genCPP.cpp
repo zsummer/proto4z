@@ -356,7 +356,26 @@ std::string GenCPP::genDataPacket(const DataPacket & dp)
         {
             if (!getBitFlag(m._tag, MT_DB_IGNORE) && !getBitFlag(m._tag, MT_DB_AUTO))
             {
-                text += "    q << this->" + m._name + ";" + LFCR;
+                if (m._type == "ui8" || m._type == "ui16" || m._type == "ui32" || m._type == "ui64"
+                    || m._type == "i8" || m._type == "i16" || m._type == "i32" || m._type == "i64"
+                    || m._type == "double" || m._type == "float" || m._type == "string")
+                {
+                    text += "    q << this->" + m._name + ";" + LFCR;
+                }
+                else
+                {
+                    text += "    try" + LFCR;
+                    text += "    {" + LFCR;
+                    text += "        "  "zsummer::proto4z::WriteStream ws(" + m._name + ".getProtoID());" + LFCR;
+                    text += "        "  "ws <<  this->" + m._name + ";" + LFCR;
+                    text += "        "  "q.add(ws.getStreamBody(), ws.getStreamBodyLen());" + LFCR;
+                    text += "    }" + LFCR;
+                    text += "    catch(const std::exception & e)" + LFCR;
+                    text += "    {" + LFCR;
+                    text += "        "  "LOGW(\"catch one except error when insert " + dp._struct._name + "." + m._name + " error=\" << e.what());" + LFCR;
+                    text += "    }" + LFCR;
+                }
+                
             }
         }
         text += "    return q.pickSQL();" + LFCR;
@@ -432,7 +451,26 @@ std::string GenCPP::genDataPacket(const DataPacket & dp)
         {
             if (!getBitFlag(m._tag, MT_DB_KEY) && !getBitFlag(m._tag, MT_DB_IGNORE) && !getBitFlag(m._tag, MT_DB_AUTO))
             {
-                text += "    q << this->" + m._name + ";" + LFCR;
+                if (m._type == "ui8" || m._type == "ui16" || m._type == "ui32" || m._type == "ui64"
+                    || m._type == "i8" || m._type == "i16" || m._type == "i32" || m._type == "i64"
+                    || m._type == "double" || m._type == "float" || m._type == "string")
+                {
+                    text += "    q << this->" + m._name + ";" + LFCR;
+                }
+                else
+                {
+                    text += "    try" + LFCR;
+                    text += "    {" + LFCR;
+                    text += "        "  "zsummer::proto4z::WriteStream ws(" + m._name + ".getProtoID());" + LFCR;
+                    text += "        "  "ws <<  this->" + m._name + ";" + LFCR;
+                    text += "        "  "q.add(ws.getStreamBody(), ws.getStreamBodyLen());" + LFCR;
+                    text += "    }" + LFCR;
+                    text += "    catch(const std::exception & e)" + LFCR;
+                    text += "    {" + LFCR;
+                    text += "        "  "LOGW(\"catch one except error when update " + dp._struct._name + "." + m._name + " error=\" << e.what());" + LFCR;
+                    text += "    }" + LFCR;
+                }
+                
             }
         }
         text += "    return q.pickSQL();" + LFCR;
@@ -475,7 +513,7 @@ std::string GenCPP::genDataPacket(const DataPacket & dp)
                 text += "                    "  "rs >> this->" + m._name + ";" + LFCR;
                 text += "                "  "}" + LFCR;
                 text += "            }" + LFCR;
-                text += "            catch(std::runtime_error e)" + LFCR;
+                text += "            catch(const std::exception & e)" + LFCR;
                 text += "            {" + LFCR;
                 text += "                "  "LOGW(\"catch one except error when fetch " + dp._struct._name + "." + m._name + "  from table " + dbtable + " . what=\" << e.what() << \"  ErrorCode=\"  <<  result.getErrorCode() << \", Error=\" << result.getErrorMsg() << \", sql=\" << result.peekSQL());" + LFCR;
                 text += "            }" + LFCR;
@@ -486,7 +524,7 @@ std::string GenCPP::genDataPacket(const DataPacket & dp)
         text += "        }" + LFCR;
 
         text += "    }" + LFCR;
-        text += "    catch(std::runtime_error e)" + LFCR;
+        text += "    catch(const std::exception & e)" + LFCR;
         text += "    {" + LFCR;
         text += "        "  "LOGE(\"catch one except error when fetch " + dp._struct._name + " from table " + dbtable + " . what=\" << e.what() << \"  ErrorCode=\"  <<  result.getErrorCode() << \", Error=\" << result.getErrorMsg() << \", sql=\" << result.peekSQL());" + LFCR;
         text += "        "  "return false;" + LFCR;

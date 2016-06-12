@@ -46,7 +46,7 @@ int main(int argc, char *argv[])
             cache.write();
         }
     }
-    catch (std::runtime_error e)
+    catch (const std::exception & e)
     {
         LOGE("catch error: " << e.what());
         return -1;

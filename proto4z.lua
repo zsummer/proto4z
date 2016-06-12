@@ -53,7 +53,7 @@ Proto4z = Proto4z or {}
 function Proto4z.pack(obj, name)
     local data = {}
     data[1] = Proto4zUtil.pack(0, "ui16") -- reseve field
-    data[2] = Proto4zUtil.pack(Proto4z[name].getProtoID(), "ui16") -- proto id field
+    data[2] = Proto4zUtil.pack(Proto4z[name].__protoID, "ui16") -- proto id field
     Proto4z.__encode(obj, name, data)
     local dst = table.concat(data)
     local head = Proto4zUtil.pack(#dst+4, "ui32") -- proto len field
