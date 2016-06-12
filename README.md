@@ -30,11 +30,11 @@ proto4z是一个序列化工具库, 可以通过一次编写xml格式的数据�
         <member name="moneyTree" type="MoneyTree"     desc=""/>
     </packet>
 </Proto>
-```  
+```   
 ###lua code  
 
 **test serializable/deserialize code**  
-```
+```  
 --require
 require("proto4z")
 require("TestProto")
@@ -47,7 +47,7 @@ Proto4z.dump(recvPack)
 ###c++ test code  
 
 **test serializable/deserialize code**  
-```
+```  
     try
     {
         
@@ -73,9 +73,9 @@ Proto4z.dump(recvPack)
     {
         cout << "error:" << e.what() << endl;
     }
-```
+```  
 
-###c# code
+###c# code  
 
 **test serializable/deserialize code**  
 ```  
@@ -96,9 +96,9 @@ Proto4z.dump(recvPack)
         }
 ```  
 
-
+###sql code  
 **test sql build, load, select, insert, del code**  
-```
+```  
         SimplePack pack;
         pack.id = 10;
         pack.name = "aaa";
@@ -132,9 +132,11 @@ Proto4z.dump(recvPack)
                 return false;
             }
         }
-```
+```  
+  
+###http code  
 **test http serializable/deserialize code. (和模板配置无关)**
-```
+```  
     TestHTTP th;
     WriteHTTP whGet;
     whGet.addHead("Content-Type", "application/x-www-form-urlencoded");
@@ -154,7 +156,7 @@ Proto4z.dump(recvPack)
     whResult.addHead("Host", "www.google.com");
     whResult.response("200", "");
     th.Test(whResult);
-```
+```  
 
 
 
