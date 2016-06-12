@@ -99,39 +99,39 @@ Proto4z.dump(recvPack)
 
 **test sql build, load, select, insert, del code**  
 ```
-    zsummer::mysql::DBHelper helper;
-    helper.init("127.0.0.1", 3306, "info", "root", "123");
-    if (!helper.connect())
-    {
-        return -1;
-    }
-    auto buidsqls = TestIntegerData_BUILD();
-    auto result = helper.query(buidsqls.at(0));
-    if (result->getErrorCode() != zsummer::mysql::QEC_SUCCESS) //need create table  
-    {
-        if (helper.query(buidsqls.at(1))->getErrorCode() != zsummer::mysql::QEC_SUCCESS)
+        SimplePack pack;
+        pack.id = 10;
+        pack.name = "aaa";
+        pack.createTime = time(NULL);
+        pack.moneyTree.freeCount = 0;
+        pack.moneyTree.lastTime = pack.createTime;
+        pack.moneyTree.statSum = 0;
+        pack.moneyTree.statCount = 0;
+        pack.moneyTree.payCount = 0;
+
+        DBHelperPtr dbHelper = std::make_shared<DBHelper>();
+        dbHelper->init(dbConfig._ip, dbConfig._port, dbConfig._db, dbConfig._user, dbConfig._pwd, true); //最后一个true可以自动创建库如果库不存在 
+        if (!dbHelper->connect())
         {
-            return -2; //create tables failed 
+            return false;
         }
-    }
-    auto insertSql = TestIntegerData_INSERT(TestIntegerData(12, 23, 1));
-    if (helper.query(insertSql)->getErrorCode() != zsummer::mysql::QEC_SUCCESS)
-    {
-        return -3;
-    }
-    auto selectSql = TestIntegerData_SELECT(12, 23);//double key 
-    result = helper.query(insertSql);
-    if (result->getErrorCode() != zsummer::mysql::QEC_SUCCESS)
-    {
-        return -4;
-    }
-    while (result->haveRow())
-    {
-        TestIntegerData td;
-        *result >> td._uint;
-        *result >> td._i64;
-        *result >> td._ui64;
-    }
+        dbhelper->query(pack.getDBBuild()); //创建对应的表,并自动alter普通字段 . 
+        if (dbhelper->query(pack.getDBInsert())->getErrorCode() != QEC_SUCCESS)
+        {
+            return false;
+        }
+        if (dbhelper->query(pack.getDBUpdate())->getErrorCode() != QEC_SUCCESS)
+        {
+            return false;
+        }
+        auto ret = dbhelper->query(pack.getDBSelect());
+        if (ret->getErrorCode() == QEC_SUCCESS)
+        {
+            if (!pack.fetchFromDBResult(*ret))
+            {
+                return false;
+            }
+        }
 ```
 **test http serializable/deserialize code. (和模板配置无关)**
 ```
