@@ -241,13 +241,6 @@ struct SimplePack //简单示例
 { 
     static const unsigned short getProtoID() { return 30005;} 
     static const std::string getProtoName() { return "SimplePack";} 
-    inline const std::vector<std::string>  getDBBuild(); 
-    inline std::string  getDBInsert(); 
-    inline std::string  getDBDelete(); 
-    inline std::string  getDBUpdate(); 
-    inline std::string  getDBSelect(); 
-    inline std::string  getDBSelectPure(); 
-    inline bool fetchFromDBResult(zsummer::mysql::DBResult &result); 
     unsigned int id; //id, 对应数据库的结构为自增ID,key  
     std::string name; //昵称, 唯一索引  
     unsigned int createTime; //创建时间, 普通索引  
@@ -265,96 +258,6 @@ struct SimplePack //简单示例
         this->moneyTree = moneyTree; 
     } 
 }; 
- 
-const std::vector<std::string>  SimplePack::getDBBuild() 
-{ 
-    std::vector<std::string> ret; 
-    ret.push_back("CREATE TABLE IF NOT EXISTS `tb_SimplePack` (        `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT ,        `name` varchar(255) NOT NULL DEFAULT '' ,        `createTime` bigint(20) unsigned NOT NULL DEFAULT '0' ,        PRIMARY KEY(`id`),        UNIQUE KEY `name` (`name`),        KEY `createTime` (`createTime`) ) ENGINE = MyISAM DEFAULT CHARSET = utf8"); 
-    ret.push_back("alter table `tb_SimplePack` add `id`  bigint(20) unsigned NOT NULL AUTO_INCREMENT "); 
-    ret.push_back("alter table `tb_SimplePack` change `id`  `id`  bigint(20) unsigned NOT NULL AUTO_INCREMENT "); 
-    ret.push_back("alter table `tb_SimplePack` add `name`  varchar(255) NOT NULL DEFAULT '' "); 
-    ret.push_back("alter table `tb_SimplePack` change `name`  `name`  varchar(255) NOT NULL DEFAULT '' "); 
-    ret.push_back("alter table `tb_SimplePack` add `createTime`  bigint(20) unsigned NOT NULL DEFAULT '0' "); 
-    ret.push_back("alter table `tb_SimplePack` change `createTime`  `createTime`  bigint(20) unsigned NOT NULL DEFAULT '0' "); 
-    ret.push_back("alter table `tb_SimplePack` add `moneyTree`  blob "); 
-    ret.push_back("alter table `tb_SimplePack` change `moneyTree`  `moneyTree`  blob "); 
-    return std::move(ret); 
-} 
-std::string  SimplePack::getDBSelect() 
-{ 
-    zsummer::mysql::DBQuery q; 
-    q.init("select `id`,`name`,`createTime`,`moneyTree` from `tb_SimplePack` where `id` = ? "); 
-    q << this->id; 
-    return q.pickSQL(); 
-} 
-std::string  SimplePack::getDBSelectPure() 
-{ 
-    return "select `id`,`name`,`createTime`,`moneyTree` from `tb_SimplePack` "; 
-} 
-std::string  SimplePack::getDBInsert() 
-{ 
-    zsummer::mysql::DBQuery q; 
-    q.init("insert into `tb_SimplePack`(`name`,`createTime`,`moneyTree`) values(?,?,?)"); 
-    q << this->name; 
-    q << this->createTime; 
-    q << this->moneyTree; 
-    return q.pickSQL(); 
-} 
-std::string  SimplePack::getDBDelete() 
-{ 
-    zsummer::mysql::DBQuery q; 
-    q.init("delete from `tb_SimplePack` where `id` = ? "); 
-    q << this->id; 
-    return q.pickSQL(); 
-} 
-std::string  SimplePack::getDBUpdate() 
-{ 
-    zsummer::mysql::DBQuery q; 
-    q.init("insert into `tb_SimplePack`(id) values(? ) on duplicate key update `name` = ?,`createTime` = ?,`moneyTree` = ? "); 
-    q << this->id; 
-    q << this->name; 
-    q << this->createTime; 
-    q << this->moneyTree; 
-    return q.pickSQL(); 
-} 
-bool SimplePack::fetchFromDBResult(zsummer::mysql::DBResult &result) 
-{ 
-    if (result.getErrorCode() != zsummer::mysql::QEC_SUCCESS) 
-    { 
-        LOGE("error fetch SimplePack from table `tb_SimplePack` . ErrorCode="  <<  result.getErrorCode() << ", Error=" << result.getErrorMsg() << ", sql=" << result.peekSQL()); 
-        return false; 
-    } 
-    try 
-    { 
-        if (result.haveRow()) 
-        { 
-            result >> this->id; 
-            result >> this->name; 
-            result >> this->createTime; 
-            try 
-            { 
-                std::string blob; 
-                result >> blob; 
-                if(!blob.empty()) 
-                { 
-                    zsummer::proto4z::ReadStream rs(blob.c_str(), (zsummer::proto4z::Integer)blob.length(), false); 
-                    rs >> this->moneyTree; 
-                } 
-            } 
-            catch(std::runtime_error e) 
-            { 
-                LOGW("catch one except error when fetch SimplePack.moneyTree  from table `tb_SimplePack` . what=" << e.what() << "  ErrorCode="  <<  result.getErrorCode() << ", Error=" << result.getErrorMsg() << ", sql=" << result.peekSQL()); 
-            } 
-            return true;  
-        } 
-    } 
-    catch(std::runtime_error e) 
-    { 
-        LOGE("catch one except error when fetch SimplePack from table `tb_SimplePack` . what=" << e.what() << "  ErrorCode="  <<  result.getErrorCode() << ", Error=" << result.getErrorMsg() << ", sql=" << result.peekSQL()); 
-        return false; 
-    } 
-    return false; 
-} 
 inline zsummer::proto4z::WriteStream & operator << (zsummer::proto4z::WriteStream & ws, const SimplePack & data) 
 { 
     ws << data.id;  
