@@ -37,21 +37,16 @@ proto4z是一个序列化工具库, 可以通过一次编写xml格式的数据�
 ```
 --require
 require("proto4z")
-local dump = Proto4z.dump
-local proto = Proto4z
-local echo = {  _iarray = {{_uint=6,_i64=12345678.2,_ui64=12345678},{_uint=6,_i64="123456789000000.2",_ui64="1123122345678.0"}},
-				_f =2.235,
-				_s = "abcdefg"
-				}
-
-local data = proto.encode(echo, "EchoPack")
-local dr = proto.decode(data, proto.getName(proto.EchoPack.__getID))
-dump(dr)
+require("TestProto")
+local pack = {id=10, name="name", createTime=100, moneyTree={lastTime=1,freeCount=5,payCount=5,statSum=0,statCount=0}}
+local binMemory = Proto4z.encode(pack, "SimplePack") --序列化  
+local recvPack = Proto4z.decode(binMemory, Proto4z.getName(Proto4z.SimplePack.__protoID)) --反序列化  
+Proto4z.dump(recvPack)
 ```
 
 ###c++ test code  
 
-**test serializable/deserialize code**
+**test serializable/deserialize code**  
 ```
     try
     {
@@ -79,7 +74,30 @@ dump(dr)
         cout << "error:" << e.what() << endl;
     }
 ```
-**test sql build, load, select, insert, del code**
+
+###c# code
+
+**test serializable/deserialize code**  
+```  
+        try
+        {
+            SimplePack pk = new SimplePack(10, "name", 100, null);
+            pk.moneyTree = new MoneyTree(10001, 5, 5, 0, 0);
+            var binMemory = pk.__encode().ToArray();  //序列化  
+
+            SimplePack recvPK = new SimplePack();
+            int curPos = 0;
+            recvPK.__decode(binMemory, ref curPos);
+            System.Console.Write("success");
+        }
+        catch(Exception e)
+        {
+            System.Console.Write("error");
+        }
+```  
+
+
+**test sql build, load, select, insert, del code**  
 ```
     zsummer::mysql::DBHelper helper;
     helper.init("127.0.0.1", 3306, "info", "root", "123");
@@ -137,26 +155,7 @@ dump(dr)
     whResult.response("200", "");
     th.Test(whResult);
 ```
-###c# code
 
-**test serializable/deserialize code**
-```
-        try
-        {
-            SimplePack pk = new SimplePack(10, "name", 100, null);
-            pk.moneyTree = new MoneyTree(10001, 5, 5, 0, 0);
-            var binMemory = pk.__encode().ToArray();  //序列化  
-
-            SimplePack recvPK = new SimplePack();
-            int curPos = 0;
-            recvPK.__decode(binMemory, ref curPos);
-            System.Console.Write("success");
-        }
-        catch(Exception e)
-        {
-            System.Console.Write("error");
-        }
-```
 
 
 
