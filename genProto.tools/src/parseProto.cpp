@@ -304,6 +304,10 @@ std::list<AnyData> parseProto(std::string fileName, ParseCache & cache)
                             {
                                 dm._tag = setBitFlag(dm._tag, MT_DB_IGNORE);
                             }
+                            else if (compareStringIgnCase(tag, "blob"))
+                            {
+                                dm._tag = setBitFlag(dm._tag, MT_DB_BLOB);
+                            }
                             else
                             {
                                 E("Attribute Error. unknown tag");

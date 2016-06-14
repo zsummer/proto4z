@@ -22,7 +22,11 @@ std::string GenCPP::getRealType(const std::string & xmltype)
 
 std::string getMysqlType(const DataStruct::DataMember & m)
 {
-    if (m._type == "string")
+    if (m._type == "string" && getBitFlag(m._tag, MT_DB_BLOB))
+    {
+        return " longblob NOT NULL ";
+    }
+    else if (m._type == "string")
     {
         return " varchar(255) NOT NULL DEFAULT '' ";
     }
@@ -42,7 +46,7 @@ std::string getMysqlType(const DataStruct::DataMember & m)
         }
         return " bigint(20) unsigned NOT NULL DEFAULT '0' ";
     }
-    return " blob ";
+    return " longblob NOT NULL ";
 }
 
 

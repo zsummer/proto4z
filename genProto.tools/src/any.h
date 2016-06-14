@@ -77,6 +77,7 @@ enum MemberTag : short
     MT_DB_IDX,
     MT_DB_AUTO,
     MT_DB_IGNORE,
+    MT_DB_BLOB,
 };
 
 //comment
