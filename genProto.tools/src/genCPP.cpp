@@ -46,6 +46,10 @@ std::string getMysqlType(const DataStruct::DataMember & m)
         }
         return " bigint(20) unsigned NOT NULL DEFAULT '0' ";
     }
+    else if (m._type == "float" || m._type == "double")
+    {
+        return " double NOT NULL DEFAULT '0' ";
+    }
     return " longblob NOT NULL ";
 }
 

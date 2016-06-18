@@ -126,9 +126,9 @@ std::list<AnyData> parseProto(std::string fileName, ParseCache & cache)
                 {
                     E("Attribute Error. ");
                 }
-                dc._type = ele->Attribute("type");
-                dc._name = ele->Attribute("name");
-                dc._value = ele->Attribute("value");
+                dc._type = trim(ele->Attribute("type"));
+                dc._name = trim(ele->Attribute("name"));
+                dc._value = trim(ele->Attribute("value"));
                 
                 if (ele->Attribute("desc"))
                 {
@@ -148,14 +148,14 @@ std::list<AnyData> parseProto(std::string fileName, ParseCache & cache)
                 {
                     E("Attribute Error. ");
                 }
-                enumData._enum._type = ele->Attribute("type");
+                enumData._enum._type = trim(ele->Attribute("type"));
                 if (ele->Attribute("name"))
                 {
-                    enumData._enum._name = ele->Attribute("name");
+                    enumData._enum._name = trim(ele->Attribute("name"));
                 }
                 if (ele->Attribute("desc"))
                 {
-                    enumData._enum._desc = ele->Attribute("desc");
+                    enumData._enum._desc = trim(ele->Attribute("desc"));
                 }
                 
                 XMLElement * member = ele->FirstChildElement("member");
@@ -171,10 +171,10 @@ std::list<AnyData> parseProto(std::string fileName, ParseCache & cache)
                         E("Attribute Error. ");
                     }
                     dc._type = enumData._enum._type;
-                    dc._name = member->Attribute("name");
+                    dc._name = trim(member->Attribute("name"));
                     if (member->Attribute("value"))
                     {
-                        int v = atoi(member->Attribute("value"));
+                        int v = atoi(trim(member->Attribute("value")).c_str());
                         if (v < lastID)
                         {
                             E("enum value is invalid.");
@@ -200,8 +200,8 @@ std::list<AnyData> parseProto(std::string fileName, ParseCache & cache)
                 {
                     E("Attribute Error. ");
                 }
-                ar._type = ele->Attribute("type");
-                ar._arrayName = ele->Attribute("name");
+                ar._type = trim(ele->Attribute("type"));
+                ar._arrayName = trim(ele->Attribute("name"));
                 if (ele->Attribute("desc"))
                 {
                     ar._desc = ele->Attribute("desc");
@@ -219,9 +219,9 @@ std::list<AnyData> parseProto(std::string fileName, ParseCache & cache)
                 {
                     E("Attribute Error. ");
                 }
-                dm._typeKey = ele->Attribute("key");
-                dm._typeValue = ele->Attribute("value");
-                dm._mapName = ele->Attribute("name");
+                dm._typeKey = trim(ele->Attribute("key"));
+                dm._typeValue = trim(ele->Attribute("value"));
+                dm._mapName = trim(ele->Attribute("name"));
                 if (ele->Attribute("desc"))
                 {
                     dm._desc = ele->Attribute("desc");
@@ -275,8 +275,8 @@ std::list<AnyData> parseProto(std::string fileName, ParseCache & cache)
                     {
                         E("Attribute Error. ");
                     }
-                    dm._type = member->Attribute("type");
-                    dm._name = member->Attribute("name");
+                    dm._type = trim(member->Attribute("type"));
+                    dm._name = trim(member->Attribute("name"));
                     dm._tag = MT_NORMAL;
                     if (member->Attribute("tag"))
                     {
