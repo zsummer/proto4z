@@ -374,7 +374,7 @@ std::string GenCPP::genDataPacket(const DataPacket & dp)
                 {
                     text += "    try" + LFCR;
                     text += "    {" + LFCR;
-                    text += "        "  "zsummer::proto4z::WriteStream ws(" + m._name + ".getProtoID());" + LFCR;
+                    text += "        "  "zsummer::proto4z::WriteStream ws(0);" + LFCR;
                     text += "        "  "ws <<  this->" + m._name + ";" + LFCR;
                     text += "        "  "q.add(ws.getStreamBody(), ws.getStreamBodyLen());" + LFCR;
                     text += "    }" + LFCR;
