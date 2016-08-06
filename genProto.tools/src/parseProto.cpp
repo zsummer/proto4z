@@ -104,7 +104,7 @@ std::list<AnyData> parseProto(std::string fileName, ParseCache & cache)
     } while (0);
     LOGI("parseConfig [" << filename << "] NextNumber=" << cache.getCurrentProtoID() << ", minProtoNo=" << minProtoID << ", maxProtoNo=" << maxProtoID);
 
-
+    if (true)
     {
         XMLElement * ele = doc.FirstChildElement("Proto");
         if (ele == NULL)
@@ -259,9 +259,9 @@ std::list<AnyData> parseProto(std::string fileName, ParseCache & cache)
                 dp._struct._hadLog4z = hadLog4z;
 
                 dp._const._type = ProtoIDType;
-                dp._const._name = "ID_" + dp._struct._name;
+                dp._const._name = dp._struct._name;
                 dp._const._desc = dp._struct._desc;
-                dp._const._value = toString(cache.genProtoID(dp._const._name, minProtoID, maxProtoID));
+                dp._const._value = toString(cache.genProtoID(dp._struct._name, minProtoID, maxProtoID));
 
                 XMLElement * member = ele->FirstChildElement("member");
                 do

@@ -62,7 +62,7 @@ class ParseCache
     std::string _md5Cache[SL_END];
     //cache data
     unsigned short _currentProtoID = 0;
-
+public:
     std::map<std::string, unsigned short> _cacheNumber;
 public:
     void parse(std::string filename);

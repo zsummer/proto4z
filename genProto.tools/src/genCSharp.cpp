@@ -360,6 +360,72 @@ std::string GenCSharp::genDataPacket(const DataPacket & dp)
 }
 
 
+void writeCSharpReflection(std::map<std::string, unsigned short> & keys)
+{
+    std::string trustName = SupportLanguageFilePath[SL_CSHARP];
+    trustName += "/Proto4zReflection";
+    trustName += SupportLanguageFileSuffix[SL_CSHARP];
+    std::string content;
+    content += R"---OOO(
+namespace Proto4z
+{
+    static class Reflection
+    {
+        public static ushort getProtoID(string protoName)
+        {
+            try
+            {
+                return _nameToID[protoName];
+            }
+            catch (System.Exception)
+            {
+            }
+            return 0;
+        }
+        public static string getProtoName(ushort protoID)
+        {
+            try
+            {
+                return _idToName[protoID];
+            }
+            catch (System.Exception)
+            {
+            }
+            return "unknown";
+        }
+
+        static System.Collections.Generic.Dictionary<string, ushort> _nameToID = new System.Collections.Generic.Dictionary<string, ushort>();
+        static System.Collections.Generic.Dictionary<ushort, string> _idToName = new System.Collections.Generic.Dictionary<ushort, string>();
+        static Reflection()
+        {
+        
+
+                    )---OOO";
+
+
+    content += "\r\n";
+    for (auto & kv : keys)
+    {
+        content += "            _nameToID.Add(\"" + kv.first + "\", " + toString(kv.second) + ");\r\n";
+        content += "            _idToName.Add(" + toString(kv.second) + ", \"" + kv.first + "\");\r\n";
+    }
+
+
+    content += R"---OOO(
+        }
+    }
+}
+
+
+)---OOO";
+
+
+
+    if (writeFileContent(trustName, content.c_str(), content.length(), false) != content.length())
+    {
+        E("writeCSharpReflection open file Error ");
+    }
+}
 
 
 

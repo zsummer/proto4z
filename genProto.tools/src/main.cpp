@@ -21,30 +21,32 @@ int main(int argc, char *argv[])
     }
     try
     {
+        std::map<std::string, unsigned short> _cacheKeys;
         for (auto & file : files)
         {
             std::string filename = subStringWithoutBack(file.filename, ".");
             ParseCache cache;
             cache.parse(filename);
-            if (!cache.isNeedUpdate())
+            if (cache.isNeedUpdate())
             {
-                continue;
-            }
-            auto stores = parseProto(filename, cache);
-            for (int i = SL_NORMAL + 1; i < SL_END; i++)
-            {
-                auto gen = createGenerate((SupportLanguageType)i);
-                if (!gen)
+                auto stores = parseProto(filename, cache);
+                for (int i = SL_NORMAL + 1; i < SL_END; i++)
                 {
-                    continue;
+                    auto gen = createGenerate((SupportLanguageType)i);
+                    if (!gen)
+                    {
+                        continue;
+                    }
+                    gen->init(filename, (SupportLanguageType)i);
+                    auto content = gen->genRealContent(stores);
+                    gen->write(content);
+                    destroyGenerate(gen);
                 }
-                gen->init(filename, (SupportLanguageType)i);
-                auto content = gen->genRealContent(stores);
-                gen->write(content);
-                destroyGenerate(gen);
+                cache.write();
             }
-            cache.write();
+            _cacheKeys.insert(cache._cacheNumber.begin(), cache._cacheNumber.end());
         }
+        writeCSharpReflection(_cacheKeys);
     }
     catch (const std::exception & e)
     {

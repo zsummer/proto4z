@@ -58,7 +58,7 @@ protected:
 };
 
 
-
+void writeCSharpReflection(std::map<std::string, unsigned short> & keys);
 #endif
 
 
