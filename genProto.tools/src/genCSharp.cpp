@@ -360,10 +360,10 @@ std::string GenCSharp::genDataPacket(const DataPacket & dp)
 }
 
 
-void writeCSharpReflection(std::map<std::string, unsigned short> & keys)
+void writeCSharpReflection(std::map<std::string, unsigned short> & keys, std::map<std::string, std::string> & errCodes)
 {
     std::string trustName = SupportLanguageFilePath[SL_CSHARP];
-    trustName += "/Proto4zReflection";
+    trustName += "/ProtoReflection";
     trustName += SupportLanguageFileSuffix[SL_CSHARP];
     std::string content;
     content += R"---OOO(
@@ -391,11 +391,22 @@ namespace Proto4z
             catch (System.Exception)
             {
             }
-            return "unknown";
+            return "UnknownProtoID_" + protoID;
         }
-
+        public static string getErrorDesc(ushort errCode)
+        {
+            try
+            {
+                return _errCodes[errCode];
+            }
+            catch (System.Exception)
+            {
+            }
+            return "UnknownErrorCode_" + errCode;
+        }
         static System.Collections.Generic.Dictionary<string, ushort> _nameToID = new System.Collections.Generic.Dictionary<string, ushort>();
         static System.Collections.Generic.Dictionary<ushort, string> _idToName = new System.Collections.Generic.Dictionary<ushort, string>();
+        static System.Collections.Generic.Dictionary<ushort, string> _errCodes = new System.Collections.Generic.Dictionary<ushort, string>();
         static Reflection()
         {
         
@@ -409,7 +420,10 @@ namespace Proto4z
         content += "            _nameToID.Add(\"" + kv.first + "\", " + toString(kv.second) + ");\r\n";
         content += "            _idToName.Add(" + toString(kv.second) + ", \"" + kv.first + "\");\r\n";
     }
-
+    for (auto & kv : errCodes)
+    {
+        content += "            _errCodes.Add(" + toString(kv.first) + ", \"" + kv.second + "\");\r\n";
+    }
 
     content += R"---OOO(
         }

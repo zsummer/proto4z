@@ -574,17 +574,85 @@ std::string GenCPP::genDataPacket(const DataPacket & dp)
     {
         text += "inline zsummer::log4z::Log4zStream & operator << (zsummer::log4z::Log4zStream & stm, const " + dp._struct._name + " & info)" + LFCR;
         text += "{" + LFCR;
-        text += "    stm << \"[\\n\";" + LFCR;
+        text += "    stm << \"[\";" + LFCR;
         for (const auto &m : dp._struct._members)
         {
-            text += "    stm << \"" + m._name + "=\"" + " << info." + m._name + " << \"\\n\";" + LFCR;
+            text += "    stm << \"" + m._name + "=\"" + " << info." + m._name + " << \",\";" + LFCR;
         }
-        text += "    stm << \"]\\n\";" + LFCR;
+        text += "    stm << \"]\";" + LFCR;
         text += "    return stm;" + LFCR;
         text += "}" + LFCR;
     }
     return text;
 }
 
+
+
+void writeCPPReflection(std::map<std::string, unsigned short> & keys, std::map<std::string, std::string> & errCodes)
+{
+    std::string trustName = SupportLanguageFilePath[SL_CPP];
+    trustName += "/ProtoReflection";
+    trustName += SupportLanguageFileSuffix[SL_CPP];
+    std::string content;
+    content.push_back((char)(unsigned char)0xef);
+    content.push_back((char)(unsigned char)0xbb);
+    content.push_back((char)(unsigned char)0xbf);
+    content += R"---OOO(
+#ifndef _ProtoReflection_H_ 
+#define _ProtoReflection_H_ 
+class ProtoReflection
+{
+public:
+    static std::string getProtoName(ui16 protoID)
+    {
+        switch (protoID)
+        {
+            case 0:
+            {
+                return "InvalidProtoID";
+            }
+            break;
+)---OOO";
+    for (auto & kv : keys)
+    {
+        content += "            case " + toString(kv.second) + ":\r\n            {\r\n                   return \"" + kv.first + "\";\r\n            }\r\n            break;\r\n";
+    }
+    content += R"---OOO(
+        }
+        char buf[20];
+        printf(buf, protoID);
+        return std::string("UnknownProtoID_") + buf;
+    }
+)---OOO";
+
+    content += R"---OOO(
+    static std::string getErrorDesc(ui16 errCode)
+    {
+        switch (errCode)
+        {
+)---OOO";
+    for (auto & kv : errCodes)
+    {
+        content += "            case " + toString(kv.first) + ":\r\n            {\r\n                   return \"" + kv.second + "\";\r\n            }\r\n            break;\r\n";
+    }
+    content += R"---OOO(
+        }
+        char buf[20];
+        printf(buf, errCode);
+        return std::string("UnknownErrorCode_") + buf;
+    }
+};
+
+#endif
+
+
+)---OOO";
+
+
+    if (writeFileContent(trustName, content.c_str(), content.length(), false) != content.length())
+    {
+        E("writeCSharpReflection open file Error ");
+    }
+}
 
 

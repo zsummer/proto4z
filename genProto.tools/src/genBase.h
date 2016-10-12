@@ -58,7 +58,8 @@ protected:
 };
 
 
-void writeCSharpReflection(std::map<std::string, unsigned short> & keys);
+void writeCSharpReflection(std::map<std::string, unsigned short> & keys, std::map<std::string, std::string> & errCodes);
+void writeCPPReflection(std::map<std::string, unsigned short> & keys, std::map<std::string, std::string> & errCodes);
 #endif
 
 

@@ -6,7 +6,8 @@
 #include "genBase.h"
 #include "parseCache.h"
 #include "parseProto.h"
-
+std::map<std::string, unsigned short> _cacheKeys;
+std::map<std::string, std::string> _errCodes;
 //#define __WITH_TAG
 int main(int argc, char *argv[])
 {
@@ -21,7 +22,7 @@ int main(int argc, char *argv[])
     }
     try
     {
-        std::map<std::string, unsigned short> _cacheKeys;
+        bool updateReflection = false;
         for (auto & file : files)
         {
             std::string filename = subStringWithoutBack(file.filename, ".");
@@ -29,6 +30,7 @@ int main(int argc, char *argv[])
             cache.parse(filename);
             if (cache.isNeedUpdate())
             {
+                updateReflection = true;
                 auto stores = parseProto(filename, cache);
                 for (int i = SL_NORMAL + 1; i < SL_END; i++)
                 {
@@ -44,9 +46,28 @@ int main(int argc, char *argv[])
                 }
                 cache.write();
             }
+            if (true)
+            {
+                auto stores = parseProto(filename, cache);
+                for (auto & store : stores)
+                {
+                    if (store._type == GT_DataEnum && trim(store._enum._name) == "ERROR_CODE")
+                    {
+                        for (auto & kv : store._enum._members)
+                        {
+                            _errCodes[kv._value] = kv._desc;
+                        }
+                    }
+                }
+            }
             _cacheKeys.insert(cache._cacheNumber.begin(), cache._cacheNumber.end());
         }
-        writeCSharpReflection(_cacheKeys);
+        if (updateReflection)
+        {
+            writeCSharpReflection(_cacheKeys, _errCodes);
+            writeCPPReflection(_cacheKeys, _errCodes);
+        }
+
     }
     catch (const std::exception & e)
     {
