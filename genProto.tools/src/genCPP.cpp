@@ -588,7 +588,7 @@ std::string GenCPP::genDataPacket(const DataPacket & dp)
 
 
 
-void writeCPPReflection(std::map<std::string, unsigned short> & keys, std::map<std::string, std::string> & errCodes)
+void writeCPPReflection(std::map<unsigned short, std::string> & keys, std::map<unsigned short, std::string> & errCodes)
 {
     std::string trustName = SupportLanguageFilePath[SL_CPP];
     trustName += "/ProtoReflection";
@@ -615,7 +615,7 @@ public:
 )---OOO";
     for (auto & kv : keys)
     {
-        content += "            case " + toString(kv.second) + ":\r\n            {\r\n                   return \"" + kv.first + "\";\r\n            }\r\n            break;\r\n";
+        content += "            case " + toString(kv.first) + ":\r\n            {\r\n                   return \"" + kv.second + "\";\r\n            }\r\n            break;\r\n";
     }
     content += R"---OOO(
         }

@@ -360,7 +360,7 @@ std::string GenCSharp::genDataPacket(const DataPacket & dp)
 }
 
 
-void writeCSharpReflection(std::map<std::string, unsigned short> & keys, std::map<std::string, std::string> & errCodes)
+void writeCSharpReflection(std::map<unsigned short, std::string> & keys, std::map<unsigned short, std::string> & errCodes)
 {
     std::string trustName = SupportLanguageFilePath[SL_CSHARP];
     trustName += "/ProtoReflection";
@@ -417,8 +417,8 @@ namespace Proto4z
     content += "\r\n";
     for (auto & kv : keys)
     {
-        content += "            _nameToID.Add(\"" + kv.first + "\", " + toString(kv.second) + ");\r\n";
-        content += "            _idToName.Add(" + toString(kv.second) + ", \"" + kv.first + "\");\r\n";
+        content += "            _nameToID.Add(\"" + kv.second + "\", " + toString(kv.first) + ");\r\n";
+        content += "            _idToName.Add(" + toString(kv.first) + ", \"" + kv.second + "\");\r\n";
     }
     for (auto & kv : errCodes)
     {

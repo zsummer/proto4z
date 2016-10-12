@@ -6,8 +6,8 @@
 #include "genBase.h"
 #include "parseCache.h"
 #include "parseProto.h"
-std::map<std::string, unsigned short> _cacheKeys;
-std::map<std::string, std::string> _errCodes;
+std::map<unsigned short, std::string> _cacheKeys;
+std::map<unsigned short, std::string> _errCodes;
 //#define __WITH_TAG
 int main(int argc, char *argv[])
 {
@@ -55,12 +55,15 @@ int main(int argc, char *argv[])
                     {
                         for (auto & kv : store._enum._members)
                         {
-                            _errCodes[kv._value] = kv._desc;
+                            _errCodes[fromString<unsigned short>(kv._value, 0)] = kv._desc;
                         }
                     }
                 }
+                for (auto & kv : cache._cacheNumber)
+                {
+                    _cacheKeys[kv.second] = kv.first;
+                }
             }
-            _cacheKeys.insert(cache._cacheNumber.begin(), cache._cacheNumber.end());
         }
         if (updateReflection)
         {
