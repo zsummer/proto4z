@@ -1525,7 +1525,7 @@ inline std::string proto4z_traceback()
     }
     free(stackSymbol);
 #endif
-    return std::move(ss.str());
+    return ss.str();
 }
 
 

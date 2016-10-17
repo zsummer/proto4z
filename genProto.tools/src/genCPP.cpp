@@ -173,7 +173,7 @@ std::string GenCPP::genDataPacket(const DataPacket & dp)
     text += std::string("    static const ") + getRealType("string") + " getProtoName() { return \"" + dp._struct._name + "\";}" + LFCR;
     if (!dp._struct._store.empty())
     {
-        text += "    inline const std::vector<std::string>  getDBBuild();" + LFCR;
+        text += "    inline std::vector<std::string>  getDBBuild();" + LFCR;
         text += "    inline std::string  getDBInsert();" + LFCR;
         text += "    inline std::string  getDBDelete();" + LFCR;
         text += "    inline std::string  getDBUpdate();" + LFCR;
@@ -230,7 +230,7 @@ std::string GenCPP::genDataPacket(const DataPacket & dp)
     {
         //build
         text += LFCR;
-        text += "const std::vector<std::string>  " + dp._struct._name + "::getDBBuild()" + LFCR;
+        text += "std::vector<std::string>  " + dp._struct._name + "::getDBBuild()" + LFCR;
         text += "{" + LFCR;
         text += "    std::vector<std::string> ret;" + LFCR;
 //        text += "    ret.push_back(\"desc " + dbtable + "\");" + LFCR;
@@ -276,7 +276,7 @@ std::string GenCPP::genDataPacket(const DataPacket & dp)
                 text += "    ret.push_back(\"alter table `tb_" + dp._struct._name + "` change `" + m._name + "` " + " `" + m._name + "` " + getMysqlType(m) + "\");" + LFCR;
             }
         }
-        text += "    return std::move(ret);" + LFCR;
+        text += "    return ret;" + LFCR;
         text += "}" + LFCR;
 
         //select
