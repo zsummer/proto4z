@@ -23,49 +23,270 @@
 #define _UTLS_IMPL_H_
 
 
-
 //string
 template<class T>
 std::string toString(const T &t)
 {
     std::stringstream os;
+    os.precision(16);
     os << t;
     return os.str();
 }
 
 
-template<class RET>
-RET fromString(const std::string & t, RET def)
+
+
+template<class To>
+typename std::enable_if<std::is_floating_point<To>::value, To>::type fromString(const std::string & t, To def)
 {
     if (t.empty()) return def;
-    if (typeid(RET) == typeid(float) || typeid(RET) == typeid(double))
-    {
-        return (RET)atof(t.c_str());
-    }
-    else if (typeid(RET) == typeid(unsigned long long))
-    {
-
-        char *cursor = nullptr;
-        return (RET)strtoull(t.c_str(), &cursor, 10);
-    }
-    return (RET)atoll(t.c_str());
+    return (To)atof(t.c_str());
+}
+template<class To>
+typename std::enable_if<std::is_floating_point<To>::value, To>::type fromString(const std::string & t)
+{
+    return (To)atof(t.c_str());
 }
 
-inline double getTick()
+template<class To>
+typename std::enable_if<std::is_integral<To>::value, To>::type fromString(const std::string & t, To def)
+{
+    if (t.empty()) return def;
+    if (t.length()>= 19)
+    {
+        if (typeid(To) == typeid(unsigned long long))
+        {
+            char *cursor = nullptr;
+            return (To)strtoull(t.c_str(), &cursor, 10);
+        }
+    }
+    return (To)atoll(t.c_str());
+}
+
+template<class To>
+typename std::enable_if<std::is_integral<To>::value, To>::type fromString(const std::string & t)
+{
+    if (t.length() >= 19)
+    {
+        if (typeid(To) == typeid(unsigned long long))
+        {
+            char *cursor = nullptr;
+            return (To)strtoull(t.c_str(), &cursor, 10);
+        }
+    }
+    return (To)atoll(t.c_str());
+}
+
+template<class To>
+typename std::enable_if<std::is_pointer<To>::value, To>::type fromString(const std::string & t, To def)
+{
+    if (t.empty()) return def;
+    return t.c_str();
+}
+template<class To>
+typename std::enable_if<std::is_pointer<To>::value, To>::type fromString(const std::string & t)
+{
+    return t.c_str();
+}
+
+template<class To>
+typename std::enable_if<std::is_class<To>::value, To>::type fromString(const std::string & t, To def)
+{
+    if (t.empty()) return def;
+    return t;
+}
+template<class To>
+typename std::enable_if<std::is_class<To>::value, To>::type fromString(const std::string & t)
+{
+    return t;
+}
+
+template<class To>
+typename std::enable_if<std::is_class<To>::value, To>::type fromString(std::string && t, To def)
+{
+    if (t.empty()) return def;
+    return std::move(t);
+}
+template<class To>
+typename std::enable_if<std::is_class<To>::value, To>::type fromString(std::string && t)
+{
+    return std::move(t);
+}
+
+
+template<class _Tuple>
+void splitTupleStringImpl(_Tuple & ret, const std::string & text, const std::string & deli, const std::string & ign)
+{
+}
+
+template<class _Tuple, class _This, class ... _Rest>
+void splitTupleStringImpl(_Tuple & ret, const std::string & text, const std::string & deli, const std::string & ign)
+{
+    std::size_t which = std::tuple_size<_Tuple>::value - 1 - sizeof ...(_Rest);
+    std::size_t firstCursor = 0;
+    std::size_t secondCursor = 0;
+    std::size_t curFinder = 0;
+    while (curFinder <= which)
+    {
+        auto pos = text.find(deli, firstCursor);
+        if (curFinder < which &&  pos == std::string::npos)
+        {
+            // not found
+            return;
+        }
+        else if (curFinder < which)
+        {
+            curFinder++;
+            firstCursor = pos + deli.size();
+        }
+        else
+        {
+            secondCursor = pos;
+            break;
+        }
+    }
+    std::get< std::tuple_size<_Tuple>::value - 1 - sizeof ...(_Rest) >(ret) = fromString<_This>(trim(text.substr(firstCursor, secondCursor - firstCursor), ign));
+    splitTupleStringImpl<_Tuple, _Rest ...>(ret, text, deli, ign);
+}
+
+
+
+
+template<class ... T>
+typename std::enable_if<std::is_integral<int>::value, std::tuple<T ... >>::type splitTupleString(const std::string & text, const std::string & deli, const std::string & ign)
+{
+    std::tuple<T ... > ret;
+    splitTupleStringImpl<std::tuple<T ... >, T ...>(ret, text, deli, ign);
+    return ret;
+}
+
+template<class First, class Second>
+typename std::enable_if<std::is_integral<int>::value, std::pair<First, Second>>::type splitPairString(const std::string & str, const std::string & delimiter)
+{
+    auto tp = splitTupleString<First, Second>(str, delimiter, "");
+    return std::make_pair(std::get<0>(tp), std::get<1>(tp));
+}
+
+
+template<class ... T>
+typename std::enable_if<std::is_integral<int>::value, std::vector<std::tuple<T ...> >>::type
+splitArrayString(const std::string & text, const std::string & deli, const std::string & deliMeta, const std::string & ign)
+{
+    std::vector<std::tuple<T ...> > ret;
+    size_t beginPos = 0;
+    std::string matched;
+    for (size_t i = 0; i < text.length(); i++)
+    {
+        if ((matched.empty() && text[i] == deli[0]) || !matched.empty())
+        {
+            matched.push_back(text[i]);
+        }
+        if (matched == deli)
+        {
+            auto one = trim(text.substr(beginPos, i + 1 - deli.length() - beginPos), ign);
+            if (!one.empty())
+            {
+                ret.push_back(splitTupleString<T...>(one, deliMeta, ign));
+            }
+            beginPos = i + 1;
+            matched.clear();
+        }
+    }
+    auto one = trim(text.substr(beginPos, text.length() - beginPos), ign);
+    if (!one.empty())
+    {
+        ret.push_back(splitTupleString<T...>(std::move(one), deliMeta, ign));
+    }
+    return std::move(ret);
+}
+
+
+template<class Key, class ... T>
+typename std::enable_if<std::is_integral<int>::value, std::map<Key, std::tuple<Key, T ...> >>::type
+splitDictString(const std::string & text, const std::string & deli, const std::string & deliMeta, const std::string & ign)
+{
+    std::map<Key, std::tuple<Key, T ...> > ret;
+    size_t beginPos = 0;
+    std::string matched;
+    for (size_t i = 0; i < text.length(); i++)
+    {
+        if ((matched.empty() && text[i] == deli[0]) || !matched.empty())
+        {
+            matched.push_back(text[i]);
+        }
+        if (matched == deli)
+        {
+            auto one = trim(text.substr(beginPos, i + 1 - deli.length() - beginPos), ign);
+            if (!one.empty())
+            {
+                auto tp = splitTupleString<Key, T...>(one, deliMeta, ign);
+                auto k = std::get<0>(tp);
+                auto founder = ret.find(k);
+                if (founder == ret.end())
+                {
+                    ret.insert(std::make_pair(k, std::move(tp)));
+                }
+                else
+                {
+                    founder->second = std::move(tp);
+                }
+            }
+            beginPos = i + 1;
+            matched.clear();
+        }
+    }
+    auto one = trim(text.substr(beginPos, text.length() - beginPos), ign);
+    if (!one.empty())
+    {
+        auto tp = splitTupleString<Key, T...>(one, deliMeta, ign);
+        auto k = std::get<0>(tp);
+        ret[k] = std::move(tp);
+    }
+    return std::move(ret);
+}
+
+
+
+template<class Value>
+typename std::enable_if<std::is_integral<int>::value, std::vector<Value>>::type
+splitString(std::string text, const std::string & deli, const std::string & ign)
+{
+    std::vector<Value> ret;
+    size_t beginPos = 0;
+    std::string matched;
+    for (size_t i = 0; i < text.length(); i++)
+    {
+        if ((matched.empty() && text[i] == deli[0]) || !matched.empty())
+        {
+            matched.push_back(text[i]);
+        }
+        if (matched == deli)
+        {
+            ret.push_back(fromString<Value>(trim(text.substr(beginPos, i + 1 - deli.length() - beginPos), ign)));
+            beginPos = i + 1;
+            matched.clear();
+        }
+    }
+    ret.push_back(fromString<Value>(trim(text.substr(beginPos, text.length() - beginPos), ign)));
+    return std::move(ret);
+}
+
+
+inline double getFloatNowTime()
 {
     return std::chrono::duration_cast<std::chrono::duration<double>>(std::chrono::system_clock::now().time_since_epoch()).count();
 }
-inline double getSteadyTick()
+inline double getFloatSteadyNowTime()
 {
     return std::chrono::duration_cast<std::chrono::duration<double>>(std::chrono::steady_clock::now().time_since_epoch()).count();
 }
 
-inline long long getMSecTick()
+inline long long getNowTick()
 {
     return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 }
 
-inline long long getSteadyMSecTick()
+inline long long getNowSteadyTick()
 {
     return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now().time_since_epoch()).count();
 }
@@ -80,28 +301,11 @@ inline time_t getTZZoneOffset()
     tm tm = gettm(fixday);
     return ((tm.tm_mday - 1) * 24 + tm.tm_hour) * 3600 - fixday;
 }
-inline time_t getLocalDay(time_t t, time_t offset)
-{
-    time_t fix = getTZZoneOffset();
-    return (t + fix + offset) / 24 / 3600;
-}
-inline time_t getLocalDay(time_t offset)
-{
-    return getLocalDay(getUTCTime(), offset);
-}
 inline time_t getDaySecond(time_t t)
 {
     return (t + getTZZoneOffset()) % (24 * 3600);
 }
-inline time_t getLocalDayByReadable(time_t t, time_t offset)
-{
-    tm st = gettm(t);
-    return (st.tm_year + 1900) * 10000 + (st.tm_mon + 1) * 100 + st.tm_mday;
-}
-inline time_t getLocalDayByReadable(time_t offset)
-{
-    return getLocalDayByReadable(getUTCTime(), offset);
-}
+
 //safe method for get tm from unix timestamp
 // 
 // struct tm {
@@ -175,7 +379,10 @@ inline bool isSameDay(time_t first, time_t second, time_t offset)
     return ftm.tm_year == stm.tm_year && ftm.tm_yday == stm.tm_yday;
 }
 
-
+inline int distanceDays(time_t first, time_t second)
+{
+    return (int)std::abs((long long)(second - getDaySecond(second)) - (long long)(first - getDaySecond(first))) / 3600 / 24;
+}
 
 
 
@@ -184,11 +391,10 @@ inline bool isZero(double f, double acc)
     return fabs(f) < acc;
 }
 
-using std::max;
-using std::min;
+
 inline bool isEqual(double f1, double f2, double acc)
 {
-    return fabs(f1 - f2) <= max(fabs(f1), fabs(f2)) * acc;
+    return fabs(f1 - f2) <= std::max(fabs(f1), fabs(f2)) * acc;
 }
 
 
@@ -276,32 +482,16 @@ inline void randomShuffle(RandIt first, RandIt end)
     std::random_shuffle(first, end);
 }
 
-template<class RandIt>
-inline std::vector<RandIt> raffle(RandIt first, RandIt end, int takeCount)
-{
-    std::vector<RandIt> temp;
-    temp.reserve(128);
-    if (true)
-    {
-        auto cur = first;
-        while (cur != end)
-        {
-            temp.push_back(cur);
-            cur++;
-        }
-    }
-    randomShuffle(temp.begin(), temp.end());
-    while (temp.size() > (size_t)takeCount)
-    {
-        temp.pop_back();
-    }
-    return std::move(temp);
-}
+
+
+
 
 template<class RandIt, class GetWeightFunc> 
-inline std::vector<RandIt> raffle(RandIt first, RandIt end, int takeCount, GetWeightFunc getWeight)
+inline std::vector<RandIt> raffle(RandIt first, RandIt end, int takeCount, bool uniqueTake, GetWeightFunc getWeight)
 {
     std::vector<std::pair<RandIt, int> > temp;
+    std::vector<RandIt> ret;
+    ret.reserve(takeCount);
     temp.reserve(128);
     int sumWeight = 0;
     if (true)
@@ -310,36 +500,62 @@ inline std::vector<RandIt> raffle(RandIt first, RandIt end, int takeCount, GetWe
         while (cur != end)
         {
             int curWeight = getWeight(cur);
-            curWeight = curWeight >= 0 ? curWeight : 0;
-            sumWeight += curWeight;
-            temp.push_back(std::make_pair(cur, curWeight));
+            if (curWeight > 0)
+            {
+                sumWeight += curWeight;
+                temp.push_back(std::make_pair(cur, curWeight));
+            }
             cur++;
         }
     }
-    std::vector<RandIt> ret;
-    while (ret.size() < (size_t)takeCount && ret.size() < temp.size())
+    
+    size_t curTakeCount = 0;
+    while (sumWeight > 0 && temp.size() > 0 && curTakeCount < (size_t)takeCount)
     {
-        int rd = realRand() % (sumWeight+1);
+        curTakeCount++;
+        int rd = realRand() % (sumWeight);
         int curWeight = 0;
-        for (auto &v: temp)
+        for (auto iter = temp.begin(); iter != temp.end();)
         {
-            if (v.second < 0)
-            {
-                continue;
-            }
+            auto & v = *iter;
             curWeight += v.second;
-            if (rd <= curWeight)
+            if (rd < curWeight)
             {
                 ret.push_back(v.first);
-                sumWeight -= v.second;
-                v.second = -1;
+                if (uniqueTake)
+                {
+                    sumWeight -= v.second;
+                    temp.erase(iter);
+                }
                 break;
             }
+            iter++;
         }
     }
     return std::move(ret);
 }
 
+template<class RandIt, class GetProbabilityFunc> // func example  [](RandIt iter){return iter->probability;}
+inline std::vector<RandIt> raffle(RandIt first, RandIt end, int takeCount, GetProbabilityFunc getProbability)
+{
+    std::vector<RandIt> ret;
+    ret.reserve(takeCount);
+    auto cur = first;
+    while (cur != end)
+    {
+        double prob = getProbability(cur);
+        for (int i=0; i<takeCount; i++)
+        {
+            double rd = realRandF();
+            if (rd < prob)
+            {
+                ret.push_back(cur);
+            }
+        }
+        cur++;
+    }
+    return std::move(ret);
+}
 
 inline double calcELORatingUpper(double ownerScore, double dstScore, int winFlag)
 {
@@ -366,7 +582,7 @@ std::string mergeToString(const Container & contariner, const std::string& deli)
             ret.pop_back();
         }
     }
-    return std::move(ret);
+    return ret;
 }
 
 template<class T>  //example: Container = std::vector<int>

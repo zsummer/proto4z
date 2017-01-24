@@ -10,17 +10,22 @@
 
 void ParseCache::parse(std::string filename)
 {
-    _fileName = filename;
-    std::string configFile = filename + ".xml.cache";
-    if (!accessFile(configFile))
+    _configPath = ".";
+    _configFileName = filename;
+    _cacheFile = _configPath + "/.cache/" + _configFileName + ".xml.cache";
+    if (!isDirectory("./.cache"))
     {
-        LOGW("ParseCache::parse [" << configFile << " not found.");
+        createDirectory("./.cache");
+    }
+    if (!accessFile(_cacheFile))
+    {
+        LOGW("ParseCache::parse [" << _cacheFile << " not found.");
         return;
     }
     tinyxml2::XMLDocument doc;
-    if (doc.LoadFile(configFile.c_str()) != tinyxml2::XML_SUCCESS)
+    if (doc.LoadFile(_cacheFile.c_str()) != tinyxml2::XML_SUCCESS)
     {
-        E(" ParseCache::parse Error. configFile=" << configFile << ", err1=" << doc.GetErrorStr1() << ", err2" << doc.GetErrorStr2());
+        E(" ParseCache::parse Error. configFile=" << _cacheFile << ", err1=" << doc.GetErrorStr1() << ", err2" << doc.GetErrorStr2());
     }
 
     for (int i = SL_NORMAL+1; i < SL_END; i++)
@@ -35,7 +40,7 @@ void ParseCache::parse(std::string filename)
     XMLElement * cacheEles = doc.FirstChildElement("cacheNumber");
     if (cacheEles == NULL)
     {
-        LOGW("ParseCache::parse can not found cacheNumber. configFile=" << configFile);
+        LOGW("ParseCache::parse can not found cacheNumber. configFile=" << _cacheFile);
         return ;
     }
 
@@ -50,14 +55,14 @@ void ParseCache::parse(std::string filename)
         const char * number = next->Attribute("Number");
         if (key == NULL || number == NULL)
         {
-            E("ParseCache::parse cache number is invalid. configFile=" << configFile);
+            E("ParseCache::parse cache number is invalid. configFile=" << _cacheFile);
         }
 
 
         auto founder = _cacheNumber.find(key);
         if (founder != _cacheNumber.end())
         {
-            E("ParseCache::parse dumplicate key on " << key << " from " << configFile);
+            E("ParseCache::parse dumplicate key on " << key << " from " << _cacheFile);
         }
         _cacheNumber[key] = atoi(number);
 
@@ -71,19 +76,19 @@ void ParseCache::parse(std::string filename)
 }
 bool   ParseCache::write()
 {
-    std::string filename = _fileName + ".xml.cache";
-    LOGI("writeCache [" << filename );
+    LOGI("writeCache [" << _cacheFile);
+
     std::string text = "<?xml version=\"1.0\" encoding=\"UTF - 8\"?>\n\n";
     for (int i = SL_NORMAL + 1; i < SL_END; i++)
     {
         std::string md5;
         if (i != SL_XML)
         {
-            md5 = genFileMD5(std::string("./") + SupportLanguageFilePath[i] + "/" + _fileName + SupportLanguageFileSuffix[i]);
+            md5 = genFileMD5(_configPath + "/" + SupportLanguageFilePath[i] + "/" + _configFileName + SupportLanguageFileSuffix[i]);
         }
         else
         {
-            md5 = genFileMD5(std::string("./") + _fileName + SupportLanguageFileSuffix[i]);
+            md5 = genFileMD5(_configPath + "/" + _configFileName + SupportLanguageFileSuffix[i]);
         }
         text += std::string() + "<" + SupportLanguageString[i] + ">";
         text += md5;
@@ -97,9 +102,9 @@ bool   ParseCache::write()
         text += "    <cache key = \"" + pr.first +"\" Number = \"" + toString(pr.second) + "\" /> \n";
     }
     text += "</cacheNumber>\n";
-    if (writeFileContent(filename, text.c_str(), text.length(), false) != text.length())
+    if (writeFileContent(_cacheFile, text.c_str(), text.length(), false) != text.length())
     {
-        LOGE("write cache file error. filename=" << filename);
+        LOGE("write cache file error. filename=" << _cacheFile);
     }
     return true;
 }
@@ -115,11 +120,11 @@ bool ParseCache::isNeedUpdate()
         std::string md5;
         if (i != SL_XML)
         {
-            md5 = genFileMD5(std::string("./") + SupportLanguageFilePath[i] + "/" + _fileName + SupportLanguageFileSuffix[i]);
+            md5 = genFileMD5(_configPath + "/" + SupportLanguageFilePath[i] + "/" + _configFileName + SupportLanguageFileSuffix[i]);
         }
         else
         {
-            md5 = genFileMD5(std::string("./") + _fileName + SupportLanguageFileSuffix[i]);
+            md5 = genFileMD5(_configPath + "/" + _configFileName + SupportLanguageFileSuffix[i]);
         }
         
         if (md5 != _md5Cache[i])

@@ -14,6 +14,8 @@ int main(int argc, char *argv[])
     zsummer::log4z::ILog4zManager::getRef().setLoggerFileLine(LOG4Z_MAIN_LOGGER_ID, false);
     zsummer::log4z::ILog4zManager::getRef().setLoggerOutFile(LOG4Z_MAIN_LOGGER_ID, false);
     zsummer::log4z::ILog4zManager::getRef().start();
+
+
     std::vector<SearchFileInfo> files;
     if (!searchFiles("./*.xml", files, false))
     {
@@ -25,7 +27,7 @@ int main(int argc, char *argv[])
         bool updateReflection = false;
         for (auto & file : files)
         {
-            std::string filename = subStringWithoutBack(file.filename, ".");
+            std::string filename = subString(file.filename, ".", true, true).first;
             ParseCache cache;
             cache.parse(filename);
             if (cache.isNeedUpdate())

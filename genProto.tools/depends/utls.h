@@ -27,6 +27,8 @@
 #pragma warning(disable:4996)
 #pragma warning(disable:4819)
 #define WIN32_LEAN_AND_MEAN
+#include <WS2tcpip.h>
+#include <WinSock2.h>
 #include <windows.h>
 #include <io.h>
 #include <shlwapi.h>
@@ -44,6 +46,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>
+#include <netdb.h>
 #endif 
 
 #ifdef __APPLE__
@@ -75,6 +78,13 @@
 #include <list>
 #include <map>
 
+#ifdef max
+#undef  max
+#endif // max
+
+#ifdef min
+#undef  min
+#endif // min
 
 //file
 //==========================================================================
@@ -112,22 +122,44 @@ std::string genFileMD5(std::string filename);
 //==========================================================================
 template<class T>
 std::string toString(const T &t);
-template<class RET>
-RET fromString(const std::string & t, RET def);
+template<class To>
+typename std::enable_if<std::is_integral<To>::value, To>::type fromString(const std::string & t, To def);
 
 //both 1 left, 2right, 3 both
 std::string trim(const std::string &str, const std::string& ign = " ", int both = 3);
+std::string trim(std::string &&str, const std::string & ign, int both);
 
-std::vector<std::string> splitString(std::string text, const std::string & deli, const std::string & ign);
+template<class First, class Second>
+typename std::enable_if<std::is_integral<int>::value, std::pair<First, Second>>::type splitPairString(const std::string & str, const std::string & delimiter);
+
+
+template<class ... T>
+typename std::enable_if<std::is_integral<int>::value, std::tuple<T ... >>::type splitTupleString(const std::string & text, const std::string & deli, const std::string & ign);
+
+template<class ... T>
+typename std::enable_if<std::is_integral<int>::value, std::vector<std::tuple<T ...> >>::type 
+splitArrayString(const std::string & text, const std::string & deli, const std::string & deliMeta, const std::string & ign);
+
+template<class Key, class ... T>
+typename std::enable_if<std::is_integral<int>::value, std::map<Key, std::tuple<Key, T ...> >>::type 
+splitDictString(const std::string & text, const std::string & deli, const std::string & deliMeta, const std::string & ign);
+
+
+template<class Value>
+typename std::enable_if<std::is_integral<int>::value, std::vector<Value>>::type
+splitString(std::string text, const std::string & deli, const std::string & ign);
+
+
+
 template<class Container>  //example: Container = std::vector<int>
 std::string mergeToString(const Container & contariner, const std::string& deli);
 template<class T>  //example: Container = std::vector<int>
 void mergeToString(std::string & dstString, const std::string& deli, const T & t);
 
-std::string subStringFront(const std::string & text, const std::string & deli);
-std::string subStringBack(const std::string & text, const std::string & deli);
-std::string subStringWithoutFront(const std::string & text, const std::string & deli);
-std::string subStringWithoutBack(const std::string & text, const std::string & deli);
+// text, deli, store text in pair.first when not found deli, greedy search
+std::pair<std::string, std::string> subString(const std::string & text, const std::string & deli, bool preStore = true, bool isGreedy = false);
+
+
 
 std::string toUpperString(std::string  org);
 std::string toLowerString(std::string  org);
@@ -148,10 +180,10 @@ void sleepMillisecond(unsigned int ms);
 
 //----- time check ------
 //check used time. don't used it as datetime.
-inline double getTick();
-inline double getSteadyTick();
-inline long long getMSecTick();
-inline long long getSteadyMSecTick();
+inline double getFloatNowTime();
+inline double getFloatSteadyNowTime();
+inline long long getNowTick();
+inline long long getNowSteadyTick();
 
 //-----date time---------
 //the second through 1900-01-01 00:00:00
@@ -166,17 +198,8 @@ inline time_t getNowTime(){ return getUTCTime(); }
 //  like get server's local datetime in any area client. server date time = localtime(UTC + (server offset - client offset)); 
 //
 inline time_t getTZZoneOffset();
-//the day through 1900-01-01 00:00:00
-inline time_t getLocalDay(time_t offset);
-//the day through 1900-01-01 00:00:00 @ $t
-inline time_t getLocalDay(time_t t, time_t offset);
 //get current second from day begin.
 inline time_t getDaySecond(time_t t);
-//the day through 1900-01-01 00:00:00
-inline time_t getLocalDayByReadable(time_t offset);
-//the day through 1900-01-01 00:00:00 @ $t
-inline time_t getLocalDayByReadable(time_t t, time_t offset);
-
 
 //get struct tm via safe method
 inline tm gettm(time_t ts);
@@ -194,6 +217,8 @@ inline bool isSameYear(time_t first, time_t second, time_t offset = 0);
 inline bool isSameMonth(time_t first, time_t second, time_t offset = 0);
 inline bool isSameWeak(time_t first, time_t second, time_t offset = 0);
 inline bool isSameDay(time_t first, time_t second, time_t offset = 0);
+//
+inline int distanceDays(time_t first, time_t second);
 
 
 //float
@@ -218,7 +243,7 @@ template<class Integer, class Pos>
 inline Integer setBitFlag(Integer bin, Pos pos, bool flag = true);// f [1-32] or [1-64], begin 1 not 0.
 
 
-//rand
+//rand 随机数, 抽卡, 
 //==========================================================================
 //[0-0xffffffff]
 unsigned int realRand();
@@ -230,10 +255,32 @@ double realRandF();
 double realRandF(double mi, double mx);
 template<class RandIt>
 inline void randomShuffle(RandIt first, RandIt end);
-template<class RandIt>
-inline std::vector<RandIt> raffle(RandIt first, RandIt end, int takeCount);
+
+
+
+//从池子里面根据每个元素的权重获取元素.
+//某个元素被抽中的概率是: 该元素的权重/所有元素的权重
+//takeCount为抽取次数, 结果累加到返回集中 
+//uniqueTake为是否允许抽到同一个元素, 如果是false 则每次抽取会移除池子中的已抽取元素. 
+//某个元素的权重为0,则该元素永远不可能被获取到. 
 template<class RandIt, class GetWeightFunc> // func example  [](RandIt iter){return iter->weight;}
-inline std::vector<RandIt> raffle(RandIt first, RandIt end, int takeCount, GetWeightFunc getWeight);
+inline std::vector<RandIt> raffle(RandIt first, RandIt end, int takeCount, bool uniqueTake, GetWeightFunc getWeight);
+template<class RandIt>
+inline std::vector<RandIt> raffle(RandIt first, RandIt end, int takeCount, bool uniqueTake)
+{
+    return raffle(first, end, takeCount, uniqueTake, [](RandIt) {return 10; }); //平均权重 
+}
+
+//和上面的机制不同,根据每个元素的概率进行独立随机 然后加入返回集 
+//某个元素被抽中的概率是: 该元素的概率, 概率为浮点数范围为[0-1]
+//某个元素的概率为0 则该元素永远不可能被获取到
+//某个元素的概率为1 则该元素一定会被获取到 
+//如果所有元素的概率介于0~1之间, 那么一次抽取可能所有元素都会被抽中 也可能一个也没有. 
+template<class RandIt, class GetProbabilityFunc> // func example  [](RandIt iter){return iter->probability;}
+inline std::vector<RandIt> raffle(RandIt first, RandIt end, int takeCount, GetProbabilityFunc getProbability);
+
+
+
 
 //rank,rating
 //==========================================================================
@@ -253,6 +300,15 @@ inline T pruning(T v, T min, T max);
 //==========================================================================
 std::string getProcessID();
 std::string getProcessName();
+
+//need call WSAStartup to init winsock in windows
+//support ipv6 & ipv4, it's will blocking when get host.
+std::string getHostByName(const std::string & name, unsigned short port);
+
+
+
+
+
 
 #include "utlsImpl.h"
 #endif

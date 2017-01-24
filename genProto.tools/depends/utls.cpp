@@ -21,7 +21,8 @@
 #include "md5/md5.h"
 #ifdef WIN32
 #pragma comment(lib, "shlwapi")
-#pragma comment(lib, "User32.lib")
+#pragma comment(lib, "User32")
+#pragma comment(lib, "ws2_32")
 #endif // WIN32
 
 
@@ -58,7 +59,7 @@ std::string readFileContent(const std::string & filename, bool isBinary, size_t 
         limitSize = fileLen - beginIndex;
     }
     
-    fseek(f, beginIndex, SEEK_SET);
+    fseek(f, (long)beginIndex, SEEK_SET);
     std::string ret;
     ret.resize(limitSize, '\0');
     size_t readLen = fread(&ret[0], 1, limitSize, f);
@@ -187,10 +188,10 @@ static bool tmpSearchPath(std::string  path, std::vector<SearchFileInfo> & files
         return false;
     }
     path = fixPathString(path);
-    std::string wildcard = subStringBack(path, "/");
-    if (!wildcard.empty())
+    auto wildcard = subString(path, "/", true, true);
+    if (!wildcard.second.empty())
     {
-        path = subStringWithoutBack(path, "/") + "/";
+        path = wildcard.first + "/";
     }
     
 
@@ -214,13 +215,13 @@ static bool tmpSearchPath(std::string  path, std::vector<SearchFileInfo> & files
                 file.bDir = true;
                 strcpy_s(file.filename, sizeof(file.filename), fd.cFileName);
                 sprintf(file.fullpath, "%s%s", path.c_str(), fd.cFileName);
-                if (wildcard.empty())
+                if (wildcard.second.empty())
                 {
                     files.push_back(file);
                 }
                 if (recursion)
                 {
-                    tmpSearchPath(fixPathString(file.fullpath) + wildcard, files, recursion);
+                    tmpSearchPath(fixPathString(file.fullpath) + wildcard.second, files, recursion);
                 }
                 
             }
@@ -234,7 +235,7 @@ static bool tmpSearchPath(std::string  path, std::vector<SearchFileInfo> & files
             file.filesize += fd.nFileSizeLow;
             strcpy_s(file.filename, sizeof(file.filename), fd.cFileName);
             sprintf(file.fullpath, "%s%s", path.c_str(), fd.cFileName);
-            if (wildcard.empty() || compareStringWildcard(file.filename, wildcard))
+            if (wildcard.second.empty() || compareStringWildcard(file.filename, wildcard.second))
             {
                 files.push_back(file);
             }
@@ -265,13 +266,13 @@ static bool tmpSearchPath(std::string  path, std::vector<SearchFileInfo> & files
             file.filesize = statbuf.st_size;
             strcpy(file.filename, entry->d_name);
             sprintf(file.fullpath, "%s%s", path.c_str(), entry->d_name);
-            if (wildcard.empty())
+            if (wildcard.second.empty())
             {
                 files.push_back(file);
             }
             if (recursion)
             {
-                tmpSearchPath(fixPathString(file.fullpath)+wildcard, files, recursion);
+                tmpSearchPath(fixPathString(file.fullpath)+wildcard.second, files, recursion);
             }
         }
         else
@@ -281,7 +282,7 @@ static bool tmpSearchPath(std::string  path, std::vector<SearchFileInfo> & files
             file.filesize = statbuf.st_size;
             strcpy(file.filename, entry->d_name);
             file.fullpath[0] = '\0';
-            if (wildcard.empty() || compareStringWildcard(file.filename, wildcard))
+            if (wildcard.second.empty() || compareStringWildcard(file.filename, wildcard.second))
             {
                 files.push_back(file);
             }
@@ -338,8 +339,8 @@ void sleepMillisecond(unsigned int ms)
 
 std::string trim(const std::string &str, const std::string & ign, int both)
 {
-    if (str.empty()){ return ""; }
-    if (ign.empty()) return str;
+    if (str.empty() ){ return ""; }
+    if (ign.empty()) { return str; }
     size_t length = str.length();
     size_t posBegin = 0;
     size_t posEnd = 0;
@@ -375,83 +376,95 @@ std::string trim(const std::string &str, const std::string & ign, int both)
     {
         posBegin = 0;
     }
-    
-    if (posBegin < posEnd)
+
+    if (posBegin == 0 && posEnd == length)
+    {
+        return str;
+    }
+    else if (posBegin < posEnd)
     {
         return str.substr(posBegin, posEnd - posBegin);
     }
-
     return "";
 }
-std::vector<std::string> splitString(std::string text, const std::string & deli, const std::string & ign)
+
+
+std::string trim(std::string &&str, const std::string & ign, int both)
 {
-    text = trim(text, ign);
-    std::vector<std::string> ret;
-    if (deli.empty())
+    if (str.empty()) { return ""; }
+    if (ign.empty()) { return std::move(str); }
+    size_t length = str.length();
+    size_t posBegin = 0;
+    size_t posEnd = 0;
+
+    //trim character 
+    for (size_t i = posBegin; i < length; i++)
     {
-        ret.push_back(text);
-        ret.back() = trim(ret.back(), ign);
-        return std::move(ret);
+        bool bCheck = false;
+        for (size_t j = 0; j < ign.length(); j++)
+        {
+            if (str.at(i) == ign.at(j))
+            {
+                bCheck = true;
+            }
+        }
+        if (bCheck)
+        {
+            if (i == posBegin)
+            {
+                posBegin++;
+            }
+        }
+        else
+        {
+            posEnd = i + 1;
+        }
     }
-    size_t beginPos = 0;
-    std::string matched;
-    for (size_t i = 0; i < text.length(); i++)
+    if (both == 1)
     {
-        if ((matched.empty() && text[i] == deli[0]) || !matched.empty() )
-        {
-            matched.push_back(text[i]);
-        }
-        if (matched == deli)
-        {
-            ret.push_back(text.substr(beginPos, i + 1 - deli.length() - beginPos));
-            ret.back() = trim(ret.back(), ign);
-            beginPos = i + 1;
-            matched.clear();
-        }
+        posEnd = length;
     }
-    ret.push_back(text.substr(beginPos, text.length() - beginPos));
-    ret.back() = trim(ret.back(), ign);
-    return std::move(ret);
+    else if (both == 2)
+    {
+        posBegin = 0;
+    }
+
+    if (posBegin == 0 && posEnd == length)
+    {
+        return std::move(str);
+    }
+    else if (posBegin < posEnd)
+    {
+        return str.substr(posBegin, posEnd - posBegin);
+    }
+    return "";
 }
 
-std::string subStringFront(const std::string & text, const std::string & deli)
+std::pair<std::string,std::string> subString(const std::string & text, const std::string & deli, bool preStore, bool isGreedy)
 {
     auto pos = text.find(deli);
     if (pos == std::string::npos)
     {
-        return text;
+        if (preStore)
+        {
+            return std::make_pair(text, "");
+        }
+        return std::make_pair("", text);
     }
-    return text.substr(0, pos - 0);
-}
-std::string subStringBack(const std::string & text, const std::string & deli)
-{
-    auto pos = text.rfind(deli);
-    if (pos == std::string::npos)
+
+    if (isGreedy)
     {
-        return text;
+        auto rpos = text.rfind(deli);
+        if (rpos > pos)
+        {
+            pos = rpos;
+        }
     }
-    return text.substr(pos+deli.length());
+
+    return std::make_pair(text.substr(0, pos - 0), text.substr(pos+deli.length()));
 }
 
-std::string subStringWithoutFront(const std::string & text, const std::string & deli)
-{
-    auto pos = text.find(deli);
-    if (pos == std::string::npos)
-    {
-        return text;
-    }
-    return text.substr(pos+deli.length());
-}
 
-std::string subStringWithoutBack(const std::string & text, const std::string & deli)
-{
-    auto pos = text.rfind(deli);
-    if (pos == std::string::npos)
-    {
-        return text;
-    }
-    return text.substr(0, pos - 0);
-}
 std::string toUpperString(std::string  org)
 {
     std::for_each(org.begin(), org.end(), [](char &ch){ch = toupper(ch); });
@@ -654,7 +667,7 @@ time_t getUTCTimeFromLocalString(const std::string & str)
     std::string stime;
     if (str.find(' ') != std::string::npos)
     {
-        auto sp = splitString(str, " ", " ");
+        auto sp = splitString<std::string>(trim(str, " "), " ", " ");
         if (sp.size() < 2)
         {
             return 0;
@@ -693,7 +706,7 @@ time_t getUTCTimeFromLocalString(const std::string & str)
         std::vector<std::string> spdate;
         if (!deli.empty())
         {
-            spdate = splitString(sdate, deli, " ");
+            spdate = splitString<std::string>(sdate, deli, " ");
         }
         else if (sdate.size() == 8)
         {
@@ -731,7 +744,7 @@ time_t getUTCTimeFromLocalString(const std::string & str)
     } //sdate
     if (!stime.empty())
     {
-        auto sptime = splitString(stime, ":", " ");
+        auto sptime = splitString<std::string>(stime, ":", " ");
         if (sptime.size() >= 1)
         {
             st.tm_hour = fromString<int>(sptime[0], 0);
@@ -756,7 +769,7 @@ time_t getUTCTimeFromLocalString(const std::string & str)
 
 time_t getSecondFromTimeString(const std::string & str)
 {
-    auto sptime = splitString(str, ":", " ");
+    auto sptime = splitString<std::string>(str, ":", " ");
     int hour = 0;
     int minute = 0;
     int second = 0;
@@ -846,7 +859,7 @@ thread_local std::mt19937 __genRandom; //vs2015 support
 //==========================================================================
 unsigned int realRand()
 {
-    return (rand() & 0xffff) << 16 | (rand() & 0xffff);
+    return (rand() &0x7fff) << 30 | (rand() & 0x7fff) << 15 | (rand() & 0x7fff);
 #ifdef WIN32
     return (rand() << 20) | (rand() << 8) | (rand() &0xff);
 //    if (!__genRandomInited)
@@ -875,4 +888,40 @@ double realRandF(double mi, double mx)
 }
 
 
+std::string getHostByName(const std::string & name, unsigned short port)
+{
+    auto ret = subString(name, "https://", false).second;
+    ret = subString(ret, "http://", false).second;
+    ret += "/";
+    ret = subString(ret, "/", true).first;
+    if (std::find_if(ret.begin(), ret.end(), [](char ch) {return !isdigit(ch) && ch != '.'; }) == ret.end())
+    {
+        return ret; //ipv4 
+    }
+    if (std::find_if(ret.begin(), ret.end(), [](char ch) {return !isxdigit(ch) && ch != ':'; }) == ret.end())
+    {
+        return ret; //ipv6 
+    }
+    struct addrinfo *res = nullptr;
+    struct addrinfo hints;
+    memset(&hints, 0, sizeof(hints));
+    hints.ai_family = AF_UNSPEC;
+    hints.ai_socktype = SOCK_STREAM;
+    hints.ai_flags = AI_PASSIVE;
+    if (getaddrinfo(ret.c_str(), toString(port).c_str(), &hints, &res) == 0)
+    {
+        char buf[100] = { 0 };
+        if (res->ai_family == AF_INET)
+        {
+            inet_ntop(res->ai_family, &(((sockaddr_in*)res->ai_addr)->sin_addr), buf, 100);
+        }
+        else if (res->ai_family == AF_INET6)
+        {
+            inet_ntop(res->ai_family, &(((sockaddr_in6*)res->ai_addr)->sin6_addr), buf, 100);
+        }
+        return buf;
+    }
+
+    return "";
+}
 

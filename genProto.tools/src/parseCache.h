@@ -58,7 +58,9 @@ struct DataCache
 //manager
 class ParseCache
 {
-    std::string _fileName;
+    std::string _configFileName;
+    std::string _configPath;
+    std::string _cacheFile;
     std::string _md5Cache[SL_END];
     //cache data
     unsigned short _currentProtoID = 0;

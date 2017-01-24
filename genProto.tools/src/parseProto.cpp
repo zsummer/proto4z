@@ -281,7 +281,7 @@ std::list<AnyData> parseProto(std::string fileName, ParseCache & cache)
                     if (member->Attribute("tag"))
                     {
                         std::string tagText = member->Attribute("tag");
-                        auto spt = splitString(tagText, ",", " ");
+                        auto spt = splitString<std::string>(tagText, ",", " ");
                         for (auto tag : spt)
                         {
                             if (compareStringIgnCase(tag, "key"))
