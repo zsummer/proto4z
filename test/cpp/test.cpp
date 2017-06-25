@@ -48,10 +48,10 @@ void  fillOnePack(EchoPack &pack)
     pack._sarray.push_back(sdata);
     pack._sarray.push_back(sdata);
 
-    pack._imap.insert(std::make_pair("123", idata));
-    pack._imap.insert(std::make_pair("223", idata));
-    pack._fmap.insert(std::make_pair("323", fdata));
-    pack._fmap.insert(std::make_pair("423", fdata));
+    pack._imap.insert(std::make_pair(123, idata));
+    pack._imap.insert(std::make_pair(223, idata));
+    pack._fmap.insert(std::make_pair(32.3, fdata));
+    pack._fmap.insert(std::make_pair(42.3, fdata));
     pack._smap.insert(std::make_pair("523", sdata));
     pack._smap.insert(std::make_pair("623", sdata));
 }
