@@ -140,10 +140,10 @@ typedef std::vector<FloatData> FloatDataArray;
 typedef std::vector<StringData> StringDataArray;  
  
  
-typedef std::map<std::string, IntegerData> IntegerDataMap;  
+typedef std::map<unsigned int, IntegerData> IntegerDataMap;  
  
  
-typedef std::map<std::string, FloatData> FloatDataMap;  
+typedef std::map<double, FloatData> FloatDataMap;  
  
  
 typedef std::map<std::string, StringData> StringDataMap;  

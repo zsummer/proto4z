@@ -265,7 +265,7 @@ namespace Proto4z
     } 
  
  
-    public class IntegerDataMap : System.Collections.Generic.Dictionary<string, IntegerData>, Proto4z.IProtoObject  
+    public class IntegerDataMap : System.Collections.Generic.Dictionary<uint, IntegerData>, Proto4z.IProtoObject  
     { 
         public System.Collections.Generic.List<byte> __encode() 
         { 
@@ -274,7 +274,7 @@ namespace Proto4z
             ret.AddRange(Proto4z.BaseProtoObject.encodeI32(len)); 
             foreach(var kv in this) 
             { 
-                ret.AddRange(Proto4z.BaseProtoObject.encodeString(kv.Key)); 
+                ret.AddRange(Proto4z.BaseProtoObject.encodeUI32(kv.Key)); 
                 ret.AddRange(kv.Value.__encode()); 
             } 
             return ret; 
@@ -287,7 +287,7 @@ namespace Proto4z
             { 
                 for (int i=0; i<len; i++) 
                 { 
-                    var key = Proto4z.BaseProtoObject.decodeString(binData, ref pos); 
+                    var key = Proto4z.BaseProtoObject.decodeUI32(binData, ref pos); 
                     var val = new IntegerData(); 
                     val.__decode(binData, ref pos); 
                     this.Add(key, val); 
@@ -298,7 +298,7 @@ namespace Proto4z
     } 
  
  
-    public class FloatDataMap : System.Collections.Generic.Dictionary<string, FloatData>, Proto4z.IProtoObject  
+    public class FloatDataMap : System.Collections.Generic.Dictionary<double, FloatData>, Proto4z.IProtoObject  
     { 
         public System.Collections.Generic.List<byte> __encode() 
         { 
@@ -307,7 +307,7 @@ namespace Proto4z
             ret.AddRange(Proto4z.BaseProtoObject.encodeI32(len)); 
             foreach(var kv in this) 
             { 
-                ret.AddRange(Proto4z.BaseProtoObject.encodeString(kv.Key)); 
+                ret.AddRange(Proto4z.BaseProtoObject.encodeDouble(kv.Key)); 
                 ret.AddRange(kv.Value.__encode()); 
             } 
             return ret; 
@@ -320,7 +320,7 @@ namespace Proto4z
             { 
                 for (int i=0; i<len; i++) 
                 { 
-                    var key = Proto4z.BaseProtoObject.decodeString(binData, ref pos); 
+                    var key = Proto4z.BaseProtoObject.decodeDouble(binData, ref pos); 
                     var val = new FloatData(); 
                     val.__decode(binData, ref pos); 
                     this.Add(key, val); 

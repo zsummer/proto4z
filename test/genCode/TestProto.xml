@@ -65,8 +65,8 @@
     <array name="StringDataArray" type="StringData" desc=""/>
     
     <!-- 支持字典类型-->
-    <map key="string" name="IntegerDataMap" value="IntegerData" desc=""/>
-    <map key="string" name="FloatDataMap" value="FloatData" desc=""/>
+    <map key="ui32" name="IntegerDataMap" value="IntegerData" desc=""/>
+    <map key="double" name="FloatDataMap" value="FloatData" desc=""/>
     <map key="string" name="StringDataMap" value="StringData" desc=""/>
 
     
