@@ -175,7 +175,6 @@ int main()
 
 
 
-    getchar();
 //     cout << "press any key to continue." << endl;
 //     getchar();
     return 0;
