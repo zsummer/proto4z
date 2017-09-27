@@ -22,10 +22,7 @@ matrix:
       osx_image: xcode8.3
       env: 
         - TOOL="xcode-osx"
-    - os: osx
-      osx_image: xcode8.2
-      env: 
-        - TOOL="xcode-osx"
+
 
 
 
