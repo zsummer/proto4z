@@ -1,19 +1,39 @@
 sudo: true
 language: cpp
-compiler: 
-  - g++ 
-  - clang
-os:
-  - linux
-  - osx
+matrix:
+  include:
+
+    # linux version have unique dependencies, so we set them up individually
+    - os: linux
+      dist: trusty
+      compiler: clang
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-4.9
+      sudo: required
+      env: 
+        - TARGET="trusty"
+
+    # OS X Xcode
+    - os: osx
+      osx_image: xcode8.3
+      env: 
+        - TOOL="xcode-osx"
+
+
+
+
 before_install:
   - if [ "${TRAVIS_OS_NAME}" = "linux" ]; then sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test; fi
   - if [ "${TRAVIS_OS_NAME}" = "linux" ]; then sudo apt-get update -qq; fi
 
 install:
   - if [ "${TRAVIS_OS_NAME}" = "linux" ]; then sudo apt-get install -qq cmake; fi
-  - if [ "${TRAVIS_OS_NAME}" = "linux" ]; then sudo apt-get install -qq g++-4.8; fi
-  - if [ "${TRAVIS_OS_NAME}" = "linux" ]; then export CXX="g++-4.8"; fi
+  - if [ "${TRAVIS_OS_NAME}" = "linux" ]; then sudo apt-get install -qq g++-4.9; fi
+  - if [ "${TRAVIS_OS_NAME}" = "linux" ]; then export CXX="g++-4.9"; fi
 script:
   - cmake --version
   - cmake .
@@ -26,5 +46,4 @@ script:
   - cd ../../
   - cd test/bin
   - ./cpptest
-  - ./lua51
   - ./lua53
