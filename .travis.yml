@@ -46,5 +46,4 @@ script:
   - cd ../../
   - cd test/bin
   - ./cpptest
-  - ./lua51
   - ./lua53
