@@ -1,4 +1,4 @@
-﻿/*
+/*
  * proto4z License
  * -----------
  * 
@@ -204,7 +204,7 @@ private:
 public:
     //! testStream : if true then WriteStreamImpl will not do any write operation.
     //! attach : the existing memory.
-    WriteStreamImpl(ProtoInteger pID);
+    WriteStreamImpl(ProtoInteger pID, bool withHeader = true);
     ~WriteStreamImpl();
 public:
     //get total stream buff, the pointer must be used immediately.
@@ -233,7 +233,10 @@ public:
         checkMoveCursor(sizeof(U));
         _attach->append((const char*)&data, sizeof(U));
         _cursor += sizeof(U);
-        baseTypeToStream(&(*_attach)[0], _cursor);
+        if (_isHaveHeader)
+        {
+            baseTypeToStream(&(*_attach)[0], _cursor);
+        }
         return *this;
     }
 
@@ -251,6 +254,7 @@ private:
     ReserveInteger _reserve;
     ProtoInteger _pID; //! proto ID
     Integer _headLen;
+    bool _isHaveHeader;
 };
 //http://zh.cppreference.com/w/cpp/language/storage_duration 
 template<class T>
@@ -631,21 +635,27 @@ inline std::pair<INTEGRITY_RET_TYPE, Integer> checkBuffIntegrity(const char * bu
 //////////////////////////////////////////////////////////////////////////
 
 template<class T>
-WriteStreamImpl<T>::WriteStreamImpl(ProtoInteger pID)
+WriteStreamImpl<T>::WriteStreamImpl(ProtoInteger pID, bool withHeader)
 {
     _reserve = 0;
     _pID = pID;
-    _headLen = sizeof(Integer)+ sizeof(ReserveInteger) + sizeof(ProtoInteger);
-    _cursor = _headLen;
     _attach = _tlsque.pop();
     _attach->reserve(1200);
+    _isHaveHeader = withHeader;
+
+    Integer headLen = sizeof(Integer) + sizeof(ReserveInteger) + sizeof(ProtoInteger);
+
+    _headLen = withHeader ? headLen : 0;
+    _cursor = _headLen;
     _attach->resize(_cursor, '\0');
     _attachLen = MaxPackLen;
 
-    baseTypeToStream(&(*_attach)[0], _headLen);
-    baseTypeToStream(&(*_attach)[0] + sizeof(Integer), _reserve);
-    baseTypeToStream(&(*_attach)[0] + sizeof(Integer) + sizeof(ReserveInteger), pID);
-
+    if (withHeader)
+    {
+        baseTypeToStream(&(*_attach)[0], _headLen);
+        baseTypeToStream(&(*_attach)[0] + sizeof(Integer), _reserve);
+        baseTypeToStream(&(*_attach)[0] + sizeof(Integer) + sizeof(ReserveInteger), pID);
+    }
 }
 
 template<class T>
@@ -692,7 +702,10 @@ inline WriteStreamImpl<T> & WriteStreamImpl<T>::appendOriginalData(const void * 
     T & attach = *_attach;
     attach.append((const char*)data, len);
     _cursor += len;
-    baseTypeToStream(&attach[0], _cursor);
+    if (_isHaveHeader)
+    {
+        baseTypeToStream(&attach[0], _cursor);
+    }
     return *this;
 }
 
@@ -704,6 +717,7 @@ inline WriteStreamImpl<T> & WriteStreamImpl<T>::fixOriginalData(Integer offset, 
     {
         PROTO4Z_THROW("fixOriginalData over stream. _attachLen=" << _attachLen << ", _cursor=" << _cursor << ", unit=" << unit << ", offset=" << offset);
     }
+
     baseTypeToStream(&(*_attach)[offset], unit);
     return *this;
 }
