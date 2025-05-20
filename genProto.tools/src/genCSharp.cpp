@@ -21,6 +21,17 @@ CSharpType GenCSharp::getCSharpType(const std::string & xmltype)
     if (xmltype == "double") return{ true, "double", "Proto4z.BaseProtoObject.encodeDouble", "Proto4z.BaseProtoObject.decodeDouble" };
     if (xmltype == "string") return{ true, "string", "Proto4z.BaseProtoObject.encodeString", "Proto4z.BaseProtoObject.decodeString" };
 
+    if (xmltype == "s8") return{ true, "char", "Proto4z.BaseProtoObject.encodeI8", "Proto4z.BaseProtoObject.decodeI8" };
+    if (xmltype == "u8") return{ true, "byte", "Proto4z.BaseProtoObject.encodeUI8", "Proto4z.BaseProtoObject.decodeUI8" };
+    if (xmltype == "s16") return{ true, "short", "Proto4z.BaseProtoObject.encodeI16", "Proto4z.BaseProtoObject.decodeI16" };
+    if (xmltype == "u16") return{ true, "ushort", "Proto4z.BaseProtoObject.encodeUI16", "Proto4z.BaseProtoObject.decodeUI16" };
+    if (xmltype == "s32") return{ true, "int", "Proto4z.BaseProtoObject.encodeI32", "Proto4z.BaseProtoObject.decodeI32" };
+    if (xmltype == "u32") return{ true, "uint", "Proto4z.BaseProtoObject.encodeUI32", "Proto4z.BaseProtoObject.decodeUI32" };
+    if (xmltype == "s64") return{ true, "long", "Proto4z.BaseProtoObject.encodeI64", "Proto4z.BaseProtoObject.decodeI64" };
+    if (xmltype == "u64") return{ true, "ulong", "Proto4z.BaseProtoObject.encodeUI64", "Proto4z.BaseProtoObject.decodeUI64" };
+    if (xmltype == "f32") return{ true, "float", "Proto4z.BaseProtoObject.encodeSingle", "Proto4z.BaseProtoObject.decodeSingle" };
+
+
     return{ false, xmltype, "", "" };
 }
 
@@ -29,6 +40,8 @@ std::string  GenCSharp::getTypeDefault(const std::string & xmltype)
     if (xmltype == "i8") return "'\\0'";
     else if (xmltype == "float") return "0.0f";
     else if (xmltype == "string") return "\"\"";
+    else if (xmltype == "s8") return "'\\0'";
+    else if (xmltype == "f32") return "0.0f";
     return GenBase::getTypeDefault(xmltype);
 }
 

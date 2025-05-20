@@ -17,6 +17,18 @@ std::string GenCPP::getRealType(const std::string & xmltype)
     else if ( xmltype == "float") return "float";
     else if ( xmltype == "double") return "double";
     else if ( xmltype == "string") return "std::string";
+    else if (xmltype == "s8") return "char";
+    else if (xmltype == "u8") return "unsigned char";
+    else if (xmltype == "s16") return "short";
+    else if (xmltype == "u16") return "unsigned short";
+    else if (xmltype == "s32") return "int";
+    else if (xmltype == "u32") return "unsigned int";
+    else if (xmltype == "s64") return "long long";
+    else if (xmltype == "u64") return "unsigned long long";
+    else if (xmltype == "f32") return "float";
+
+
+
     return xmltype;
 }
 
@@ -99,7 +111,7 @@ std::string GenCPP::genRealContent(const std::list<AnyData> & stores)
     }
     text += LFCR + "#endif" + LFCR;
 
-    return std::move(text);
+    return text;
 }
 
 
