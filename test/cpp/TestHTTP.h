@@ -24,7 +24,7 @@ public:
         std::string methodLine;
         std::map<std::string,std::string> head;
         std::string body;
-        if (HasWebRawPacket(wh.GetStream(), wh.GetStreamLen(), 1024, isChunked, method, methodLine, head, body).first == kIntegrityIntack)
+        if (HasWebRawPacket(wh.GetStream(), wh.GetStreamLen(), 1024, isChunked, method, methodLine, head, body).first == kIntegrityIntact)
         {
             if (head.find("Host") != head.end()
                 && (method == "GET" || method == "POST" || methodLine == "200"))
