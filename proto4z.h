@@ -147,12 +147,12 @@ void WritePodData(char *stream, T v);
 
 enum IntegrityType
 {
-    kIntegrityIntack = 0,
+    kIntegrityIntact = 0,
     kIntegrityShortage = 1,
     kIntegrityCorrupted = 2,
 };
 //! return value:
-//! first: kIntegrityIntack data integrity. second: current integrity data lenght.
+//! first: kIntegrityIntact data integrity. second: current integrity data lenght.
 //! first: kIntegrityShortage data not integrity. second: shortage lenght.
 //! first: kIntegrityCorrupted data corruption. second: data lenght
 //! buff 缓冲区内容起始位置 
@@ -690,11 +690,11 @@ inline std::pair<IntegrityType, LenInteger> HasRawPacket(const char * buff, LenI
     }
     if (packLen == curBuffLen)
     {
-        return std::make_pair(kIntegrityIntack, packLen);
+        return std::make_pair(kIntegrityIntact, packLen);
     }
     if (packLen < curBuffLen)
     {
-        return std::make_pair(kIntegrityIntack, packLen);
+        return std::make_pair(kIntegrityIntact, packLen);
     }
     return std::make_pair(kIntegrityShortage, packLen - curBuffLen);
 }
@@ -1167,7 +1167,7 @@ inline unsigned int InnerReadLine(const char * buff, unsigned int curBuffLen, un
         if (buff[cursor] == LF)
         {
             cursor++;
-            isIntegrityData = kIntegrityIntack;
+            isIntegrityData = kIntegrityIntact;
             break;
         }
         if (!isKV)
@@ -1219,7 +1219,7 @@ inline unsigned int InnerReadLine(const char * buff, unsigned int curBuffLen, un
         }//end. isKV
     }//extract character loop
 
-    if (isIntegrityData != kIntegrityIntack)
+    if (isIntegrityData != kIntegrityIntact)
     {
         throw isIntegrityData;
     }
@@ -1317,7 +1317,7 @@ inline std::pair<IntegrityType, unsigned int> HasWebRawPacket(const char * buff,
     }
     else if (method == "GET")
     {
-        return std::make_pair(kIntegrityIntack, usedCount);
+        return std::make_pair(kIntegrityIntact, usedCount);
     }
     
     if (bodyLenght == -1 || usedCount + bodyLenght > maxBuffLen)
@@ -1351,7 +1351,7 @@ inline std::pair<IntegrityType, unsigned int> HasWebRawPacket(const char * buff,
     }
     
 
-    return std::make_pair(kIntegrityIntack, usedCount);
+    return std::make_pair(kIntegrityIntact, usedCount);
 }
 
 
