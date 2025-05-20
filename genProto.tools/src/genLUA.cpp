@@ -35,7 +35,7 @@ std::string GenLUA::genRealContent(const std::list<AnyData> & stores)
         }
     }
 
-    return std::move(text);
+    return text;
 }
 
 

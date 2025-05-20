@@ -28,10 +28,11 @@
 
 std::string readFileContent(const std::string & filename, bool isBinary, size_t limitSize, size_t beginIndex)
 {
+    std::string ret;
     FILE * f = fopen(filename.c_str(), "rb");
     if (f == NULL)
     {
-        return "";
+        return ret;
     }
     size_t fileLen = 0;
     fseek(f, 0, SEEK_SET);
@@ -52,7 +53,7 @@ std::string readFileContent(const std::string & filename, bool isBinary, size_t 
     if (beginIndex >= fileLen)
     {
         fclose(f);
-        return "";
+        return ret;
     }
     if (limitSize > fileLen - beginIndex)
     {
@@ -60,7 +61,7 @@ std::string readFileContent(const std::string & filename, bool isBinary, size_t 
     }
     
     fseek(f, (long)beginIndex, SEEK_SET);
-    std::string ret;
+    
     ret.resize(limitSize, '\0');
     size_t readLen = fread(&ret[0], 1, limitSize, f);
     fclose(f);
@@ -68,7 +69,7 @@ std::string readFileContent(const std::string & filename, bool isBinary, size_t 
     {
         return ret.substr(0, readLen);
     }
-    return std::move(ret);
+    return ret;
 }
 size_t writeFileContent(const std::string & filename, const char * buff, size_t buffLen, bool isAppend)
 {
@@ -465,15 +466,15 @@ std::pair<std::string,std::string> subString(const std::string & text, const std
 }
 
 
-std::string toUpperString(std::string  org)
+std::string toUpperString(std::string org)
 {
     std::for_each(org.begin(), org.end(), [](char &ch){ch = toupper(ch); });
-    return std::move(org);
+    return org;
 }
 std::string toLowerString(std::string  org)
 {
     std::for_each(org.begin(), org.end(), [](char &ch){ch = tolower(ch); });
-    return std::move(org);
+    return org;
 }
 
 bool compareStringIgnCase(const std::string & left, const std::string & right, bool canTruncate)

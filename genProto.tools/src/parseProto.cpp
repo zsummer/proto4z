@@ -349,7 +349,7 @@ std::list<AnyData> parseProto(std::string fileName, ParseCache & cache)
             curTagIndex++;
         }
     }
-    return std::move(anydata);
+    return anydata;
 }
 
 GenBase * createGenerate(SupportLanguageType t)

@@ -1,6 +1,6 @@
 Welcome to the proto4z wiki!  
 ## Introduction:    
-[![Build Status](https://travis-ci.org/zsummer/proto4z.svg?branch=master)](https://travis-ci.org/zsummer/proto4z)  
+[![Build](https://github.com/zsummer/proto4z/actions/workflows/cmake.yml/badge.svg)](https://github.com/zsummer/proto4z/actions/workflows/cmake.yml)
 proto4z  is an efficient serialization library for C++, lua, C#, It's like Google protocol buffers.  
 proto4z是一个序列化工具库, 可以通过一次编写xml格式的数据结构, 使用genProto工具一键生成对应的C++,lua,C#的原生数据结构和对应的序列化/反序列化代码, 并且通过开关可以额外生成C++使用的MYSQL增删改查的接口代码(和dbHelper.h配合使用).  
 

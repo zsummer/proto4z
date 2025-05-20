@@ -47,6 +47,16 @@ std::string GenBase::getTypeDefault(const std::string & xmltype)
     else if (xmltype == "ui64") return "0";
     else if (xmltype == "float") return "0.0";
     else if (xmltype == "double") return "0.0";
+    else if (xmltype == "s8") return "0";
+    else if (xmltype == "u8") return "0";
+    else if (xmltype == "s16") return "0";
+    else if (xmltype == "u16") return "0";
+    else if (xmltype == "s32") return "0";
+    else if (xmltype == "u32") return "0";
+    else if (xmltype == "s64") return "0";
+    else if (xmltype == "u64") return "0";
+    else if (xmltype == "f32") return "0.0";
+
     return "";
 }
 

@@ -197,7 +197,7 @@ splitArrayString(const std::string & text, const std::string & deli, const std::
     {
         ret.push_back(splitTupleString<T...>(std::move(one), deliMeta, ign));
     }
-    return std::move(ret);
+    return ret;
 }
 
 
@@ -242,7 +242,7 @@ splitDictString(const std::string & text, const std::string & deli, const std::s
         auto k = std::get<0>(tp);
         ret[k] = std::move(tp);
     }
-    return std::move(ret);
+    return ret;
 }
 
 
@@ -268,7 +268,7 @@ splitString(std::string text, const std::string & deli, const std::string & ign)
         }
     }
     ret.push_back(fromString<Value>(trim(text.substr(beginPos, text.length() - beginPos), ign)));
-    return std::move(ret);
+    return ret;
 }
 
 
@@ -532,7 +532,7 @@ inline std::vector<RandIt> raffle(RandIt first, RandIt end, int takeCount, bool 
             iter++;
         }
     }
-    return std::move(ret);
+    return ret;
 }
 
 template<class RandIt, class GetProbabilityFunc> // func example  [](RandIt iter){return iter->probability;}
@@ -554,7 +554,7 @@ inline std::vector<RandIt> raffle(RandIt first, RandIt end, int takeCount, GetPr
         }
         cur++;
     }
-    return std::move(ret);
+    return ret;
 }
 
 inline double calcELORatingUpper(double ownerScore, double dstScore, int winFlag)

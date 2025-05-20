@@ -96,11 +96,11 @@ int main()
         fillOnePack(echo);
         ws << echo;
         wwrap << "3333333333333333333333333333";
-        wwrap.appendOriginalData(ws.getStream(), ws.getStreamLen());
-        ReadStream rwrap(wwrap.getStream(), wwrap.getStreamLen());
+        wwrap.AppendRawData(ws.GetStream(), ws.GetStreamLen());
+        ReadStream rwrap(wwrap.GetStream(), wwrap.GetStreamLen());
         std::string tmp;
         rwrap >> tmp;
-        ReadStream rs(rwrap.getStreamUnread(), rwrap.getStreamUnreadLen());
+        ReadStream rs(rwrap.GetStreamUnread(), rwrap.GetStreamUnreadLen());
         rs >> echo;
         cout << "success" << endl;
     }
@@ -129,7 +129,7 @@ int main()
         WriteStream ws(SimplePack::getProtoID());
         ws << pack;
         //反序列化
-        ReadStream rs(ws.getStream(), ws.getStreamLen());
+        ReadStream rs(ws.GetStream(), ws.GetStreamLen());
         rs >> pack;
         cout << "success" << endl;
     }
@@ -155,7 +155,7 @@ int main()
     {
         WriteStream ws(100);
         ws << pack;
-        count += ws.getStreamLen();
+        count += ws.GetStreamLen();
     }
     std::cout << "writeStream used time: " << getSteadyTime() - now << std::endl;
     
@@ -164,9 +164,9 @@ int main()
     {
         WriteStream ws(100);
         ws << pack;
-        ReadStream rs(ws.getStream(), ws.getStreamLen());
+        ReadStream rs(ws.GetStream(), ws.GetStreamLen());
         rs >> pack;
-        count += rs.getStreamLen();
+        count += rs.GetStreamLen();
     }
     std::cout << "write and read stream used time: " << getSteadyTime() - now << std::endl;
 
