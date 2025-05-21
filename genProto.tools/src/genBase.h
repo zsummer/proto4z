@@ -54,7 +54,7 @@ public:
     virtual void write(const std::string & content);
 protected:
     std::string _filename;
-    SupportLanguageType _type = SL_NORMAL;
+    SupportLanguageType type_ = SL_NORMAL;
 };
 
 

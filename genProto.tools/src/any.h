@@ -83,7 +83,7 @@ enum MemberTag : short
 //comment
 struct DataComment
 {
-    std::string _desc;
+    std::string desc_;
 };
 
 
@@ -91,60 +91,60 @@ struct DataComment
 //array type
 struct DataArray
 {
-    std::string _type;
-    std::string _arrayName;
-    std::string _desc;
+    std::string type_;
+    std::string arrayName_;
+    std::string desc_;
 };
 
 //dict type
 struct DataMap
 {
-    std::string _typeKey;
-    std::string _typeValue;
-    std::string _mapName;
-    std::string _desc;
+    std::string typeKey_;
+    std::string typeValue_;
+    std::string mapName_;
+    std::string desc_;
 };
 
 //const type
 struct DataConstValue
 {
-    std::string _type;
-    std::string _name;
-    std::string _value;
-    std::string _desc;
+    std::string type_;
+    std::string name_;
+    std::string value_;
+    std::string desc_;
 };
 
 //include file name, without suffix
 struct DataEnum
 {
-    std::string _type;
-    std::string _name;
-    std::string _desc;
-    std::vector<DataConstValue> _members;
+    std::string type_;
+    std::string name_;
+    std::string desc_;
+    std::vector<DataConstValue> members_;
 };
 
 //struct type
 struct DataStruct
 {
-    std::string _name;
-    std::string _desc;
-    std::string _store;
-    bool _hadLog4z = false;
+    std::string name_;
+    std::string desc_;
+    std::string store_;
+    bool hadLog4z_ = false;
     struct DataMember
     {
-        std::string _type;
-        std::string _name;
-        std::string _desc;
-        short _tag; //MemberTag
+        std::string type_;
+        std::string name_;
+        std::string desc_;
+        short tag_; //MemberTag
     };
-    std::vector<DataMember> _members;
+    std::vector<DataMember> members_;
 };
 
 //proto type
 struct DataPacket
 {
-    DataConstValue _const;
-    DataStruct _struct;
+    DataConstValue const_;
+    DataStruct struct_;
 };
 
 
@@ -152,13 +152,13 @@ struct DataPacket
 //general store type
 struct AnyData
 {
-    AnyType _type;
+    AnyType type_;
     DataComment _comment;
-    DataConstValue _const;
-    DataEnum _enum;
-    DataArray _array;
-    DataMap _map;
-    DataPacket _proto;
+    DataConstValue const_;
+    DataEnum enum_;
+    DataArray array_;
+    DataMap map_;
+    DataPacket proto_;
 };
 
 

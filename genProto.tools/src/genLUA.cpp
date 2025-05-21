@@ -8,30 +8,30 @@ std::string GenLUA::genRealContent(const std::list<AnyData> & stores)
     std::string text;
     for (auto &info : stores)
     {
-        if (info._type == GT_DataConstValue)
+        if (info.type_ == GT_DataConstValue)
         {
             text += LFCR;
-            text += genDataConst(info._const);
+            text += genDataConst(info.const_);
         }
-        else if (info._type == GT_DataEnum)
+        else if (info.type_ == GT_DataEnum)
         {
             text += LFCR;
-            text += genDataEnum(info._enum);
+            text += genDataEnum(info.enum_);
         }
-        else if (info._type == GT_DataArray)
+        else if (info.type_ == GT_DataArray)
         {
             text += LFCR;
-            text += genDataArray(info._array);
+            text += genDataArray(info.array_);
         }
-        else if (info._type == GT_DataMap)
+        else if (info.type_ == GT_DataMap)
         {
             text += LFCR;
-            text += genDataMap(info._map);
+            text += genDataMap(info.map_);
         }
-        else if (info._type == GT_DataPacket)
+        else if (info.type_ == GT_DataPacket)
         {
             text += LFCR;
-            text += genDataPacket(info._proto);
+            text += genDataPacket(info.proto_);
         }
     }
 
@@ -43,10 +43,10 @@ std::string GenLUA::genRealContent(const std::list<AnyData> & stores)
 std::string GenLUA::genDataConst(const DataConstValue & dc)
 {
     std::string text;
-    text += "Proto4z." + dc._name + " = " + dc._value;
-    if (!dc._desc.empty())
+    text += "Proto4z." + dc.name_ + " = " + dc.value_;
+    if (!dc.desc_.empty())
     {
-        text += "--" + dc._desc;
+        text += "--" + dc.desc_;
     }
     return text;
 }
@@ -54,12 +54,12 @@ std::string GenLUA::genDataConst(const DataConstValue & dc)
 std::string GenLUA::genDataEnum(const DataEnum & de)
 {
     std::string text;
-    for (const auto & m : de._members)
+    for (const auto & m : de.members_)
     {
-        text += "Proto4z." + m._name + " = " + m._value;
-        if (!m._desc.empty())
+        text += "Proto4z." + m.name_ + " = " + m.value_;
+        if (!m.desc_.empty())
         {
-            text += "--" + m._desc;
+            text += "--" + m.desc_;
         }
         text += LFCR;
     }
@@ -68,60 +68,60 @@ std::string GenLUA::genDataEnum(const DataEnum & de)
 std::string GenLUA::genDataArray(const DataArray & da)
 {
     std::string text;
-    text += "Proto4z." + da._arrayName + " = {} ";
-    if (!da._desc.empty())
+    text += "Proto4z." + da.arrayName_ + " = {} ";
+    if (!da.desc_.empty())
     {
-        text += "--" + da._desc;
+        text += "--" + da.desc_;
     }
     text += LFCR;
 
-    text += "Proto4z." + da._arrayName + ".__protoName = \"" + da._arrayName + "\"" + LFCR;
-    text += "Proto4z." + da._arrayName + ".__protoDesc = \"array\"" + LFCR;
-    text += "Proto4z." + da._arrayName + ".__protoTypeV = \"" + da._type + "\"" + LFCR;
+    text += "Proto4z." + da.arrayName_ + ".__protoName = \"" + da.arrayName_ + "\"" + LFCR;
+    text += "Proto4z." + da.arrayName_ + ".__protoDesc = \"array\"" + LFCR;
+    text += "Proto4z." + da.arrayName_ + ".__protoTypeV = \"" + da.type_ + "\"" + LFCR;
     return text;
 }
 std::string GenLUA::genDataMap(const DataMap & dm)
 {
     std::string text;
-    text += "Proto4z." + dm._mapName + " = {} ";
-    if (!dm._desc.empty())
+    text += "Proto4z." + dm.mapName_ + " = {} ";
+    if (!dm.desc_.empty())
     {
-        text += "--" + dm._desc;
+        text += "--" + dm.desc_;
     }
     text += LFCR;
 
-    text += "Proto4z." + dm._mapName + ".__protoName = \"" + dm._mapName + "\"" + LFCR;
-    text += "Proto4z." + dm._mapName + ".__protoDesc = \"map\"" + LFCR;
-    text += "Proto4z." + dm._mapName + ".__protoTypeK = \"" + dm._typeKey + "\"" + LFCR;
-    text += "Proto4z." + dm._mapName + ".__protoTypeV = \"" + dm._typeValue + "\"" + LFCR;
+    text += "Proto4z." + dm.mapName_ + ".__protoName = \"" + dm.mapName_ + "\"" + LFCR;
+    text += "Proto4z." + dm.mapName_ + ".__protoDesc = \"map\"" + LFCR;
+    text += "Proto4z." + dm.mapName_ + ".__protoTypeK = \"" + dm.typeKey_ + "\"" + LFCR;
+    text += "Proto4z." + dm.mapName_ + ".__protoTypeV = \"" + dm.typeValue_ + "\"" + LFCR;
     return text;
 }
 std::string GenLUA::genDataPacket(const DataPacket & dp)
 {
     std::string text;
 
-    text += "Proto4z.register(" + dp._const._value + ",\"" + dp._struct._name + "\")" + LFCR;
+    text += "Proto4z.register(" + dp.const_.value_ + ",\"" + dp.struct_.name_ + "\")" + LFCR;
 
 
-    text += "Proto4z." + dp._struct._name + " = {} ";
-    if (!dp._struct._desc.empty())
+    text += "Proto4z." + dp.struct_.name_ + " = {} ";
+    if (!dp.struct_.desc_.empty())
     {
-        text += "--" + dp._struct._desc;
+        text += "--" + dp.struct_.desc_;
     }
     text += LFCR;
 
 
-    text += "Proto4z." + dp._struct._name + ".__protoID = " + dp._const._value + "" + LFCR;
-    text += "Proto4z." + dp._struct._name + ".__protoName = \"" + dp._struct._name + "\"" + LFCR;
+    text += "Proto4z." + dp.struct_.name_ + ".__protoID = " + dp.const_.value_ + "" + LFCR;
+    text += "Proto4z." + dp.struct_.name_ + ".__protoName = \"" + dp.struct_.name_ + "\"" + LFCR;
 
-    for (size_t i = 0; i < dp._struct._members.size(); ++i)
+    for (size_t i = 0; i < dp.struct_.members_.size(); ++i)
     {
-        text += "Proto4z." + dp._struct._name + "[" + toString(i + 1)
-            + "] = {name=\"" + dp._struct._members[i]._name + "\", type=\"" + dp._struct._members[i]._type + "\"";
+        text += "Proto4z." + dp.struct_.name_ + "[" + toString(i + 1)
+            + "] = {name=\"" + dp.struct_.members_[i].name_ + "\", type=\"" + dp.struct_.members_[i].type_ + "\"";
         text += " } ";
-        if (!dp._struct._members[i]._desc.empty())
+        if (!dp.struct_.members_[i].desc_.empty())
         {
-            text += "--" + dp._struct._members[i]._desc;
+            text += "--" + dp.struct_.members_[i].desc_;
         }
         text += LFCR;
     }

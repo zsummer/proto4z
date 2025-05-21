@@ -14,10 +14,10 @@ using namespace  std;
 using namespace zsummer::proto4z;
 
 const int MAX_HTTP_LEN = 1000;
-class TestHTTP
+class TestWeb
 {
 public:
-    bool Test(WriteHTTP &wh)
+    bool Test(WriteWebStream &wh)
     {
         bool isChunked = false;
         std::string method;
