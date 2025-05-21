@@ -53,11 +53,11 @@ int main(int argc, char *argv[])
                 auto stores = parseProto(filename, cache);
                 for (auto & store : stores)
                 {
-                    if (store._type == GT_DataEnum && trim(store._enum._name) == "ERROR_CODE")
+                    if (store.type_ == GT_DataEnum && trim(store.enum_.name_) == "ERROR_CODE")
                     {
-                        for (auto & kv : store._enum._members)
+                        for (auto & kv : store.enum_.members_)
                         {
-                            _errCodes[fromString<unsigned short>(kv._value, 0)] = kv._desc;
+                            _errCodes[fromString<unsigned short>(kv.value_, 0)] = kv.desc_;
                         }
                     }
                 }

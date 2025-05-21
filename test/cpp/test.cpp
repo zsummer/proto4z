@@ -20,7 +20,7 @@ using namespace std;
 using namespace zsummer::proto4z;
 
 #include "C++/TestProto.h"
-#include "TestHTTP.h"
+#include "TestWeb.h"
 
 void  fillOnePack(EchoPack &pack)
 {
@@ -67,20 +67,20 @@ int main()
 
 
     cout << "check http proto ..." << endl;
-    TestHTTP th;
-    WriteHTTP whGet;
+    TestWeb th;
+    WriteWebStream whGet;
     whGet.addHead("Content-Type", "application/x-www-form-urlencoded");
     whGet.addHead("Host", "www.google.com");
     whGet.get("/");
     th.Test(whGet);
 
-    WriteHTTP whPost;
+    WriteWebStream whPost;
     whPost.addHead("Content-Type", "application/x-www-form-urlencoded");
     whPost.addHead("Host", "www.google.com");
     whPost.post("/", "index.php?aaa=333");
     th.Test(whPost);
 
-    WriteHTTP whResult;
+    WriteWebStream whResult;
     whResult.addHead("test", "test");
     whResult.addHead("Content-Type", "application/x-www-form-urlencoded");
     whResult.addHead("Host", "www.google.com");

@@ -126,36 +126,36 @@ std::list<AnyData> parseProto(std::string fileName, ParseCache & cache)
                 {
                     E("Attribute Error. ");
                 }
-                dc._type = trim(ele->Attribute("type"));
-                dc._name = trim(ele->Attribute("name"));
-                dc._value = trim(ele->Attribute("value"));
+                dc.type_ = trim(ele->Attribute("type"));
+                dc.name_ = trim(ele->Attribute("name"));
+                dc.value_ = trim(ele->Attribute("value"));
                 
                 if (ele->Attribute("desc"))
                 {
-                    dc._desc = ele->Attribute("desc");
+                    dc.desc_ = ele->Attribute("desc");
                 }
                 AnyData info;
-                info._const = dc;
-                info._type = GT_DataConstValue;
+                info.const_ = dc;
+                info.type_ = GT_DataConstValue;
                 anydata.push_back(info);
             }
             else if (stype == "enum")
             {
                 AnyData enumData;
-                enumData._type = GT_DataEnum;
+                enumData.type_ = GT_DataEnum;
                 int lastID = 0;
                 if (!ele->Attribute("type"))
                 {
                     E("Attribute Error. ");
                 }
-                enumData._enum._type = trim(ele->Attribute("type"));
+                enumData.enum_.type_ = trim(ele->Attribute("type"));
                 if (ele->Attribute("name"))
                 {
-                    enumData._enum._name = trim(ele->Attribute("name"));
+                    enumData.enum_.name_ = trim(ele->Attribute("name"));
                 }
                 if (ele->Attribute("desc"))
                 {
-                    enumData._enum._desc = trim(ele->Attribute("desc"));
+                    enumData.enum_.desc_ = trim(ele->Attribute("desc"));
                 }
                 
                 XMLElement * member = ele->FirstChildElement("member");
@@ -170,8 +170,8 @@ std::list<AnyData> parseProto(std::string fileName, ParseCache & cache)
                     {
                         E("Attribute Error. ");
                     }
-                    dc._type = enumData._enum._type;
-                    dc._name = trim(member->Attribute("name"));
+                    dc.type_ = enumData.enum_.type_;
+                    dc.name_ = trim(member->Attribute("name"));
                     if (member->Attribute("value"))
                     {
                         int v = atoi(trim(member->Attribute("value")).c_str());
@@ -181,13 +181,13 @@ std::list<AnyData> parseProto(std::string fileName, ParseCache & cache)
                         }
                         lastID = v;
                     }
-                    dc._value = toString(lastID);
+                    dc.value_ = toString(lastID);
                     lastID++;
                     if (member->Attribute("desc"))
                     {
-                        dc._desc = member->Attribute("desc");
+                        dc.desc_ = member->Attribute("desc");
                     }
-                    enumData._enum._members.push_back(dc);
+                    enumData.enum_.members_.push_back(dc);
                     member = member->NextSiblingElement("member");
                 } while (true);
                 anydata.push_back(enumData);
@@ -200,15 +200,15 @@ std::list<AnyData> parseProto(std::string fileName, ParseCache & cache)
                 {
                     E("Attribute Error. ");
                 }
-                ar._type = trim(ele->Attribute("type"));
-                ar._arrayName = trim(ele->Attribute("name"));
+                ar.type_ = trim(ele->Attribute("type"));
+                ar.arrayName_ = trim(ele->Attribute("name"));
                 if (ele->Attribute("desc"))
                 {
-                    ar._desc = ele->Attribute("desc");
+                    ar.desc_ = ele->Attribute("desc");
                 }
                 AnyData info;
-                info._type = GT_DataArray;
-                info._array = ar;
+                info.type_ = GT_DataArray;
+                info.array_ = ar;
                 anydata.push_back(info);
             }
             //K-V类型
@@ -219,16 +219,16 @@ std::list<AnyData> parseProto(std::string fileName, ParseCache & cache)
                 {
                     E("Attribute Error. ");
                 }
-                dm._typeKey = trim(ele->Attribute("key"));
-                dm._typeValue = trim(ele->Attribute("value"));
-                dm._mapName = trim(ele->Attribute("name"));
+                dm.typeKey_ = trim(ele->Attribute("key"));
+                dm.typeValue_ = trim(ele->Attribute("value"));
+                dm.mapName_ = trim(ele->Attribute("name"));
                 if (ele->Attribute("desc"))
                 {
-                    dm._desc = ele->Attribute("desc");
+                    dm.desc_ = ele->Attribute("desc");
                 }
                 AnyData info;
-                info._type = GT_DataMap;
-                info._map = dm;
+                info.type_ = GT_DataMap;
+                info.map_ = dm;
                 anydata.push_back(info);
             }
             //结构体类型
@@ -239,29 +239,29 @@ std::list<AnyData> parseProto(std::string fileName, ParseCache & cache)
                 {
                     E("Attribute Error. ");
                 }
-                dp._struct._name = ele->Attribute("name");
+                dp.struct_.name_ = ele->Attribute("name");
                 if (ele->Attribute("desc"))
                 {
-                    dp._struct._desc = ele->Attribute("desc");
+                    dp.struct_.desc_ = ele->Attribute("desc");
                 }
                 if (ele->Attribute("store"))
                 {
                     if (compareStringIgnCase(ele->Attribute("store"), "InnoDB"))
                     {
-                        dp._struct._store = "InnoDB";
+                        dp.struct_.store_ = "InnoDB";
                     }
                     else
                     {
-                        dp._struct._store = "MyISAM";
+                        dp.struct_.store_ = "MyISAM";
                     }
                     
                 }
-                dp._struct._hadLog4z = hadLog4z;
+                dp.struct_.hadLog4z_ = hadLog4z;
 
-                dp._const._type = ProtoIDType;
-                dp._const._name = dp._struct._name;
-                dp._const._desc = dp._struct._desc;
-                dp._const._value = toString(cache.genProtoID(dp._struct._name, minProtoID, maxProtoID));
+                dp.const_.type_ = ProtoIDType;
+                dp.const_.name_ = dp.struct_.name_;
+                dp.const_.desc_ = dp.struct_.desc_;
+                dp.const_.value_ = toString(cache.genProtoID(dp.struct_.name_, minProtoID, maxProtoID));
 
                 XMLElement * member = ele->FirstChildElement("member");
                 do
@@ -275,9 +275,9 @@ std::list<AnyData> parseProto(std::string fileName, ParseCache & cache)
                     {
                         E("Attribute Error. ");
                     }
-                    dm._type = trim(member->Attribute("type"));
-                    dm._name = trim(member->Attribute("name"));
-                    dm._tag = MT_NORMAL;
+                    dm.type_ = trim(member->Attribute("type"));
+                    dm.name_ = trim(member->Attribute("name"));
+                    dm.tag_ = MT_NORMAL;
                     if (member->Attribute("tag"))
                     {
                         std::string tagText = member->Attribute("tag");
@@ -286,27 +286,27 @@ std::list<AnyData> parseProto(std::string fileName, ParseCache & cache)
                         {
                             if (compareStringIgnCase(tag, "key"))
                             {
-                                dm._tag = setBitFlag(dm._tag, MT_DB_KEY);
+                                dm.tag_ = setBitFlag(dm.tag_, MT_DB_KEY);
                             }
                             else if (compareStringIgnCase(tag, "uni"))
                             {
-                                dm._tag = setBitFlag(dm._tag, MT_DB_UNI);
+                                dm.tag_ = setBitFlag(dm.tag_, MT_DB_UNI);
                             }
                             else if (compareStringIgnCase(tag, "idx"))
                             {
-                                dm._tag = setBitFlag(dm._tag, MT_DB_IDX);
+                                dm.tag_ = setBitFlag(dm.tag_, MT_DB_IDX);
                             }
                             else if (compareStringIgnCase(tag, "auto"))
                             {
-                                dm._tag = setBitFlag(dm._tag, MT_DB_AUTO);
+                                dm.tag_ = setBitFlag(dm.tag_, MT_DB_AUTO);
                             }
                             else if (compareStringIgnCase(tag, "ignore"))
                             {
-                                dm._tag = setBitFlag(dm._tag, MT_DB_IGNORE);
+                                dm.tag_ = setBitFlag(dm.tag_, MT_DB_IGNORE);
                             }
                             else if (compareStringIgnCase(tag, "blob"))
                             {
-                                dm._tag = setBitFlag(dm._tag, MT_DB_BLOB);
+                                dm.tag_ = setBitFlag(dm.tag_, MT_DB_BLOB);
                             }
                             else
                             {
@@ -317,16 +317,16 @@ std::list<AnyData> parseProto(std::string fileName, ParseCache & cache)
 
                     if (member->Attribute("desc"))
                     {
-                        dm._desc = member->Attribute("desc");
+                        dm.desc_ = member->Attribute("desc");
                     }
-                    dp._struct._members.push_back(dm);
+                    dp.struct_.members_.push_back(dm);
                     member = member->NextSiblingElement("member");
 
                 } while (true);
 
                 AnyData info;
-                info._type = GT_DataPacket;
-                info._proto = dp;
+                info.type_ = GT_DataPacket;
+                info.proto_ = dp;
                 anydata.push_back(info);
             }
             
@@ -337,15 +337,15 @@ std::list<AnyData> parseProto(std::string fileName, ParseCache & cache)
 
     for (auto &info : anydata)
     {
-        if (info._type != GT_DataPacket)
+        if (info.type_ != GT_DataPacket)
         {
             continue;
         }
         int curTagIndex = 0;
-//        info._proto._struct._tag = 0;
-        for (const auto & m : info._proto._struct._members)
+//        info.proto_.struct_.tag_ = 0;
+        for (const auto & m : info.proto_.struct_.members_)
         {
-//            info._proto._struct._tag |= (1ULL << curTagIndex);
+//            info.proto_.struct_.tag_ |= (1ULL << curTagIndex);
             curTagIndex++;
         }
     }

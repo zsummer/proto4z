@@ -22,7 +22,7 @@ GenBase::~GenBase()
 void GenBase::init(std::string fileName, SupportLanguageType t)
 {
     _filename = fileName;
-    _type = t;
+    type_ = t;
     std::string path = SupportLanguageFilePath[t];
     if (!isDirectory(path) && !createDirectory(path))
     {
@@ -69,10 +69,10 @@ std::string GenBase::genRealContent(const std::list<AnyData> & stores)
 
 void GenBase::write(const std::string & content)
 {
-    std::string filename = SupportLanguageFilePath[_type];
+    std::string filename = SupportLanguageFilePath[type_];
     filename += "/";
     filename += _filename;
-    filename += SupportLanguageFileSuffix[_type];
+    filename += SupportLanguageFileSuffix[type_];
     if (writeFileContent(filename, content.c_str(), content.length(), false) != content.length())
     {
         E("genCppFile open file Error. : " << filename);

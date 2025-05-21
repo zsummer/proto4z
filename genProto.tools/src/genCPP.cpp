@@ -34,31 +34,31 @@ std::string GenCPP::getRealType(const std::string & xmltype)
 
 std::string getMysqlType(const DataStruct::DataMember & m)
 {
-    if (m._type == "string" && getBitFlag(m._tag, MT_DB_BLOB))
+    if (m.type_ == "string" && getBitFlag(m.tag_, MT_DB_BLOB))
     {
         return " longblob NOT NULL ";
     }
-    else if (m._type == "string")
+    else if (m.type_ == "string")
     {
         return " varchar(255) NOT NULL DEFAULT '' ";
     }
-    else if (m._type == "i8" || m._type == "i16" || m._type == "i32" || m._type == "i64")
+    else if (m.type_ == "i8" || m.type_ == "i16" || m.type_ == "i32" || m.type_ == "i64")
     {
-        if (getBitFlag(m._tag, MT_DB_AUTO))
+        if (getBitFlag(m.tag_, MT_DB_AUTO))
         {
             return " bigint(20) NOT NULL AUTO_INCREMENT ";
         }
         return " bigint(20) NOT NULL DEFAULT '0' ";
     }
-    else if (m._type == "ui8" || m._type == "ui16" || m._type == "ui32" || m._type == "ui64")
+    else if (m.type_ == "ui8" || m.type_ == "ui16" || m.type_ == "ui32" || m.type_ == "ui64")
     {
-        if (getBitFlag(m._tag, MT_DB_AUTO))
+        if (getBitFlag(m.tag_, MT_DB_AUTO))
         {
             return " bigint(20) unsigned NOT NULL AUTO_INCREMENT ";
         }
         return " bigint(20) unsigned NOT NULL DEFAULT '0' ";
     }
-    else if (m._type == "float" || m._type == "double")
+    else if (m.type_ == "float" || m.type_ == "double")
     {
         return " double NOT NULL DEFAULT '0' ";
     }
@@ -77,35 +77,35 @@ std::string GenCPP::genRealContent(const std::list<AnyData> & stores)
 
     for (auto &info : stores)
     {
-        if (info._type == GT_DataComment)
+        if (info.type_ == GT_DataComment)
         {
             text += LFCR;
-            text += "/*" + info._comment._desc + "*/" + LFCR;
+            text += "/*" + info._comment.desc_ + "*/" + LFCR;
         }
-        else if (info._type == GT_DataConstValue)
+        else if (info.type_ == GT_DataConstValue)
         {
             text += LFCR;
-            text += genDataConst(info._const);
+            text += genDataConst(info.const_);
         }
-        else if (info._type == GT_DataEnum)
+        else if (info.type_ == GT_DataEnum)
         {
             text += LFCR;
-            text += genDataEnum(info._enum);
+            text += genDataEnum(info.enum_);
         }
-        else if (info._type == GT_DataArray)
+        else if (info.type_ == GT_DataArray)
         {
             text += LFCR;
-            text += genDataArray(info._array);
+            text += genDataArray(info.array_);
         }
-        else if (info._type == GT_DataMap)
+        else if (info.type_ == GT_DataMap)
         {
             text += LFCR;
-            text += genDataMap(info._map);
+            text += genDataMap(info.map_);
         }
-        else if (info._type == GT_DataPacket)
+        else if (info.type_ == GT_DataPacket)
         {
             text += LFCR;
-            text += genDataPacket(info._proto);
+            text += genDataPacket(info.proto_);
         }
 
     }
@@ -118,10 +118,10 @@ std::string GenCPP::genRealContent(const std::list<AnyData> & stores)
 std::string GenCPP::genDataConst(const DataConstValue & dc)
 {
     std::string text;
-    text += "const " + getRealType(dc._type) + " " + dc._name + " = " + dc._value + "; ";
-    if (!dc._desc.empty())
+    text += "const " + getRealType(dc.type_) + " " + dc.name_ + " = " + dc.value_ + "; ";
+    if (!dc.desc_.empty())
     {
-        text += "//" + dc._desc + " ";
+        text += "//" + dc.desc_ + " ";
     }
     text += LFCR;
     return text;
@@ -129,14 +129,14 @@ std::string GenCPP::genDataConst(const DataConstValue & dc)
 std::string GenCPP::genDataEnum(const DataEnum & de)
 {
     std::string text;
-    text += "enum " + de._name + " : " + getRealType(de._type) + LFCR;
+    text += "enum " + de.name_ + " : " + getRealType(de.type_) + LFCR;
     text += "{" + LFCR;
-    for (auto m : de._members)
+    for (auto m : de.members_)
     {
-        text += "    " + m._name + " = " + m._value + ", ";
-        if (!m._desc.empty())
+        text += "    " + m.name_ + " = " + m.value_ + ", ";
+        if (!m.desc_.empty())
         {
-            text += "//" + m._desc + " ";
+            text += "//" + m.desc_ + " ";
         }
         text += LFCR;
     }
@@ -146,10 +146,10 @@ std::string GenCPP::genDataEnum(const DataEnum & de)
 std::string GenCPP::genDataArray(const DataArray & da)
 {
     std::string text;
-    text += LFCR + "typedef std::vector<" + getRealType(da._type) + "> " + da._arrayName + "; ";
-    if (!da._desc.empty())
+    text += LFCR + "typedef std::vector<" + getRealType(da.type_) + "> " + da.arrayName_ + "; ";
+    if (!da.desc_.empty())
     {
-        text += "//" + da._desc + " ";
+        text += "//" + da.desc_ + " ";
     }
     text += LFCR;
     return text;
@@ -158,11 +158,11 @@ std::string GenCPP::genDataMap(const DataMap & dm)
 {
     std::string text;
     text += LFCR + "typedef std::map<"
-        + getRealType(dm._typeKey) + ", " + getRealType(dm._typeValue)
-        + "> " + dm._mapName + "; ";
-    if (!dm._desc.empty())
+        + getRealType(dm.typeKey_) + ", " + getRealType(dm.typeValue_)
+        + "> " + dm.mapName_ + "; ";
+    if (!dm.desc_.empty())
     {
-        text += "//" + dm._desc + " ";
+        text += "//" + dm.desc_ + " ";
     }
     text += LFCR;
     return text;
@@ -172,18 +172,18 @@ std::string GenCPP::genDataPacket(const DataPacket & dp)
     std::string text;
 
     //write struct
-    text += "struct " + dp._struct._name;
-    if (!dp._struct._desc.empty())
+    text += "struct " + dp.struct_.name_;
+    if (!dp.struct_.desc_.empty())
     {
-        text += " //" + dp._struct._desc + " ";
+        text += " //" + dp.struct_.desc_ + " ";
     }
     text += LFCR;
     text += "{" + LFCR;
 
-    std::string dbtable = "`tb_" + dp._struct._name + "`";
-    text += std::string("    static const ") + getRealType(ProtoIDType) + " getProtoID() { return " + dp._const._value + ";}" + LFCR;
-    text += std::string("    static const ") + getRealType("string") + " getProtoName() { return \"" + dp._struct._name + "\";}" + LFCR;
-    if (!dp._struct._store.empty())
+    std::string dbtable = "`tb_" + dp.struct_.name_ + "`";
+    text += std::string("    static const ") + getRealType(ProtoIDType) + " getProtoID() { return " + dp.const_.value_ + ";}" + LFCR;
+    text += std::string("    static const ") + getRealType("string") + " getProtoName() { return \"" + dp.struct_.name_ + "\";}" + LFCR;
+    if (!dp.struct_.store_.empty())
     {
         text += "    inline std::vector<std::string>  getDBBuild();" + LFCR;
         text += "    inline std::string  getDBInsert();" + LFCR;
@@ -194,123 +194,123 @@ std::string GenCPP::genDataPacket(const DataPacket & dp)
         text += "    inline bool fetchFromDBResult(zsummer::mysql::DBResult &result);" + LFCR;
     }
 
-    for (const auto & m : dp._struct._members)
+    for (const auto & m : dp.struct_.members_)
     {
-        text += "    " + getRealType(m._type) + " " + m._name + "; ";
-        if (!m._desc.empty())
+        text += "    " + getRealType(m.type_) + " " + m.name_ + "; ";
+        if (!m.desc_.empty())
         {
-            text += "//" + m._desc + " ";
+            text += "//" + m.desc_ + " ";
         }
         text += LFCR;
     }
 
-    if (!dp._struct._members.empty())
+    if (!dp.struct_.members_.empty())
     {    //struct init
-        text += "    " + dp._struct._name + "()" + LFCR;
+        text += "    " + dp.struct_.name_ + "()" + LFCR;
         text += "    {" + LFCR;
-        for (const auto &m : dp._struct._members)
+        for (const auto &m : dp.struct_.members_)
         {
-            std::string def = getTypeDefault(m._type);
+            std::string def = getTypeDefault(m.type_);
             if (!def.empty())
             {
-                text += "        " + m._name + " = " + def + ";" + LFCR;
+                text += "        " + m.name_ + " = " + def + ";" + LFCR;
             }
         }
         text += "    }" + LFCR;
     }
 
-    if (!dp._struct._members.empty())
+    if (!dp.struct_.members_.empty())
     {    //struct init
-        text += "    " + dp._struct._name + "(";
-        for (size_t i = 0; i < dp._struct._members.size(); i++)
+        text += "    " + dp.struct_.name_ + "(";
+        for (size_t i = 0; i < dp.struct_.members_.size(); i++)
         {
-            const auto & m = dp._struct._members[i];
+            const auto & m = dp.struct_.members_[i];
             if (i != 0) text += ", ";
-            text += "const " + getRealType(m._type) + " & " + m._name;
+            text += "const " + getRealType(m.type_) + " & " + m.name_;
         }
         text += ")" + LFCR;
         text += "    {" + LFCR;
-        for (const auto &m : dp._struct._members)
+        for (const auto &m : dp.struct_.members_)
         {
-            text += "        this->" + m._name + " = " + m._name + ";" + LFCR;
+            text += "        this->" + m.name_ + " = " + m.name_ + ";" + LFCR;
         }
         text += "    }" + LFCR;
     }
     text += "};" + LFCR;
 
-    if (!dp._struct._store.empty())
+    if (!dp.struct_.store_.empty())
     {
         //build
         text += LFCR;
-        text += "std::vector<std::string>  " + dp._struct._name + "::getDBBuild()" + LFCR;
+        text += "std::vector<std::string>  " + dp.struct_.name_ + "::getDBBuild()" + LFCR;
         text += "{" + LFCR;
         text += "    std::vector<std::string> ret;" + LFCR;
 //        text += "    ret.push_back(\"desc " + dbtable + "\");" + LFCR;
         text += "    ret.push_back(\"CREATE TABLE IF NOT EXISTS " + dbtable + " (";
-        for (const auto &m : dp._struct._members)
+        for (const auto &m : dp.struct_.members_)
         {
-            if (m._tag != 0 && !getBitFlag(m._tag, MT_DB_IGNORE)) text += "        `" + m._name + "`" + getMysqlType(m) + ",";
+            if (m.tag_ != 0 && !getBitFlag(m.tag_, MT_DB_IGNORE)) text += "        `" + m.name_ + "`" + getMysqlType(m) + ",";
         }
         if (true)
         {
             std::string primaryKey;
-            for(const auto &m : dp._struct._members)
+            for(const auto &m : dp.struct_.members_)
             {
-                if (getBitFlag(m._tag, MT_DB_KEY)) mergeToString(primaryKey, ",", std::string("`") + m._name + "`");
+                if (getBitFlag(m.tag_, MT_DB_KEY)) mergeToString(primaryKey, ",", std::string("`") + m.name_ + "`");
             }
             if (!primaryKey.empty())
             {
                 text += "        PRIMARY KEY(";
                 text += primaryKey + "),";
             }
-            for (const auto &m : dp._struct._members)
+            for (const auto &m : dp.struct_.members_)
             {
-                if (getBitFlag(m._tag, MT_DB_UNI))
+                if (getBitFlag(m.tag_, MT_DB_UNI))
                 {
                     text += "        UNIQUE KEY `";
-                    text += m._name + "` (`" + m._name + "`),";
+                    text += m.name_ + "` (`" + m.name_ + "`),";
                 }
-                else if (getBitFlag(m._tag, MT_DB_IDX))
+                else if (getBitFlag(m.tag_, MT_DB_IDX))
                 {
                     text += "        KEY `";
-                    text += m._name + "` (`" + m._name + "`),";
+                    text += m.name_ + "` (`" + m.name_ + "`),";
                 }
             }
         }
         if (text.back() == ',') text.pop_back();
-        text += " ) ENGINE = " + dp._struct._store + " DEFAULT CHARSET = utf8\");" + LFCR;
+        text += " ) ENGINE = " + dp.struct_.store_ + " DEFAULT CHARSET = utf8\");" + LFCR;
 
-        for (auto& m : dp._struct._members)
+        for (auto& m : dp.struct_.members_)
         {
-            if (m._tag == 0 || !getBitFlag(m._tag, MT_DB_IGNORE))
+            if (m.tag_ == 0 || !getBitFlag(m.tag_, MT_DB_IGNORE))
             {
-                text += "    ret.push_back(\"alter table `tb_" + dp._struct._name + "` add `" + m._name + "` " + getMysqlType(m) + "\");" + LFCR;
-                text += "    ret.push_back(\"alter table `tb_" + dp._struct._name + "` change `" + m._name + "` " + " `" + m._name + "` " + getMysqlType(m) + "\");" + LFCR;
+                text += "    ret.push_back(\"alter table `tb_" + dp.struct_.name_ + "` add `" + m.name_ + "` " + getMysqlType(m) + "\");" + LFCR;
+                text += "    ret.push_back(\"alter table `tb_" + dp.struct_.name_ + "` change `" + m.name_ + "` " + " `" + m.name_ + "` " + getMysqlType(m) + "\");" + LFCR;
             }
         }
         text += "    return ret;" + LFCR;
         text += "}" + LFCR;
 
         //select
-        text += "std::string  " + dp._struct._name + "::getDBSelect()" + LFCR;
+        text += "std::string  " + dp.struct_.name_ + "::getDBSelect()" + LFCR;
         text += "{" + LFCR;
         text += "    zsummer::mysql::DBQuery q;" + LFCR;
         text += "    q.init(\"select ";
-        for (auto& m : dp._struct._members)
+        for (auto& m : dp.struct_.members_)
         {
-            if (!getBitFlag(m._tag, MT_DB_IGNORE))
+            if (!getBitFlag(m.tag_, MT_DB_IGNORE))
             {
-                text += "`" + m._name + "`";
+                text += "`" + m.name_ + "`";
                 text += ",";
             }
         }
         if (text.back() == ',') text.pop_back();
         text += " from " + dbtable + " where ";
-        for (auto& m : dp._struct._members)
+        for (auto& m : dp.struct_.members_)
         {
-            if (getBitFlag(m._tag, MT_DB_KEY))
+            if (getBitFlag(m.tag_, MT_DB_KEY))
             {
-                text += "`" + m._name + "` = ? and ";
+                text += "`" + m.name_ + "` = ? and ";
             }
         }
         if (text.back() == ' ' && text.at(text.length() - 2) == 'd' && text.at(text.length() - 3) == 'n' && text.at(text.length() - 4) == 'a')
@@ -321,25 +321,25 @@ std::string GenCPP::genDataPacket(const DataPacket & dp)
             text.pop_back();
         }
         text += "\");" + LFCR;
-        for (auto& m : dp._struct._members)
+        for (auto& m : dp.struct_.members_)
         {
-            if (getBitFlag(m._tag, MT_DB_KEY))
+            if (getBitFlag(m.tag_, MT_DB_KEY))
             {
-                text += "    q << this->" + m._name + ";" + LFCR;
+                text += "    q << this->" + m.name_ + ";" + LFCR;
             }
         }
         text += "    return q.pickSQL();" + LFCR;
         text += "}" + LFCR;
 
         //select pure
-        text += "std::string  " + dp._struct._name + "::getDBSelectPure()" + LFCR;
+        text += "std::string  " + dp.struct_.name_ + "::getDBSelectPure()" + LFCR;
         text += "{" + LFCR;
         text += "    return \"select ";
-        for (auto& m : dp._struct._members)
+        for (auto& m : dp.struct_.members_)
         {
-            if (!getBitFlag(m._tag, MT_DB_IGNORE))
+            if (!getBitFlag(m.tag_, MT_DB_IGNORE))
             {
-                text += "`" + m._name + "`";
+                text += "`" + m.name_ + "`";
                 text += ",";
             }
         }
@@ -349,50 +349,50 @@ std::string GenCPP::genDataPacket(const DataPacket & dp)
 
 
         //insert
-        text += "std::string  " + dp._struct._name + "::getDBInsert()" + LFCR;
+        text += "std::string  " + dp.struct_.name_ + "::getDBInsert()" + LFCR;
         text += "{" + LFCR;
         text += "    zsummer::mysql::DBQuery q;" + LFCR;
         text += "    q.init(\"insert into " + dbtable + "(";
-        for (auto& m : dp._struct._members)
+        for (auto& m : dp.struct_.members_)
         {
-            if (!getBitFlag(m._tag, MT_DB_IGNORE)  && !getBitFlag(m._tag, MT_DB_AUTO))
+            if (!getBitFlag(m.tag_, MT_DB_IGNORE)  && !getBitFlag(m.tag_, MT_DB_AUTO))
             {
-                text += "`" + m._name + "`";
+                text += "`" + m.name_ + "`";
                 text += ",";
             }
         }
         if (text.back() == ',') text.pop_back();
         text += ") values(";
-        for (auto& m : dp._struct._members)
+        for (auto& m : dp.struct_.members_)
         {
-            if (!getBitFlag(m._tag, MT_DB_IGNORE) && !getBitFlag(m._tag, MT_DB_AUTO))
+            if (!getBitFlag(m.tag_, MT_DB_IGNORE) && !getBitFlag(m.tag_, MT_DB_AUTO))
             {
                 text += "?,";
             }
         }
         if (text.back() == ',') text.pop_back();
         text += ")\");" + LFCR;
-        for (auto& m : dp._struct._members)
+        for (auto& m : dp.struct_.members_)
         {
-            if (!getBitFlag(m._tag, MT_DB_IGNORE) && !getBitFlag(m._tag, MT_DB_AUTO))
+            if (!getBitFlag(m.tag_, MT_DB_IGNORE) && !getBitFlag(m.tag_, MT_DB_AUTO))
             {
-                if (m._type == "ui8" || m._type == "ui16" || m._type == "ui32" || m._type == "ui64"
-                    || m._type == "i8" || m._type == "i16" || m._type == "i32" || m._type == "i64"
-                    || m._type == "double" || m._type == "float" || m._type == "string")
+                if (m.type_ == "ui8" || m.type_ == "ui16" || m.type_ == "ui32" || m.type_ == "ui64"
+                    || m.type_ == "i8" || m.type_ == "i16" || m.type_ == "i32" || m.type_ == "i64"
+                    || m.type_ == "double" || m.type_ == "float" || m.type_ == "string")
                 {
-                    text += "    q << this->" + m._name + ";" + LFCR;
+                    text += "    q << this->" + m.name_ + ";" + LFCR;
                 }
                 else
                 {
                     text += "    try" + LFCR;
                     text += "    {" + LFCR;
                     text += "        "  "zsummer::proto4z::WriteStream ws(0);" + LFCR;
-                    text += "        "  "ws <<  this->" + m._name + ";" + LFCR;
+                    text += "        "  "ws <<  this->" + m.name_ + ";" + LFCR;
                     text += "        "  "q.add(ws.getStreamBody(), ws.getStreamBodyLen());" + LFCR;
                     text += "    }" + LFCR;
                     text += "    catch(const std::exception & e)" + LFCR;
                     text += "    {" + LFCR;
-                    text += "        "  "LOGW(\"catch one except error when insert " + dp._struct._name + "." + m._name + " error=\" << e.what());" + LFCR;
+                    text += "        "  "LOGW(\"catch one except error when insert " + dp.struct_.name_ + "." + m.name_ + " error=\" << e.what());" + LFCR;
                     text += "    }" + LFCR;
                 }
                 
@@ -402,92 +402,92 @@ std::string GenCPP::genDataPacket(const DataPacket & dp)
         text += "}" + LFCR;
 
         //delete
-        text += "std::string  " + dp._struct._name + "::getDBDelete()" + LFCR;
+        text += "std::string  " + dp.struct_.name_ + "::getDBDelete()" + LFCR;
         text += "{" + LFCR;
         text += "    zsummer::mysql::DBQuery q;" + LFCR;
         text += "    q.init(\"delete from " + dbtable + " where ";
-        for (auto& m : dp._struct._members)
+        for (auto& m : dp.struct_.members_)
         {
-            if (getBitFlag(m._tag, MT_DB_KEY))
+            if (getBitFlag(m.tag_, MT_DB_KEY))
             {
-                text += "`" + m._name + "` = ?,";
+                text += "`" + m.name_ + "` = ?,";
             }
         }
         if (text.back() == ',') text.pop_back();
         text += " \");" + LFCR;
-        for (auto& m : dp._struct._members)
+        for (auto& m : dp.struct_.members_)
         {
-            if (getBitFlag(m._tag, MT_DB_KEY))
+            if (getBitFlag(m.tag_, MT_DB_KEY))
             {
-                text += "    q << this->" + m._name + ";" + LFCR;
+                text += "    q << this->" + m.name_ + ";" + LFCR;
             }
         }
         text += "    return q.pickSQL();" + LFCR;
         text += "}" + LFCR;
 
         //update
-        text += "std::string  " + dp._struct._name + "::getDBUpdate()" + LFCR;
+        text += "std::string  " + dp.struct_.name_ + "::getDBUpdate()" + LFCR;
         text += "{" + LFCR;
         text += "    zsummer::mysql::DBQuery q;" + LFCR;
         text += "    q.init(\"insert into " + dbtable + "(";
-        for (auto& m : dp._struct._members)
+        for (auto& m : dp.struct_.members_)
         {
-            if (getBitFlag(m._tag, MT_DB_KEY))
+            if (getBitFlag(m.tag_, MT_DB_KEY))
             {
-                text += m._name;
+                text += m.name_;
                 text += ",";
             }
         }
         if (text.back() == ',') text.pop_back();
         text += ") values(";
-        for (auto& m : dp._struct._members)
+        for (auto& m : dp.struct_.members_)
         {
-            if (getBitFlag(m._tag, MT_DB_KEY))
+            if (getBitFlag(m.tag_, MT_DB_KEY))
             {
                 text += "?,";
             }
         }
         if (text.back() == ',') text.pop_back();
         text += " ) on duplicate key update ";
-        for (auto& m : dp._struct._members)
+        for (auto& m : dp.struct_.members_)
         {
-            if (!getBitFlag(m._tag, MT_DB_KEY) && !getBitFlag(m._tag, MT_DB_IGNORE) && !getBitFlag(m._tag, MT_DB_AUTO))
+            if (!getBitFlag(m.tag_, MT_DB_KEY) && !getBitFlag(m.tag_, MT_DB_IGNORE) && !getBitFlag(m.tag_, MT_DB_AUTO))
             {
-                text += "`" + m._name + "` = ?,";
+                text += "`" + m.name_ + "` = ?,";
             }
         }
         if (text.back() == ',') text.pop_back();
         text += " \");" + LFCR;
 
-        for (auto& m : dp._struct._members)
+        for (auto& m : dp.struct_.members_)
         {
-            if (getBitFlag(m._tag, MT_DB_KEY))
+            if (getBitFlag(m.tag_, MT_DB_KEY))
             {
-                text += "    q << this->" + m._name + ";" + LFCR;
+                text += "    q << this->" + m.name_ + ";" + LFCR;
             }
         }
 
-        for (auto& m : dp._struct._members)
+        for (auto& m : dp.struct_.members_)
         {
-            if (!getBitFlag(m._tag, MT_DB_KEY) && !getBitFlag(m._tag, MT_DB_IGNORE) && !getBitFlag(m._tag, MT_DB_AUTO))
+            if (!getBitFlag(m.tag_, MT_DB_KEY) && !getBitFlag(m.tag_, MT_DB_IGNORE) && !getBitFlag(m.tag_, MT_DB_AUTO))
             {
-                if (m._type == "ui8" || m._type == "ui16" || m._type == "ui32" || m._type == "ui64"
-                    || m._type == "i8" || m._type == "i16" || m._type == "i32" || m._type == "i64"
-                    || m._type == "double" || m._type == "float" || m._type == "string")
+                if (m.type_ == "ui8" || m.type_ == "ui16" || m.type_ == "ui32" || m.type_ == "ui64"
+                    || m.type_ == "i8" || m.type_ == "i16" || m.type_ == "i32" || m.type_ == "i64"
+                    || m.type_ == "double" || m.type_ == "float" || m.type_ == "string")
                 {
-                    text += "    q << this->" + m._name + ";" + LFCR;
+                    text += "    q << this->" + m.name_ + ";" + LFCR;
                 }
                 else
                 {
                     text += "    try" + LFCR;
                     text += "    {" + LFCR;
                     text += "        "  "zsummer::proto4z::WriteStream ws(0);" + LFCR;
-                    text += "        "  "ws <<  this->" + m._name + ";" + LFCR;
+                    text += "        "  "ws <<  this->" + m.name_ + ";" + LFCR;
                     text += "        "  "q.add(ws.getStreamBody(), ws.getStreamBodyLen());" + LFCR;
                     text += "    }" + LFCR;
                     text += "    catch(const std::exception & e)" + LFCR;
                     text += "    {" + LFCR;
-                    text += "        "  "LOGW(\"catch one except error when update " + dp._struct._name + "." + m._name + " error=\" << e.what());" + LFCR;
+                    text += "        "  "LOGW(\"catch one except error when update " + dp.struct_.name_ + "." + m.name_ + " error=\" << e.what());" + LFCR;
                     text += "    }" + LFCR;
                 }
                 
@@ -497,11 +497,11 @@ std::string GenCPP::genDataPacket(const DataPacket & dp)
         text += "}" + LFCR;
 
         //fetch
-        text += "bool " + dp._struct._name + "::fetchFromDBResult(zsummer::mysql::DBResult &result)" + LFCR;
+        text += "bool " + dp.struct_.name_ + "::fetchFromDBResult(zsummer::mysql::DBResult &result)" + LFCR;
         text += "{" + LFCR;
         text += "    if (result.getErrorCode() != zsummer::mysql::QEC_SUCCESS)" + LFCR;
         text += "    {" + LFCR;
-        text += "        "  "LOGE(\"error fetch " + dp._struct._name + " from table " + dbtable + " . ErrorCode=\"  <<  result.getErrorCode() << \", Error=\" << result.getErrorMsg() << \", sql=\" << result.peekSQL());" + LFCR;
+        text += "        "  "LOGE(\"error fetch " + dp.struct_.name_ + " from table " + dbtable + " . ErrorCode=\"  <<  result.getErrorCode() << \", Error=\" << result.getErrorMsg() << \", sql=\" << result.peekSQL());" + LFCR;
         text += "        "  "return false;" + LFCR;
         text += "    }" + LFCR;
         text += "    try" + LFCR;
@@ -509,17 +509,17 @@ std::string GenCPP::genDataPacket(const DataPacket & dp)
 
         text += "        "  "if (result.haveRow())" + LFCR;
         text += "        {" + LFCR;
-        for (auto& m : dp._struct._members)
+        for (auto& m : dp.struct_.members_)
         {
-            if (getBitFlag(m._tag, MT_DB_IGNORE))
+            if (getBitFlag(m.tag_, MT_DB_IGNORE))
             {
                 continue;
             }
-            if (m._type == "ui8" || m._type == "ui16" || m._type == "ui32" || m._type == "ui64"
-                || m._type == "i8" || m._type == "i16" || m._type == "i32" || m._type == "i64"
-                || m._type == "double" || m._type == "float" || m._type == "string")
+            if (m.type_ == "ui8" || m.type_ == "ui16" || m.type_ == "ui32" || m.type_ == "ui64"
+                || m.type_ == "i8" || m.type_ == "i16" || m.type_ == "i32" || m.type_ == "i64"
+                || m.type_ == "double" || m.type_ == "float" || m.type_ == "string")
             {
-                text += "            result >> this->" + m._name + ";" + LFCR;
+                text += "            result >> this->" + m.name_ + ";" + LFCR;
             }
             else
             {
@@ -530,12 +530,12 @@ std::string GenCPP::genDataPacket(const DataPacket & dp)
                 text += "                "  "if(!blob.empty())" + LFCR;
                 text += "                "  "{" + LFCR;
                 text += "                    "  "zsummer::proto4z::ReadStream rs(blob.c_str(), (zsummer::proto4z::Integer)blob.length(), false);" + LFCR;
-                text += "                    "  "rs >> this->" + m._name + ";" + LFCR;
+                text += "                    "  "rs >> this->" + m.name_ + ";" + LFCR;
                 text += "                "  "}" + LFCR;
                 text += "            }" + LFCR;
                 text += "            catch(const std::exception & e)" + LFCR;
                 text += "            {" + LFCR;
-                text += "                "  "LOGW(\"catch one except error when fetch " + dp._struct._name + "." + m._name + "  from table " + dbtable + " . what=\" << e.what() << \"  ErrorCode=\"  <<  result.getErrorCode() << \", Error=\" << result.getErrorMsg() << \", sql=\" << result.peekSQL());" + LFCR;
+                text += "                "  "LOGW(\"catch one except error when fetch " + dp.struct_.name_ + "." + m.name_ + "  from table " + dbtable + " . what=\" << e.what() << \"  ErrorCode=\"  <<  result.getErrorCode() << \", Error=\" << result.getErrorMsg() << \", sql=\" << result.peekSQL());" + LFCR;
                 text += "            }" + LFCR;
             }
         }
@@ -546,7 +546,7 @@ std::string GenCPP::genDataPacket(const DataPacket & dp)
         text += "    }" + LFCR;
         text += "    catch(const std::exception & e)" + LFCR;
         text += "    {" + LFCR;
-        text += "        "  "LOGE(\"catch one except error when fetch " + dp._struct._name + " from table " + dbtable + " . what=\" << e.what() << \"  ErrorCode=\"  <<  result.getErrorCode() << \", Error=\" << result.getErrorMsg() << \", sql=\" << result.peekSQL());" + LFCR;
+        text += "        "  "LOGE(\"catch one except error when fetch " + dp.struct_.name_ + " from table " + dbtable + " . what=\" << e.what() << \"  ErrorCode=\"  <<  result.getErrorCode() << \", Error=\" << result.getErrorMsg() << \", sql=\" << result.peekSQL());" + LFCR;
         text += "        "  "return false;" + LFCR;
         text += "    }" + LFCR;
 
@@ -558,11 +558,11 @@ std::string GenCPP::genDataPacket(const DataPacket & dp)
 
 
     //input stream operator
-    text += "inline zsummer::proto4z::WriteStream & operator << (zsummer::proto4z::WriteStream & ws, const " + dp._struct._name + " & data)" + LFCR;
+    text += "inline zsummer::proto4z::WriteStream & operator << (zsummer::proto4z::WriteStream & ws, const " + dp.struct_.name_ + " & data)" + LFCR;
     text += "{" + LFCR;
-    for (const auto &m : dp._struct._members)
+    for (const auto &m : dp.struct_.members_)
     {
-        text += "    ws << data." + m._name + "; " + LFCR;
+        text += "    ws << data." + m.name_ + "; " + LFCR;
     }
 
     text += "    return ws;" + LFCR;
@@ -570,26 +570,26 @@ std::string GenCPP::genDataPacket(const DataPacket & dp)
 
 
     //output stream operator
-    text += "inline zsummer::proto4z::ReadStream & operator >> (zsummer::proto4z::ReadStream & rs, " + dp._struct._name + " & data)" + LFCR;
+    text += "inline zsummer::proto4z::ReadStream & operator >> (zsummer::proto4z::ReadStream & rs, " + dp.struct_.name_ + " & data)" + LFCR;
     text += "{" + LFCR;
 
-    for (const auto &m : dp._struct._members)
+    for (const auto &m : dp.struct_.members_)
     {
-        text += "    rs >> data." + m._name + "; " + LFCR;
+        text += "    rs >> data." + m.name_ + "; " + LFCR;
     }
 
     text += "    return rs;" + LFCR;
     text += "}" + LFCR;
 
     //input log4z operator
-    if (dp._struct._hadLog4z)
+    if (dp.struct_.hadLog4z_)
     {
-        text += "inline zsummer::log4z::Log4zStream & operator << (zsummer::log4z::Log4zStream & stm, const " + dp._struct._name + " & info)" + LFCR;
+        text += "inline zsummer::log4z::Log4zStream & operator << (zsummer::log4z::Log4zStream & stm, const " + dp.struct_.name_ + " & info)" + LFCR;
         text += "{" + LFCR;
         text += "    stm << \"[\";" + LFCR;
-        for (const auto &m : dp._struct._members)
+        for (const auto &m : dp.struct_.members_)
         {
-            text += "    stm << \"" + m._name + "=\"" + " << info." + m._name + " << \",\";" + LFCR;
+            text += "    stm << \"" + m.name_ + "=\"" + " << info." + m.name_ + " << \",\";" + LFCR;
         }
         text += "    stm << \"]\";" + LFCR;
         text += "    return stm;" + LFCR;

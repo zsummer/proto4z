@@ -60,30 +60,30 @@ std::string GenCSharp::genRealContent(const std::list<AnyData> & stores)
 
     for (auto &info : stores)
     {
-        if (info._type == GT_DataConstValue)
+        if (info.type_ == GT_DataConstValue)
         {
             text += LFCR;
-            text += genDataConst(info._const);
+            text += genDataConst(info.const_);
         }
-        if (info._type == GT_DataEnum)
+        if (info.type_ == GT_DataEnum)
         {
             text += LFCR;
-            text += genDataEnum(info._enum);
+            text += genDataEnum(info.enum_);
         }
-        else if (info._type == GT_DataArray)
+        else if (info.type_ == GT_DataArray)
         {
             text += LFCR;
-            text += genDataArray(info._array);
+            text += genDataArray(info.array_);
         }
-        else if (info._type == GT_DataMap)
+        else if (info.type_ == GT_DataMap)
         {
             text += LFCR;
-            text += genDataMap(info._map);
+            text += genDataMap(info.map_);
         }
-        else if (info._type == GT_DataPacket)
+        else if (info.type_ == GT_DataPacket)
         {
             text += LFCR;
-            text += genDataPacket(info._proto);
+            text += genDataPacket(info.proto_);
         }
 
     }
@@ -97,14 +97,14 @@ std::string GenCSharp::genRealContent(const std::list<AnyData> & stores)
 std::string GenCSharp::genDataConst(const DataConstValue & dc)
 {
     std::string text;
-    text += "    public class " + dc._name + " ";
-    if (!dc._desc.empty())
+    text += "    public class " + dc.name_ + " ";
+    if (!dc.desc_.empty())
     {
-        text += "//" + dc._desc + " ";
+        text += "//" + dc.desc_ + " ";
     }
     text += LFCR;
     text += "    {" + LFCR;
-    text += "        public const " + getCSharpType(dc._type).realType + " value = " + dc._value + "; " + LFCR;
+    text += "        public const " + getCSharpType(dc.type_).realType + " value = " + dc.value_ + "; " + LFCR;
     text += "    }" + LFCR;
     return text;
 }
@@ -112,14 +112,14 @@ std::string GenCSharp::genDataConst(const DataConstValue & dc)
 std::string GenCSharp::genDataEnum(const DataEnum & de)
 {
     std::string text;
-    text += "    public enum " + de._name + " : " + getCSharpType(de._type).realType + LFCR;
+    text += "    public enum " + de.name_ + " : " + getCSharpType(de.type_).realType + LFCR;
     text += "    {" + LFCR;
-    for (auto m : de._members)
+    for (auto m : de.members_)
     {
-        text += "        " + m._name + " = " + m._value + ", ";
-        if (!m._desc.empty())
+        text += "        " + m.name_ + " = " + m.value_ + ", ";
+        if (!m.desc_.empty())
         {
-            text += "//" + m._desc + " ";
+            text += "//" + m.desc_ + " ";
         }
         text += LFCR;
     }
@@ -130,10 +130,10 @@ std::string GenCSharp::genDataEnum(const DataEnum & de)
 std::string GenCSharp::genDataArray(const DataArray & da)
 {
     std::string text;
-    text += LFCR + "    public class " + da._arrayName + " : System.Collections.Generic.List<" + getCSharpType(da._type).realType + ">, Proto4z.IProtoObject ";
-    if (!da._desc.empty())
+    text += LFCR + "    public class " + da.arrayName_ + " : System.Collections.Generic.List<" + getCSharpType(da.type_).realType + ">, Proto4z.IProtoObject ";
+    if (!da.desc_.empty())
     {
-        text += "//" + da._desc + " ";
+        text += "//" + da.desc_ + " ";
     }
     text += LFCR;
     text += "    {" + LFCR;
@@ -144,9 +144,9 @@ std::string GenCSharp::genDataArray(const DataArray & da)
     text += "            "   "ret.AddRange(Proto4z.BaseProtoObject.encodeI32(len));" + LFCR;
     text += "            "   "for (int i = 0; i < this.Count; i++ )" + LFCR;
     text += "            "   "{" + LFCR;
-    if (getCSharpType(da._type).isBase)
+    if (getCSharpType(da.type_).isBase)
     {
-        text += "                "  "ret.AddRange(" + getCSharpType(da._type).baseEncode + "(this[i])); " + LFCR;
+        text += "                "  "ret.AddRange(" + getCSharpType(da.type_).baseEncode + "(this[i])); " + LFCR;
     }
     else
     {
@@ -164,13 +164,13 @@ std::string GenCSharp::genDataArray(const DataArray & da)
     text += "            "   "{" + LFCR;
     text += "                "  "for (int i=0; i<len; i++)" + LFCR;
     text += "                "   "{" + LFCR;
-    if (getCSharpType(da._type).isBase)
+    if (getCSharpType(da.type_).isBase)
     {
-        text += "                    "  "this.Add(" + getCSharpType(da._type).baseDecode + "(binData, ref pos));" + LFCR;
+        text += "                    "  "this.Add(" + getCSharpType(da.type_).baseDecode + "(binData, ref pos));" + LFCR;
     }
     else
     {
-        text += "                    "  "var data = new " + getCSharpType(da._type).realType + "();" + LFCR;
+        text += "                    "  "var data = new " + getCSharpType(da.type_).realType + "();" + LFCR;
         text += "                    "  "data.__decode(binData, ref pos);" + LFCR;
         text += "                    "  "this.Add(data);" + LFCR;
     }
@@ -186,10 +186,10 @@ std::string GenCSharp::genDataArray(const DataArray & da)
 std::string GenCSharp::genDataMap(const DataMap & dm)
 {
     std::string text;
-    text += LFCR + "    public class " + dm._mapName + " : System.Collections.Generic.Dictionary<" + getCSharpType(dm._typeKey).realType + ", " + getCSharpType(dm._typeValue).realType + ">, Proto4z.IProtoObject ";
-    if (!dm._desc.empty())
+    text += LFCR + "    public class " + dm.mapName_ + " : System.Collections.Generic.Dictionary<" + getCSharpType(dm.typeKey_).realType + ", " + getCSharpType(dm.typeValue_).realType + ">, Proto4z.IProtoObject ";
+    if (!dm.desc_.empty())
     {
-        text += "//" + dm._desc + " ";
+        text += "//" + dm.desc_ + " ";
     }
     text += LFCR;
     text += "    {" + LFCR;
@@ -200,17 +200,17 @@ std::string GenCSharp::genDataMap(const DataMap & dm)
     text += "            "   "ret.AddRange(Proto4z.BaseProtoObject.encodeI32(len));" + LFCR;
     text += "            "   "foreach(var kv in this)" + LFCR;
     text += "            "   "{" + LFCR;
-    if (getCSharpType(dm._typeKey).isBase)
+    if (getCSharpType(dm.typeKey_).isBase)
     {
-        text += "                "   "ret.AddRange(" + getCSharpType(dm._typeKey).baseEncode + "(kv.Key));" + LFCR;
+        text += "                "   "ret.AddRange(" + getCSharpType(dm.typeKey_).baseEncode + "(kv.Key));" + LFCR;
     }
     else
     {
         text += "                "   "ret.AddRange(kv.Key.__encode());" + LFCR;
     }
-    if (getCSharpType(dm._typeValue).isBase)
+    if (getCSharpType(dm.typeValue_).isBase)
     {
-        text += "                "   "ret.AddRange(" + getCSharpType(dm._typeValue).baseEncode + "(kv.Value));" + LFCR;
+        text += "                "   "ret.AddRange(" + getCSharpType(dm.typeValue_).baseEncode + "(kv.Value));" + LFCR;
     }
     else
     {
@@ -228,23 +228,23 @@ std::string GenCSharp::genDataMap(const DataMap & dm)
     text += "            "   "{" + LFCR;
     text += "                "   "for (int i=0; i<len; i++)" + LFCR;
     text += "                "   "{" + LFCR;
-    if (getCSharpType(dm._typeKey).isBase)
+    if (getCSharpType(dm.typeKey_).isBase)
     {
-        text += "                    "   "var key = " + getCSharpType(dm._typeKey).baseDecode + "(binData, ref pos);" + LFCR;
+        text += "                    "   "var key = " + getCSharpType(dm.typeKey_).baseDecode + "(binData, ref pos);" + LFCR;
     }
     else
     {
-        text += "                    "   "var key = new " + getCSharpType(dm._typeKey).realType + "();" + LFCR;
+        text += "                    "   "var key = new " + getCSharpType(dm.typeKey_).realType + "();" + LFCR;
         text += "                    "    "key.__decode(binData, ref pos);" + LFCR;
     }
 
-    if (getCSharpType(dm._typeValue).isBase)
+    if (getCSharpType(dm.typeValue_).isBase)
     {
-        text += "                    "   "var val = " + getCSharpType(dm._typeValue).baseDecode + "(binData, ref pos);" + LFCR;
+        text += "                    "   "var val = " + getCSharpType(dm.typeValue_).baseDecode + "(binData, ref pos);" + LFCR;
     }
     else
     {
-        text += "                    "   "var val = new " + getCSharpType(dm._typeValue).realType + "();" + LFCR;
+        text += "                    "   "var val = new " + getCSharpType(dm.typeValue_).realType + "();" + LFCR;
         text += "                    "    "val.__decode(binData, ref pos);" + LFCR;
     }
     text += "                    "   "this.Add(key, val);" + LFCR;
@@ -260,10 +260,10 @@ std::string GenCSharp::genDataMap(const DataMap & dm)
 std::string GenCSharp::genDataPacket(const DataPacket & dp)
 {
     std::string text;
-    text += "    public class " + dp._struct._name + ": Proto4z.IProtoObject";
-    if (!dp._struct._desc.empty())
+    text += "    public class " + dp.struct_.name_ + ": Proto4z.IProtoObject";
+    if (!dp.struct_.desc_.empty())
     {
-        text += " //" + dp._struct._desc + " ";
+        text += " //" + dp.struct_.desc_ + " ";
     }
     text += LFCR;
     text += "    {    " + LFCR;
@@ -271,55 +271,55 @@ std::string GenCSharp::genDataPacket(const DataPacket & dp)
     //write ProtoID
 
     text += "        " "//proto id  " + LFCR;
-    text += "        " "public const ushort protoID = " + dp._const._value + "; " + LFCR;
-    text += "        " "static public ushort getProtoID() { return " + dp._const._value + "; }" + LFCR;
-    text += "        " "static public string getProtoName() { return \"" + dp._struct._name + "\"; }" + LFCR;
+    text += "        " "public const ushort protoID = " + dp.const_.value_ + "; " + LFCR;
+    text += "        " "static public ushort getProtoID() { return " + dp.const_.value_ + "; }" + LFCR;
+    text += "        " "static public string getProtoName() { return \"" + dp.struct_.name_ + "\"; }" + LFCR;
 
 
     //members
     text += "        " "//members  " + LFCR;
-    for (const auto & m : dp._struct._members)
+    for (const auto & m : dp.struct_.members_)
     {
-        text += "        public " + getCSharpType(m._type).realType + " " + m._name + "; ";
-        if (!m._desc.empty())
+        text += "        public " + getCSharpType(m.type_).realType + " " + m.name_ + "; ";
+        if (!m.desc_.empty())
         {
-            text += "//" + m._desc + " ";
+            text += "//" + m.desc_ + " ";
         }
         text += LFCR;
     }
     //default struct ()
-    text += "        public " + dp._struct._name + "() " + LFCR;
+    text += "        public " + dp.struct_.name_ + "() " + LFCR;
     text += "        {" + LFCR;
-    for (const auto & m : dp._struct._members)
+    for (const auto & m : dp.struct_.members_)
     {
-        text += "            " + m._name + " = ";
-        if (getCSharpType(m._type).isBase)
+        text += "            " + m.name_ + " = ";
+        if (getCSharpType(m.type_).isBase)
         {
-            text += getTypeDefault(m._type);
+            text += getTypeDefault(m.type_);
         }
         else
         {
-            text += "new " + getCSharpType(m._type).realType + "()";
+            text += "new " + getCSharpType(m.type_).realType + "()";
         }
         text += "; " + LFCR;
     }
     text += "        }" + LFCR;
 
     //default struct (....) 
-    if (!dp._struct._members.empty())
+    if (!dp.struct_.members_.empty())
     {
-        text += "        public " + dp._struct._name + "(";
-        for (size_t i = 0; i < dp._struct._members.size(); i ++)
+        text += "        public " + dp.struct_.name_ + "(";
+        for (size_t i = 0; i < dp.struct_.members_.size(); i ++)
         {
-            const auto &m = dp._struct._members[i];
+            const auto &m = dp.struct_.members_[i];
             if (i > 0) text += ", ";
-            text += "" + getCSharpType(m._type).realType + " " + m._name;
+            text += "" + getCSharpType(m.type_).realType + " " + m.name_;
         }
         text += ")" + LFCR;
         text += "        {" + LFCR;
-        for (const auto & m : dp._struct._members)
+        for (const auto & m : dp.struct_.members_)
         {
-            text += "            this." + m._name + " = " + m._name + ";" + LFCR;
+            text += "            this." + m.name_ + " = " + m.name_ + ";" + LFCR;
         }
         text += "        }" + LFCR;
     }
@@ -329,23 +329,23 @@ std::string GenCSharp::genDataPacket(const DataPacket & dp)
     text += "        public System.Collections.Generic.List<byte> __encode()" + LFCR;
     text += "        {" + LFCR;
     text += "            "   "var data = new System.Collections.Generic.List<byte>();" + LFCR;
-    for (const auto &m : dp._struct._members)
+    for (const auto &m : dp.struct_.members_)
     {
         //null
-        if (!getCSharpType(m._type).isBase)
+        if (!getCSharpType(m.type_).isBase)
         {
-            text += "            if (this." + m._name + " == null) this." + m._name + " = new " + m._type + "();" + LFCR;
+            text += "            if (this." + m.name_ + " == null) this." + m.name_ + " = new " + m.type_ + "();" + LFCR;
         }
 
 
         //encode
-        if (getCSharpType(m._type).isBase)
+        if (getCSharpType(m.type_).isBase)
         {
-            text += "            "  "data.AddRange(" + getCSharpType(m._type).baseEncode + "(this." + m._name + "));" + LFCR;
+            text += "            "  "data.AddRange(" + getCSharpType(m.type_).baseEncode + "(this." + m.name_ + "));" + LFCR;
         }
         else
         {
-            text += "            "  "data.AddRange(this." + m._name + ".__encode());" + LFCR;
+            text += "            "  "data.AddRange(this." + m.name_ + ".__encode());" + LFCR;
         }
     }
     text += "            "  "return data;" + LFCR;
@@ -354,16 +354,16 @@ std::string GenCSharp::genDataPacket(const DataPacket & dp)
     //decode
     text += "        public int __decode(byte[] binData, ref int pos)" + LFCR;
     text += "        {" + LFCR;
-    for (const auto &m : dp._struct._members)
+    for (const auto &m : dp.struct_.members_)
     {
-        if (getCSharpType(m._type).isBase)
+        if (getCSharpType(m.type_).isBase)
         {
-            text += "            this." + m._name + " = " + getCSharpType(m._type).baseDecode + "(binData, ref pos);" + LFCR;
+            text += "            this." + m.name_ + " = " + getCSharpType(m.type_).baseDecode + "(binData, ref pos);" + LFCR;
         }
         else
         {
-            text += "            this." + m._name + " = new " + getCSharpType(m._type).realType + "();" + LFCR;
-            text += "            this." + m._name + ".__decode(binData, ref pos);" + LFCR;
+            text += "            this." + m.name_ + " = new " + getCSharpType(m.type_).realType + "();" + LFCR;
+            text += "            this." + m.name_ + ".__decode(binData, ref pos);" + LFCR;
         }
     }
     text += "            return pos;" + LFCR;
