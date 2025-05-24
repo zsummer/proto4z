@@ -1,8 +1,9 @@
 ﻿//! yawei_zhang@foxmail.com
 
 #include <proto4z.h>
-
+#include <unordered_map>
 #include <iostream>
+#include <map>
 #include <time.h>
 #include <stdio.h>
 
@@ -107,6 +108,7 @@ int main()
     catch (const std::exception & e)
     {
         cout << "error:" << e.what() << endl;
+        return -1;
     }
 
     try
@@ -136,6 +138,53 @@ int main()
     catch (const std::exception & e)
     {
         cout << "error:" << e.what() << endl;
+        return -1;
+    }
+
+
+    try
+    {
+        using PairString = std::pair<std::string, std::string>;
+        using PairVector = std::pair<std::vector<PairString>, std::vector<PairString>>;
+        using DequeVector = std::deque<PairVector>;
+        using Map = std::map<std::string, DequeVector>;
+        using UnorderedMap = std::unordered_map<int, Map>;
+
+        PairString ps = std::make_pair("111", "111");
+        std::vector<PairString> vps;
+        vps.push_back(ps);
+        PairVector pv = std::make_pair(vps, vps);
+        DequeVector dv;
+        dv.push_back(pv);
+
+        Map m;
+        m["111"] = dv;
+
+        UnorderedMap um;
+        um[111] = m;
+
+        WriteStream ws(0);
+        ws << um;
+
+        UnorderedMap um2;
+        ReadStream rs(ws.GetStream(), ws.GetStreamLen());
+        rs >> um2;
+        if (um2[111]["111"].at(0).second.at(0).second != "111")
+        {
+            std::cout << "error" << std::endl;
+            return -10;
+        }
+        else
+        {
+            std::cout << "success" << std::endl;
+        }
+        
+
+        
+    }
+    catch (const std::exception&)
+    {
+        return -1;
     }
     
 
